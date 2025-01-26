@@ -224,7 +224,7 @@ object FlashbangEffectRenderer {
         Minecraft.getInstance().soundManager.play(
             SimpleSoundInstance(
                 soundEvent, SoundSource.AMBIENT, SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(), 1f,
-                RandomSource.create(),
+                RandomSource.createNewThreadLocalInstance(),
                 effectData.position.x, effectData.position.y, effectData.position.z
             )
         )

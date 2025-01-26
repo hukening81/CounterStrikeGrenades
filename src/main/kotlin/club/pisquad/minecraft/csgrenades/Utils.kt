@@ -19,7 +19,7 @@ fun getTimeFromTickCount(tickCount: Double): Double {
 }
 
 fun getRandomLocationFromSphere(center: Vec3, radius: Double): Vec3 {
-    val randomSource = RandomSource.create()
+    val randomSource = RandomSource.createNewThreadLocalInstance()
     while (true) {
         val posDelta = Vec3(
             randomSource.nextDouble() * radius * 2 - radius,
@@ -33,7 +33,7 @@ fun getRandomLocationFromSphere(center: Vec3, radius: Double): Vec3 {
 }
 
 fun getRandomLocationFromCircle(center: Vec2, radius: Double): Vec2 {
-    val randomSource = RandomSource.create()
+    val randomSource = RandomSource.createNewThreadLocalInstance()
     while (true) {
         val posDelta = Vec2(
             (randomSource.nextDouble() * radius * 2 - radius).toFloat(),

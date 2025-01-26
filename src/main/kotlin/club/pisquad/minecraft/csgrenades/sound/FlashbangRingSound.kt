@@ -18,7 +18,7 @@ class FlashbangRingSound(
 ) : AbstractTickableSoundInstance(
     ModSoundEvents.FLASHBANG_EXPLOSION_RING.get(),
     SoundSource.MASTER,
-    RandomSource.create(),
+    RandomSource.createNewThreadLocalInstance(),
 ) {
     init {
         this.looping = true

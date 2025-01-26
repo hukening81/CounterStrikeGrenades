@@ -5,10 +5,13 @@ import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrowType
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
+import net.minecraft.client.Minecraft
 import net.minecraft.core.Rotations
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -24,7 +27,7 @@ import java.time.Instant
 private var drawSoundPlayedSlot: Int = -1
 
 
-open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties) {
+open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(1)) {
 
     lateinit var grenadeType: GrenadeType
 
@@ -49,9 +52,6 @@ open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties) {
         val playerSpeedFactor = when (throwType) {
             GrenadeThrowType.Strong -> STRONG_THROW_PLAYER_SPEED_FACTOR
             GrenadeThrowType.Weak -> WEAK_THROW_PLAYER_SPEED_FACTOR
-        }
-        if (!player.isCreative) {
-            player.inventory.getSelected().count -= 1
         }
 
         val speed = player.deltaMovement.scale(playerSpeedFactor)
@@ -82,6 +82,18 @@ object PlayerInteractEventHandler {
         val itemInHand = event.entity.getItemInHand(event.hand).item
         if (itemInHand !is CounterStrikeGrenadeItem) return
 
+        val player = Minecraft.getInstance().player!!
+        if (!player.isCreative) {
+            when (event.hand) {
+                InteractionHand.MAIN_HAND -> {
+                    player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY)
+                }
+
+                InteractionHand.OFF_HAND -> {
+                    player.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY)
+                }
+            }
+        }
 
         when (event) {
             is PlayerInteractEvent.LeftClickBlock, is PlayerInteractEvent.LeftClickEmpty -> {

@@ -66,7 +66,7 @@ class HEGrenadeRenderer(
             SoundSource.AMBIENT,
             SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
             1f,
-            RandomSource.create(),
+            RandomSource.createNewThreadLocalInstance(),
             data.position.x,
             data.position.y,
             data.position.z
@@ -75,7 +75,7 @@ class HEGrenadeRenderer(
 
 
         val particleEngine = Minecraft.getInstance().particleEngine
-        val randomSource = RandomSource.create()
+        val randomSource = RandomSource.createNewThreadLocalInstance()
 
         for (i in 1..1000) {
             particleEngine.createParticle(

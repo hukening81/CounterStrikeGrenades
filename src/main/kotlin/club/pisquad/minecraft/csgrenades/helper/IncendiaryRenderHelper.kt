@@ -102,7 +102,7 @@ private class IncendiaryRenderer(
                 data.position.z.minus(pos.y).toFloat()
             ).length().toDouble()
 
-            val random = RandomSource.create().nextDouble()
+            val random = RandomSource.createNewThreadLocalInstance().nextDouble()
             val particleType = when {
                 random < 0.2 -> ParticleTypes.SMOKE
                 random < 0.5 -> ParticleTypes.FLAME
@@ -125,7 +125,7 @@ private class IncendiaryRenderer(
     private fun drawAirPoppedParticles() {
         val particleEngine = Minecraft.getInstance().particleEngine
         val particleCount = 500
-        val randomSource = RandomSource.create()
+        val randomSource = RandomSource.createNewThreadLocalInstance()
 
         repeat(particleCount) {
             particleEngine.createParticle(
@@ -142,7 +142,7 @@ private class IncendiaryRenderer(
 
     private fun playExplosionSound() {
         val distance = data.position.distanceTo(Minecraft.getInstance().player!!.position())
-        val randomSource = RandomSource.create()
+        val randomSource = RandomSource.createNewThreadLocalInstance()
         val extinguishSoundInstance = SimpleSoundInstance(
             ModSoundEvents.INCENDIARY_EXPLODE.get(),
             SoundSource.AMBIENT,
@@ -158,7 +158,7 @@ private class IncendiaryRenderer(
 
     private fun playExtinguishSound() {
         val distance = data.position.distanceTo(Minecraft.getInstance().player!!.position())
-        val randomSource = RandomSource.create()
+        val randomSource = RandomSource.createNewThreadLocalInstance()
         val extinguishSoundInstance = SimpleSoundInstance(
             ModSoundEvents.INCENDIARY_POP.get(),
             SoundSource.AMBIENT,
@@ -174,7 +174,7 @@ private class IncendiaryRenderer(
 
     private fun playAirPoppedSound() {
         val distance = data.position.distanceTo(Minecraft.getInstance().player!!.position())
-        val randomSource = RandomSource.create()
+        val randomSource = RandomSource.createNewThreadLocalInstance()
         val extinguishSoundInstance = SimpleSoundInstance(
             ModSoundEvents.INCENDIARY_EXPLODE_AIR.get(),
             SoundSource.AMBIENT,
@@ -190,7 +190,7 @@ private class IncendiaryRenderer(
 }
 
 fun getLifetimeFromDistance(distance: Double): Int {
-    val randomSource = RandomSource.create()
+    val randomSource = RandomSource.createNewThreadLocalInstance()
     return (INCENDIARY_RANGE - distance).div(INCENDIARY_LIFETIME).times(INCENDIARY_PARTICLE_LIFETIME)
         .toInt() + randomSource.nextInt(0, 5)
 }
