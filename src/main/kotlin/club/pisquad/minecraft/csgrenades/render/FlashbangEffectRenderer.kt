@@ -23,10 +23,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import java.time.Duration
 import java.time.Instant
-import kotlin.math.PI
-import kotlin.math.acos
-import kotlin.math.max
-import kotlin.math.sqrt
+import kotlin.math.*
 
 
 @OnlyIn(Dist.CLIENT)
@@ -108,6 +105,13 @@ data class FlashbangEffectData(
 
 }
 
+private enum class RenderState {
+    IDLE,
+    AttackStage,
+    SustainStage,
+    DecayStage,
+}
+
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object FlashbangEffectRenderer {
@@ -116,28 +120,41 @@ object FlashbangEffectRenderer {
     private var effectDecay: Int = 0
     private var effectAmount: Int = 0
     private var renderStartTime: Instant = Instant.now()
-    private var rendererActive: Boolean = false
+    private var renderState: RenderState = RenderState.IDLE
 
     fun render(effectData: FlashbangEffectData) {
-        this.renderStartTime = Instant.now()
-        this.rendererActive = true
+        when (this.renderState) {
+            RenderState.IDLE -> {
+                this.renderStartTime = Instant.now()
 
-        this.effectAttack = effectData.effectAttack
-        this.effectSustain = effectData.effectSustain
-        this.effectDecay = effectData.effectDecay
-        this.effectAmount = effectData.effectAmount
+                this.effectAttack = effectData.effectAttack
+                this.effectSustain = effectData.effectSustain
+                this.effectDecay = effectData.effectDecay
+                this.effectAmount = effectData.effectAmount
 
-        MinecraftForge.EVENT_BUS.register(FlashbangEffectRenderer::eventHandler)
+                MinecraftForge.EVENT_BUS.register(FlashbangEffectRenderer::eventHandler)
+            }
 
+            RenderState.AttackStage, RenderState.SustainStage -> {
+                this.effectAttack = max(this.effectAttack, effectData.effectAttack)
+                this.effectSustain = max(this.effectSustain, effectData.effectSustain)
+                this.effectDecay = max(this.effectDecay, effectData.effectDecay)
+                this.effectAmount = max(this.effectAmount, effectData.effectAmount)
+            }
+
+            RenderState.DecayStage -> {
+                this.renderStartTime = Instant.now() + Duration.ofMillis(effectData.effectDecay.toLong())
+                this.effectAttack = effectData.effectAttack
+                this.effectSustain = effectData.effectSustain
+                this.effectDecay = effectData.effectDecay
+            }
+        }
         this.playExplosionSound(effectData)
         this.playRingSound(effectData)
     }
 
     @SubscribeEvent
     fun eventHandler(event: RenderGuiOverlayEvent.Post) {
-        if (!this.rendererActive) {
-            return
-        }
         val currentTime = Instant.now()
         // Converting type to double for precise calculation
         val timeDelta = Duration.between(this.renderStartTime, currentTime).toMillis().toDouble()
@@ -145,15 +162,16 @@ object FlashbangEffectRenderer {
         if (timeDelta < this.effectAttack) {
             val opacity = (timeDelta / this.effectAttack * this.effectAmount).toInt()
             this.drawOverlay(event.guiGraphics, opacity)
-
+            this.renderState = RenderState.AttackStage
         } else if (timeDelta < this.effectSustain + this.effectAttack) {
             val opacity = (this.effectAmount)
             this.drawOverlay(event.guiGraphics, opacity)
-
+            this.renderState = RenderState.SustainStage
         } else if (timeDelta < this.effectDecay + this.effectSustain + this.effectAttack) {
             val opacity =
                 this.effectAmount - ((timeDelta - this.effectAttack - this.effectSustain) / this.effectDecay * this.effectAmount).toInt()
             this.drawOverlay(event.guiGraphics, opacity)
+            this.renderState = RenderState.DecayStage
         } else {
             this.clean()
         }
@@ -176,7 +194,7 @@ object FlashbangEffectRenderer {
         this.effectDecay = 0
         this.effectSustain = 0
         this.effectAmount = 0
-        this.rendererActive = false
+        this.renderState = RenderState.IDLE
         MinecraftForge.EVENT_BUS.unregister(FlashbangEffectRenderer::eventHandler)
     }
 
