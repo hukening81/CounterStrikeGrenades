@@ -2,17 +2,21 @@ package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.SmokeEmittedMessage
+import club.pisquad.minecraft.csgrenades.helper.SmokeRenderHelper
 import club.pisquad.minecraft.csgrenades.registery.ModItems
+import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraftforge.network.PacketDistributor
 
 class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
     CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
@@ -26,34 +30,51 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
     override fun tick() {
         super.tick()
-        if (this.level().isClientSide) return
-        // Smoke grenade's fuse time is 1 after landing,
-        // we detect if the smoke grenade has moved during the last 1.2 second
-        if (super.isLanded && !isExploded) {
+
+        if (super.isLanded) {
             val currentPos = this.position().toVec3i()
-            if (currentPos == lastPos) {
-                tickCount++
+            if (currentPos == this.lastPos) {
+                this.tickCount++
             } else {
                 tickCount = 0
                 this.lastPos = currentPos
             }
+            if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && !this.isExploded) {
+                if (this.level() is ClientLevel) {
+                    val player = Minecraft.getInstance().player ?: return
+                    val distance = this.position().subtract(player.position()).length()
 
-            if (getTimeFromTickCount(tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND) {
-                CsGrenadePacketHandler.INSTANCE.send(
-                    PacketDistributor.ALL.noArg(),
-                    SmokeEmittedMessage(this.id, this.position())
-                )
+
+                    // Sounds
+                    val soundManager = Minecraft.getInstance().soundManager
+                    val soundEvent =
+                        if (distance > 30) ModSoundEvents.SMOKE_EXPLODE_DISTANT.get() else ModSoundEvents.SMOKE_EMIT.get()
+                    val soundType =
+                        if (distance > 30) SoundTypes.SMOKE_GRENADE_EXPLODE_DISTANT else SoundTypes.SMOKE_GRENADE_EMIT
+
+                    val soundInstance = EntityBoundSoundInstance(
+                        soundEvent,
+                        SoundSource.AMBIENT,
+                        SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
+                        1f,
+                        this,
+                        0
+                    )
+                    soundManager.play(soundInstance)
+
+                    // Particles
+                    SmokeRenderHelper.render(Minecraft.getInstance().particleEngine, this.position())
+                }
                 this.isExploded = true
-                tickCount = 0
             }
         }
-        if (this.isExploded) {
-            tickCount++
-            if (getTimeFromTickCount(tickCount.toDouble()) > SMOKE_GRENADE_SMOKE_LIFETIME) {
-                this.kill()
+        if (this.level() is ServerLevel) {
+            if (this.isExploded) {
+                if (getTimeFromTickCount(tickCount.toDouble()) > SMOKE_GRENADE_SMOKE_LIFETIME) {
+                    this.kill()
+                }
+                extinguishNearbyFires()
             }
-            // Extinguish nearby fires
-            extinguishNearbyFires()
         }
     }
 
@@ -69,7 +90,6 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 this.isLanded = true
             }
         }
-
 
         super.onHitBlock(result)
     }

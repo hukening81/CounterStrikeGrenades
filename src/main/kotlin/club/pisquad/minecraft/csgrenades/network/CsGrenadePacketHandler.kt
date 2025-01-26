@@ -50,16 +50,6 @@ object CsGrenadePacketHandler {
         )
         INSTANCE.registerMessage(
             messageTypeCount,
-            SmokeEmittedMessage::class.java,
-            SmokeEmittedMessage::encoder,
-            SmokeEmittedMessage::decoder,
-            SmokeEmittedMessage::handler,
-            Optional.of(
-                NetworkDirection.PLAY_TO_CLIENT
-            )
-        )
-        INSTANCE.registerMessage(
-            messageTypeCount,
             IncendiaryExplodedMessage::class.java,
             IncendiaryExplodedMessage::encoder,
             IncendiaryExplodedMessage::decoder,
