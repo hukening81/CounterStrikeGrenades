@@ -1,7 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.damagesource.IncendiaryDamageSource
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.IncendiaryExplodedMessage
@@ -43,10 +42,7 @@ class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLe
             for (player in level.players()) {
                 val distance = player.distanceTo(this).toDouble()
                 if (distance < INCENDIARY_RANGE) {
-                    // workaround the invulnerable time
-                    // Notice
-                    player.hurt(IncendiaryDamageSource(), 0.6f)
-                    player.invulnerableTime = 0
+                    player.hurt(player.damageSources().generic(), 2.5f)
                 }
             }
 
