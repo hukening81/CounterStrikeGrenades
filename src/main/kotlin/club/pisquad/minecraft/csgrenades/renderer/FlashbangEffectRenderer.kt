@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.render
+package club.pisquad.minecraft.csgrenades.renderer
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.SoundTypes
@@ -123,57 +123,57 @@ object FlashbangEffectRenderer {
     private var renderState: RenderState = RenderState.IDLE
 
     fun render(effectData: FlashbangEffectData) {
-        when (this.renderState) {
+        when (renderState) {
             RenderState.IDLE -> {
-                this.renderStartTime = Instant.now()
+                renderStartTime = Instant.now()
 
-                this.effectAttack = effectData.effectAttack
-                this.effectSustain = effectData.effectSustain
-                this.effectDecay = effectData.effectDecay
-                this.effectAmount = effectData.effectAmount
+                effectAttack = effectData.effectAttack
+                effectSustain = effectData.effectSustain
+                effectDecay = effectData.effectDecay
+                effectAmount = effectData.effectAmount
 
                 MinecraftForge.EVENT_BUS.register(FlashbangEffectRenderer::eventHandler)
             }
 
             RenderState.AttackStage, RenderState.SustainStage -> {
-                this.effectAttack = max(this.effectAttack, effectData.effectAttack)
-                this.effectSustain = max(this.effectSustain, effectData.effectSustain)
-                this.effectDecay = max(this.effectDecay, effectData.effectDecay)
-                this.effectAmount = max(this.effectAmount, effectData.effectAmount)
+                effectAttack = max(effectAttack, effectData.effectAttack)
+                effectSustain = max(effectSustain, effectData.effectSustain)
+                effectDecay = max(effectDecay, effectData.effectDecay)
+                effectAmount = max(effectAmount, effectData.effectAmount)
             }
 
             RenderState.DecayStage -> {
-                this.renderStartTime = Instant.now() + Duration.ofMillis(effectData.effectDecay.toLong())
-                this.effectAttack = effectData.effectAttack
-                this.effectSustain = effectData.effectSustain
-                this.effectDecay = effectData.effectDecay
+                renderStartTime = Instant.now() + Duration.ofMillis(effectData.effectDecay.toLong())
+                effectAttack = effectData.effectAttack
+                effectSustain = effectData.effectSustain
+                effectDecay = effectData.effectDecay
             }
         }
-        this.playExplosionSound(effectData)
-        this.playRingSound(effectData)
+        playExplosionSound(effectData)
+        playRingSound(effectData)
     }
 
     @SubscribeEvent
     fun eventHandler(event: RenderGuiOverlayEvent.Post) {
         val currentTime = Instant.now()
         // Converting type to double for precise calculation
-        val timeDelta = Duration.between(this.renderStartTime, currentTime).toMillis().toDouble()
+        val timeDelta = Duration.between(renderStartTime, currentTime).toMillis().toDouble()
 
-        if (timeDelta < this.effectAttack) {
-            val opacity = (timeDelta / this.effectAttack * this.effectAmount).toInt()
-            this.drawOverlay(event.guiGraphics, opacity)
-            this.renderState = RenderState.AttackStage
-        } else if (timeDelta < this.effectSustain + this.effectAttack) {
-            val opacity = (this.effectAmount)
-            this.drawOverlay(event.guiGraphics, opacity)
-            this.renderState = RenderState.SustainStage
-        } else if (timeDelta < this.effectDecay + this.effectSustain + this.effectAttack) {
+        if (timeDelta < effectAttack) {
+            val opacity = (timeDelta / effectAttack * effectAmount).toInt()
+            drawOverlay(event.guiGraphics, opacity)
+            renderState = RenderState.AttackStage
+        } else if (timeDelta < effectSustain + effectAttack) {
+            val opacity = (effectAmount)
+            drawOverlay(event.guiGraphics, opacity)
+            renderState = RenderState.SustainStage
+        } else if (timeDelta < effectDecay + effectSustain + effectAttack) {
             val opacity =
-                this.effectAmount - ((timeDelta - this.effectAttack - this.effectSustain) / this.effectDecay * this.effectAmount).toInt()
-            this.drawOverlay(event.guiGraphics, opacity)
-            this.renderState = RenderState.DecayStage
+                effectAmount - ((timeDelta - effectAttack - effectSustain) / effectDecay * effectAmount).toInt()
+            drawOverlay(event.guiGraphics, opacity)
+            renderState = RenderState.DecayStage
         } else {
-            this.clean()
+            clean()
         }
     }
 
@@ -190,11 +190,11 @@ object FlashbangEffectRenderer {
     }
 
     private fun clean() {
-        this.effectAttack = 0
-        this.effectDecay = 0
-        this.effectSustain = 0
-        this.effectAmount = 0
-        this.renderState = RenderState.IDLE
+        effectAttack = 0
+        effectDecay = 0
+        effectSustain = 0
+        effectAmount = 0
+        renderState = RenderState.IDLE
         MinecraftForge.EVENT_BUS.unregister(FlashbangEffectRenderer::eventHandler)
     }
 
@@ -204,8 +204,8 @@ object FlashbangEffectRenderer {
         Minecraft.getInstance().soundManager.play(
             FlashbangRingSound(
                 attack = 0,
-                sustain = this.effectSustain,
-                decay = this.effectDecay + 300,
+                sustain = effectSustain,
+                decay = effectDecay + 300,
                 targetVolume = SoundUtils.getVolumeFromDistance(distance, SoundTypes.FLASHBANG_RING).toFloat()
             )
         )
