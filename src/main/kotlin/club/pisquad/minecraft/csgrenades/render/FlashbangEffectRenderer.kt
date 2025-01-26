@@ -1,11 +1,19 @@
 package club.pisquad.minecraft.csgrenades.render
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.SoundTypes
+import club.pisquad.minecraft.csgrenades.SoundUtils
+import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.sound.FlashbangRingSound
 import club.pisquad.minecraft.csgrenades.toVec3i
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.core.BlockPos
+import net.minecraft.sounds.SoundSource
 import net.minecraft.util.FastColor
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
@@ -19,11 +27,12 @@ import java.time.Instant
 import kotlin.math.PI
 import kotlin.math.acos
 import kotlin.math.max
+import kotlin.math.sqrt
 
 
 @OnlyIn(Dist.CLIENT)
 data class FlashbangEffectData(
-    val effectAttack: Int, val effectSustain: Int, val effectDecay: Int, val effectAmount: Int
+    val position: Vec3, val effectAttack: Int, val effectSustain: Int, val effectDecay: Int, val effectAmount: Int
 ) {
     companion object {
         fun create(flashbangPos: Vec3): FlashbangEffectData {
@@ -56,6 +65,7 @@ data class FlashbangEffectData(
             )
 
             return FlashbangEffectData(
+                position = flashbangPos,
                 effectAttack = 20,
                 effectAmount = 150,
                 effectSustain = (fullyBlindedTime * 1000).toInt(),
@@ -118,8 +128,10 @@ object FlashbangEffectRenderer {
         this.effectDecay = effectData.effectDecay
         this.effectAmount = effectData.effectAmount
 
-        println("Rendering${effectData}")
         MinecraftForge.EVENT_BUS.register(FlashbangEffectRenderer::eventHandler);
+
+        this.playExplosionSound(effectData)
+        this.playRingSound(effectData)
     }
 
     @SubscribeEvent
@@ -133,18 +145,15 @@ object FlashbangEffectRenderer {
 
         if (timeDelta < this.effectAttack) {
             val opacity = (timeDelta / this.effectAttack * this.effectAmount).toInt()
-            println("Attack Phase opacity $opacity")
             this.drawOverlay(event.guiGraphics, opacity)
 
         } else if (timeDelta < this.effectSustain + this.effectAttack) {
             val opacity = (this.effectAmount)
-            println("Sustain Phase opacity $opacity")
             this.drawOverlay(event.guiGraphics, opacity)
 
         } else if (timeDelta < this.effectDecay + this.effectSustain + this.effectAttack) {
             val opacity =
                 this.effectAmount - ((timeDelta - this.effectAttack - this.effectSustain) / this.effectDecay * this.effectAmount).toInt()
-            println("Decay Phase opacity $opacity")
             this.drawOverlay(event.guiGraphics, opacity)
         } else {
             this.clean()
@@ -170,5 +179,38 @@ object FlashbangEffectRenderer {
         this.effectAmount = 0
         this.rendererActive = false
         MinecraftForge.EVENT_BUS.unregister(FlashbangEffectRenderer::eventHandler);
+    }
+
+    private fun playRingSound(effectData: FlashbangEffectData) {
+        val distance = sqrt(Minecraft.getInstance().player!!.distanceToSqr(effectData.position))
+
+        Minecraft.getInstance().soundManager.play(
+            FlashbangRingSound(
+                attack = 0,
+                sustain = this.effectSustain,
+                decay = this.effectDecay + 300,
+                targetVolume = SoundUtils.getVolumeFromDistance(distance, SoundTypes.FLASHBANG_RING).toFloat()
+            )
+        )
+    }
+
+    private fun playExplosionSound(effectData: FlashbangEffectData) {
+        val distance = sqrt(Minecraft.getInstance().player!!.distanceToSqr(effectData.position))
+        val soundEvent = when {
+            distance <= 15 -> ModSoundEvents.FLASHBANG_EXPLODE.get()
+            else -> ModSoundEvents.FLASHBANG_EXPLODE_DISTANT.get()
+        }
+        val soundType = when {
+            distance <= 15 -> SoundTypes.FLASHBANG_EXPLODE
+            else -> SoundTypes.FLASHBANG_EXPLODE_DISTANT
+        }
+        Minecraft.getInstance().soundManager.play(
+            SimpleSoundInstance(
+                soundEvent, SoundSource.AMBIENT, SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(), 1f,
+                RandomSource.create(),
+                effectData.position.x, effectData.position.y, effectData.position.z
+            )
+        )
+
     }
 }
