@@ -28,7 +28,7 @@ class FlashbangRingSound(
     }
 
     override fun tick() {
-        val timeNow = Instant.now();
+        val timeNow = Instant.now()
         val timeDelta = Duration.between(this.startTime, timeNow).toMillis().toDouble()
         if (timeDelta < attack) {
             this.volume = (timeDelta / attack).toFloat() * targetVolume

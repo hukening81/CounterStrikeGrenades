@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Mod
 
 data class HEGrenadeExplosionData(
     var position: Vec3,
-) {}
+)
 
 
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
@@ -35,12 +35,12 @@ object HEGrenadeRenderHelper {
         if (event.phase == TickEvent.Phase.END) return
 
         val shouldRemove: MutableList<HEGrenadeRenderer> = mutableListOf()
-        renderers.forEach() {
+        renderers.forEach {
             if (it.update()) {
                 shouldRemove.add(it)
             }
         }
-        shouldRemove.forEach() {
+        shouldRemove.forEach {
             renderers.remove(it)
         }
     }

@@ -13,7 +13,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.FastColor
 import net.minecraft.util.RandomSource
-import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
@@ -128,7 +127,7 @@ object FlashbangEffectRenderer {
         this.effectDecay = effectData.effectDecay
         this.effectAmount = effectData.effectAmount
 
-        MinecraftForge.EVENT_BUS.register(FlashbangEffectRenderer::eventHandler);
+        MinecraftForge.EVENT_BUS.register(FlashbangEffectRenderer::eventHandler)
 
         this.playExplosionSound(effectData)
         this.playRingSound(effectData)
@@ -178,7 +177,7 @@ object FlashbangEffectRenderer {
         this.effectSustain = 0
         this.effectAmount = 0
         this.rendererActive = false
-        MinecraftForge.EVENT_BUS.unregister(FlashbangEffectRenderer::eventHandler);
+        MinecraftForge.EVENT_BUS.unregister(FlashbangEffectRenderer::eventHandler)
     }
 
     private fun playRingSound(effectData: FlashbangEffectData) {

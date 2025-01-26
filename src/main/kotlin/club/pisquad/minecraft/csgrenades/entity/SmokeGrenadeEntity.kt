@@ -1,15 +1,10 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.FIRE_EXTINGUISH_RANGE
-import club.pisquad.minecraft.csgrenades.SMOKE_FUSE_TIME_AFTER_LAND
-import club.pisquad.minecraft.csgrenades.SMOKE_GRENADE_SMOKE_LIFETIME
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.getFireExtinguishRange
-import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.SmokeEmittedMessage
 import club.pisquad.minecraft.csgrenades.registery.ModItems
-import club.pisquad.minecraft.csgrenades.toVec3i
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.world.entity.EntityType

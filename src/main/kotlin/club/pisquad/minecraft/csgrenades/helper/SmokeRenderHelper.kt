@@ -17,17 +17,17 @@ object SmokeRenderHelper {
     @SubscribeEvent
     fun tick(event: TickEvent.ClientTickEvent) {
         if (event.phase == TickEvent.Phase.END) return
-        renderers.forEach() {
+        renderers.forEach {
             it.update()
 
         }
         val shouldRemove: MutableList<SmokeRenderer> = mutableListOf()
-        renderers.forEach() {
+        renderers.forEach {
             if (it.done) {
                 shouldRemove.add(it)
             }
         }
-        shouldRemove.forEach() {
+        shouldRemove.forEach {
             renderers.remove(it)
         }
     }

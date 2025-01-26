@@ -1,13 +1,8 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.FIRE_EXTINGUISH_RANGE
-import club.pisquad.minecraft.csgrenades.INCENDIARY_FUSE_TIME
-import club.pisquad.minecraft.csgrenades.INCENDIARY_LIFETIME
-import club.pisquad.minecraft.csgrenades.INCENDIARY_RANGE
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.damagesource.IncendiaryDamageSource
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.getFireExtinguishRange
-import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.IncendiaryExplodedMessage
 import club.pisquad.minecraft.csgrenades.registery.ModItems

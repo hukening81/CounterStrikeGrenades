@@ -11,5 +11,6 @@ object ModParticles {
     val PARTICLE_TYPES: DeferredRegister<ParticleType<*>> =
         DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, CounterStrikeGrenades.ID)
 
-    val SMOKE_PARTICLE: RegistryObject<SimpleParticleType> = PARTICLE_TYPES.register("smoke_particle") { SimpleParticleType(true) }
+    val SMOKE_PARTICLE: RegistryObject<SimpleParticleType> =
+        PARTICLE_TYPES.register("smoke_particle") { SimpleParticleType(true) }
 }
