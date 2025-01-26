@@ -4,17 +4,15 @@ import club.pisquad.minecraft.csgrenades.HEGRENADE_BASE_DAMAGE
 import club.pisquad.minecraft.csgrenades.HEGRENADE_DAMAGE_RANGE
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
-import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.HEGrenadeExplodedMessage
+import club.pisquad.minecraft.csgrenades.helper.HEGrenadeExplosionData
+import club.pisquad.minecraft.csgrenades.helper.HEGrenadeRenderHelper
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
-import net.minecraftforge.network.PacketDistributor
 
 class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
     CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
@@ -30,23 +28,26 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     override fun tick() {
         super.tick()
 
-        if (this.level() is ClientLevel) return
-        if (getTimeFromTickCount(this.tickCount.toDouble()) > 2.5) {
-            val level = this.level() as ServerLevel
-            for (player in level.players()) {
-                val distance = player.distanceTo(this).toDouble()
-                if (distance < HEGRENADE_DAMAGE_RANGE) {
-                    player.hurt(player.damageSources().generic(), calculateHEGrenadeDamage(distance, 0.0).toFloat())
+
+        if (getTimeFromTickCount(this.tickCount.toDouble()) > 2.5 && !this.isExploded) {
+
+            if (this.level() is ServerLevel) {
+                val level = this.level() as ServerLevel
+                for (player in level.players()) {
+                    val distance = player.distanceTo(this).toDouble()
+                    if (distance < HEGRENADE_DAMAGE_RANGE) {
+                        player.hurt(player.damageSources().generic(), calculateHEGrenadeDamage(distance, 0.0).toFloat())
+                    }
                 }
+            } else {
+                HEGrenadeRenderHelper.render(HEGrenadeExplosionData(this.position()))
             }
-            CsGrenadePacketHandler.INSTANCE.send(
-                PacketDistributor.ALL.noArg(),
-                HEGrenadeExplodedMessage(
-                    this.id,
-                    this.position(),
-                )
-            )
-            this.kill()
+            this.isExploded = true
+        }
+        if (getTimeFromTickCount(this.tickCount.toDouble()) > 5) {
+            if (this.level() is ServerLevel) {
+                this.kill()
+            }
         }
     }
 }
