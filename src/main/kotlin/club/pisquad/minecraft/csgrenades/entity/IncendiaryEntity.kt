@@ -36,7 +36,7 @@ class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLe
     override fun tick() {
         super.tick()
         if (this.level() is ClientLevel) return
-        if (this.isExploded) {
+        if (this.entityData.get(isExplodedAccessor)) {
             // Damage players within range
             val level = this.level() as ServerLevel
             for (player in level.players()) {
@@ -51,8 +51,8 @@ class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLe
                 return
             }
         }
-        if (!this.isExploded && getTimeFromTickCount(this.tickCount.toDouble()) > INCENDIARY_FUSE_TIME) {
-            this.isExploded = true
+        if (!this.entityData.get(isExplodedAccessor) && getTimeFromTickCount(this.tickCount.toDouble()) > INCENDIARY_FUSE_TIME) {
+            this.entityData.set(isExplodedAccessor, true)
             this.poppedInAir = true
             sendExplodedMessage()
             this.kill()
@@ -65,10 +65,10 @@ class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLe
         // we only want the server to handle this logic
         if (this.extinguished) return
         if (this.level() !is ClientLevel) {
-            if (this.isExploded || this.isLanded) return
+            if (this.entityData.get(isExplodedAccessor) || this.entityData.get(isLandedAccessor)) return
             if (result.direction == Direction.UP) {
-                this.isLanded = true
-                this.isExploded = true
+                this.entityData.set(isExplodedAccessor, true)
+                this.entityData.set(isLandedAccessor, true)
                 this.deltaMovement = Vec3.ZERO
                 this.explosionTick = this.tickCount
                 this.isNoGravity = true

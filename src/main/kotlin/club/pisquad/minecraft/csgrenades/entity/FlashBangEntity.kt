@@ -20,10 +20,6 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
 
     override fun tick() {
         super.tick()
-//
-//        if (this.isExploded) {
-//
-//        }
 
         // FlashBang exploded after 1.6 second in CSGO, this logic only for server side
         if (!this.level().isClientSide) {
@@ -32,7 +28,7 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
                     PacketDistributor.ALL.noArg(),
                     FlashBangExplodedMessage(this.id, this.position())
                 )
-                isExploded = true
+                this.entityData.set(isExplodedAccessor,true)
                 this.kill()
             }
         }

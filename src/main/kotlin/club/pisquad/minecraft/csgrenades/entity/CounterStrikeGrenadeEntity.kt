@@ -27,9 +27,6 @@ abstract class CounterStrikeGrenadeEntity(
 ) :
     ThrowableItemProjectile(pEntityType, pLevel) {
 
-    val speed: Float = 0f
-    var isLanded: Boolean = false
-    var isExploded: Boolean = false
 
     var hitBlockSound = ModSoundEvents.GRENADE_HIT.get()
     var throwSound = ModSoundEvents.GRENADE_THROW.get()
@@ -37,11 +34,17 @@ abstract class CounterStrikeGrenadeEntity(
     companion object {
         val speedAccessor: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.FLOAT)
+        val isLandedAccessor: EntityDataAccessor<Boolean> =
+            SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
+        val isExplodedAccessor: EntityDataAccessor<Boolean> =
+            SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
     }
 
     override fun defineSynchedData() {
         super.defineSynchedData()
-        this.entityData.define(speedAccessor, speed)
+        this.entityData.define(speedAccessor, 0f)
+        this.entityData.define(isLandedAccessor, false)
+        this.entityData.define(isExplodedAccessor, false)
     }
 
 
@@ -53,7 +56,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun tick() {
         super.tick()
-        if (this.isLanded || this.isExploded) {
+        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isExplodedAccessor)) {
             this.deltaMovement = Vec3.ZERO
             this.isNoGravity = true
         }
@@ -87,7 +90,7 @@ abstract class CounterStrikeGrenadeEntity(
         // This function seems to be work fine when calling from server and client side?
         // So I just make a test here
         // (In integrated server, haven't tested on other configurations yet)
-        if (this.level() is ClientLevel && !isExploded && !isLanded) {
+        if (this.level() is ClientLevel && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(isLandedAccessor)) {
             val player = Minecraft.getInstance().player!!
             val distance = this.position().add(player.position().reverse()).length()
             val soundInstance = EntityBoundSoundInstance(
@@ -105,8 +108,7 @@ abstract class CounterStrikeGrenadeEntity(
         }
 
         // Calculate the movement of the entity
-        this.setPos(this.xOld, this.yOld, this.zOld)
-        if (isLanded || isExploded) {
+        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isExplodedAccessor)) {
             return
 
         } else {
@@ -132,7 +134,7 @@ abstract class CounterStrikeGrenadeEntity(
         if (result.direction == Direction.UP && this.deltaMovement.length() < 0.05) {
             this.setPos(this.x, result.blockPos.y.toDouble() + 1, this.z)
             this.deltaMovement = Vec3.ZERO
-            this.isLanded = true
+            this.entityData.set(isLandedAccessor, true)
         }
     }
 

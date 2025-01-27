@@ -23,6 +23,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
     private var lastPos: Vec3i = Vec3i(0, 0, 0)
     private var tickCount: Int = 0
+    private var localIsExploded = false
 
     override fun getDefaultItem(): Item {
         return ModItems.SMOKE_GRENADE_ITEM.get()
@@ -31,7 +32,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     override fun tick() {
         super.tick()
 
-        if (super.isLanded) {
+
+        if (this.entityData.get(isLandedAccessor)) {
             val currentPos = this.position().toVec3i()
             if (currentPos == this.lastPos) {
                 this.tickCount++
@@ -39,37 +41,16 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 tickCount = 0
                 this.lastPos = currentPos
             }
-            if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && !this.isExploded) {
+            if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && !localIsExploded) {
                 if (this.level() is ClientLevel) {
-                    val player = Minecraft.getInstance().player ?: return
-                    val distance = this.position().subtract(player.position()).length()
-
-
-                    // Sounds
-                    val soundManager = Minecraft.getInstance().soundManager
-                    val soundEvent =
-                        if (distance > 30) ModSoundEvents.SMOKE_EXPLODE_DISTANT.get() else ModSoundEvents.SMOKE_EMIT.get()
-                    val soundType =
-                        if (distance > 30) SoundTypes.SMOKE_GRENADE_EXPLODE_DISTANT else SoundTypes.SMOKE_GRENADE_EMIT
-
-                    val soundInstance = EntityBoundSoundInstance(
-                        soundEvent,
-                        SoundSource.AMBIENT,
-                        SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
-                        1f,
-                        this,
-                        0
-                    )
-                    soundManager.play(soundInstance)
-
-                    // Particles
-                    SmokeRenderHelper.render(Minecraft.getInstance().particleEngine, this.position())
+                    this.clientRenderEffect()
+                    localIsExploded = true
                 }
-                this.isExploded = true
+                this.entityData.set(isExplodedAccessor, true)
             }
         }
         if (this.level() is ServerLevel) {
-            if (this.isExploded) {
+            if (this.entityData.get(isLandedAccessor)) {
                 if (getTimeFromTickCount(tickCount.toDouble()) > SMOKE_GRENADE_SMOKE_LIFETIME) {
                     this.kill()
                 }
@@ -87,10 +68,9 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         // If the smoke hit the ground with in any incendiary's range, it will emit right away
         if (result.direction == Direction.UP) {
             if (extinguishNearbyFires() > 0) {
-                this.isLanded = true
+                this.entityData.set(isLandedAccessor, true)
             }
         }
-
         super.onHitBlock(result)
     }
 
@@ -100,11 +80,40 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         val extinguishedFires = this.level().getEntitiesOfClass(
             IncendiaryEntity::class.java,
             bb
-        ) { this.position().distanceTo(it.position()) < FIRE_EXTINGUISH_RANGE && it.isExploded }
+        ) { this.position().distanceTo(it.position()) < FIRE_EXTINGUISH_RANGE && it.entityData.get(isExplodedAccessor) }
 
-        extinguishedFires.forEach { it.extinguish() }
+        if (this.level() is ServerLevel) {
+            extinguishedFires.forEach { it.extinguish() }
+        }
         return extinguishedFires.size
 
+    }
+
+    private fun clientRenderEffect() {
+        println("clientRenderEffect")
+        val player = Minecraft.getInstance().player ?: return
+        val distance = this.position().subtract(player.position()).length()
+
+
+        // Sounds
+        val soundManager = Minecraft.getInstance().soundManager
+        val soundEvent =
+            if (distance > 30) ModSoundEvents.SMOKE_EXPLODE_DISTANT.get() else ModSoundEvents.SMOKE_EMIT.get()
+        val soundType =
+            if (distance > 30) SoundTypes.SMOKE_GRENADE_EXPLODE_DISTANT else SoundTypes.SMOKE_GRENADE_EMIT
+
+        val soundInstance = EntityBoundSoundInstance(
+            soundEvent,
+            SoundSource.AMBIENT,
+            SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
+            1f,
+            this,
+            0
+        )
+        soundManager.play(soundInstance)
+
+        // Particles
+        SmokeRenderHelper.render(Minecraft.getInstance().particleEngine, this.position())
     }
 }
 

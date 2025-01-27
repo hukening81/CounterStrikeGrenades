@@ -29,7 +29,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         super.tick()
 
 
-        if (getTimeFromTickCount(this.tickCount.toDouble()) > 2.5 && !this.isExploded) {
+        if (getTimeFromTickCount(this.tickCount.toDouble()) > 2.5 && !this.entityData.get(isExplodedAccessor)) {
 
             if (this.level() is ServerLevel) {
                 val level = this.level() as ServerLevel
@@ -42,7 +42,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             } else {
                 HEGrenadeRenderHelper.render(HEGrenadeExplosionData(this.position()))
             }
-            this.isExploded = true
+            this.entityData.set(isExplodedAccessor,true)
         }
         if (getTimeFromTickCount(this.tickCount.toDouble()) > 5) {
             if (this.level() is ServerLevel) {
