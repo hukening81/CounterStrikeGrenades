@@ -33,7 +33,6 @@ object CounterStrikeGrenades {
         ModItems.ITEMS.register(KotlinModLoadingContext.get().getKEventBus())
         ModSoundEvents.register(KotlinModLoadingContext.get().getKEventBus())
         ModParticles.PARTICLE_TYPES.register(KotlinModLoadingContext.get().getKEventBus())
-
         CsGrenadePacketHandler.registerMessage()
     }
 
@@ -49,7 +48,6 @@ object CounterStrikeGrenades {
 
         eventBus.addListener(ModCreativeTabs::onCreativeTabBuildContents)
         eventBus.addListener(ModParticleFactories::onRegisterParticleFactories)
-//        eventBus.addListener(PlayerInteractEventHandler::onPlayerInteract)
     }
 
     /**

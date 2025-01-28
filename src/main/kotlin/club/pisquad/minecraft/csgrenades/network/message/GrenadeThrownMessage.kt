@@ -14,6 +14,7 @@ import net.minecraft.core.Rotations
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
 import java.util.*
@@ -28,6 +29,7 @@ enum class GrenadeThrowType(val speed: Double) {
 @Serializable
 class GrenadeThrownMessage(
     @Serializable(with = UUIDSerializer::class) val ownerUUID: UUID,
+    val hand: InteractionHand,
     val speed: Double,
     val grenadeType: GrenadeType,
     @Serializable(with = Vec3Serializer::class) val position: Vec3,
@@ -51,11 +53,9 @@ class GrenadeThrownMessage(
 //            Logger.info("Handling message $msg")
 
             val context = ctx.get()
-            val sender: ServerPlayer = context.sender
-                ?: //                Logger.debug("Handling message failed because the sender is null")
-                return
+            val player: ServerPlayer = context.sender ?: return
 
-            val serverLevel: ServerLevel = sender.level() as ServerLevel
+            val serverLevel: ServerLevel = player.level() as ServerLevel
 
             val entityType = when (msg.grenadeType) {
                 GrenadeType.FLASH_BANG -> ModEntities.FLASH_BANG_ENTITY.get()
@@ -69,7 +69,7 @@ class GrenadeThrownMessage(
 
             grenadeEntity.setPos(msg.position)
             grenadeEntity.shootFromRotation(
-                sender,
+                player,
                 msg.rotation.x,
                 msg.rotation.y,
                 msg.rotation.z,
@@ -80,6 +80,8 @@ class GrenadeThrownMessage(
             serverLevel.addFreshEntity(grenadeEntity)
 
             context.packetHandled = true
+
+            player.inventory.removeItem(player.getItemInHand(msg.hand))
         }
 
     }
