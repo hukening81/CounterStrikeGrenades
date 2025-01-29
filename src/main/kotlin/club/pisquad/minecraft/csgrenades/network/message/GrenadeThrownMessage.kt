@@ -80,8 +80,9 @@ class GrenadeThrownMessage(
             serverLevel.addFreshEntity(grenadeEntity)
 
             context.packetHandled = true
-
-            player.inventory.removeItem(player.getItemInHand(msg.hand))
+            if (!player.isCreative) {
+                player.inventory.removeItem(player.getItemInHand(msg.hand))
+            }
         }
 
     }
