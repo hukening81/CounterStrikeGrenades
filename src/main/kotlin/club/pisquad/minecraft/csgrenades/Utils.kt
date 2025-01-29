@@ -60,11 +60,13 @@ fun getFireExtinguishRange(center: Vec3): AABB {
     )
 }
 
-fun isPositionInSmoke(pos: BlockPos, radius: Double): Boolean {
+fun isPositionInSmoke(pos: Vec3, radius: Double): Boolean {
     val level = Minecraft.getInstance().level ?: return false
 
     return level.getEntitiesOfClass(
         SmokeGrenadeEntity::class.java,
-        AABB(pos).inflate(radius)
-    ).filter { it.entityData.get(CounterStrikeGrenadeEntity.isExplodedAccessor) }.isNotEmpty()
+        AABB(BlockPos(pos.toVec3i())).inflate(radius)
+    ).any {
+        it.entityData.get(CounterStrikeGrenadeEntity.isExplodedAccessor) && it.position().distanceTo(pos) < radius
+    }
 }

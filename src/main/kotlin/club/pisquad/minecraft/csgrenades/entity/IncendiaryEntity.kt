@@ -43,7 +43,7 @@ class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLe
             for (player in level.players()) {
                 val distance = player.distanceTo(this).toDouble()
                 if (distance < INCENDIARY_RANGE && !isPositionInSmoke(
-                        BlockPos(player.position().toVec3i()),
+                        player.position(),
                         SMOKE_GRENADE_RADIUS.toDouble()
                     )
                 ) {

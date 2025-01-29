@@ -48,8 +48,8 @@ object IncendiaryEffectRenderer {
                 INCENDIARY_RANGE
             )
             if (isPositionInSmoke(
-                    BlockPos(pos.x.toInt(), position.y.toInt(), pos.y.toInt()),
-                    SMOKE_GRENADE_RADIUS.toDouble()
+                    position,
+                    SMOKE_GRENADE_RADIUS.toDouble() - 0.5
                 )
             ) {
                 continue
