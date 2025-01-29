@@ -1,7 +1,9 @@
 package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.network.message.*
+import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessage
+import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
+import club.pisquad.minecraft.csgrenades.network.message.IncendiaryMessage
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.network.NetworkEvent

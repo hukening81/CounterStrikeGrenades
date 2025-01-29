@@ -23,7 +23,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import java.time.Duration
 import java.time.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.acos
+import kotlin.math.max
+import kotlin.math.sqrt
 
 
 @OnlyIn(Dist.CLIENT)

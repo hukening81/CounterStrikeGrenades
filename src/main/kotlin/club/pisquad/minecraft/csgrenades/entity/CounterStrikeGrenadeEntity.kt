@@ -90,7 +90,10 @@ abstract class CounterStrikeGrenadeEntity(
         // This function seems to be work fine when calling from server and client side?
         // So I just make a test here
         // (In integrated server, haven't tested on other configurations yet)
-        if (this.level() is ClientLevel && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(isLandedAccessor)) {
+        if (this.level() is ClientLevel && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(
+                isLandedAccessor
+            )
+        ) {
             val player = Minecraft.getInstance().player!!
             val distance = this.position().add(player.position().reverse()).length()
             val soundInstance = EntityBoundSoundInstance(

@@ -4,7 +4,6 @@ import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity.Companion.isExplodedAccessor
 import club.pisquad.minecraft.csgrenades.entity.IncendiaryEntity
 import net.minecraft.client.Minecraft
-import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec2

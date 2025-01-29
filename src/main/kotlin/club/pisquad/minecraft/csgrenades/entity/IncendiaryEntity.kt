@@ -7,7 +7,6 @@ import club.pisquad.minecraft.csgrenades.network.message.IncendiaryMessage
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
 import net.minecraft.client.multiplayer.ClientLevel
-import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType

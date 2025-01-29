@@ -42,7 +42,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             } else {
                 HEGrenadeRenderHelper.render(HEGrenadeExplosionData(this.position()))
             }
-            this.entityData.set(isExplodedAccessor,true)
+            this.entityData.set(isExplodedAccessor, true)
         }
         if (getTimeFromTickCount(this.tickCount.toDouble()) > 5) {
             if (this.level() is ServerLevel) {

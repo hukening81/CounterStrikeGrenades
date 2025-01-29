@@ -28,7 +28,7 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
                     PacketDistributor.ALL.noArg(),
                     FlashBangExplodedMessage(this.id, this.position())
                 )
-                this.entityData.set(isExplodedAccessor,true)
+                this.entityData.set(isExplodedAccessor, true)
                 this.kill()
             }
         }
