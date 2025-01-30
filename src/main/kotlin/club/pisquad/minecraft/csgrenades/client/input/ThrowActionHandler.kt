@@ -30,6 +30,7 @@ object ThrowActionHandler {
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent) {
         if (event.phase == TickEvent.Phase.START) return
+        if (Minecraft.getInstance().screen != null) return
 
         if (Duration.between(this.grenadeLastThrow, Instant.now()).toMillis() < GRENADE_THROW_COOLDOWN) return
 
