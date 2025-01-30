@@ -20,7 +20,7 @@ import java.util.function.Supplier
 //private val Logger: Logger = LogManager.getLogger(CounterStrikeGrenades.ID + ":message:flashbangExplodedMessage")
 
 @Serializable
-class IncendiaryMessage(
+class FireGrenadeMessage(
     val messageType: MessageType,
     @Serializable(with = Vec3Serializer::class) val position: Vec3
 ) {
@@ -32,18 +32,18 @@ class IncendiaryMessage(
     }
 
     companion object {
-        fun encoder(msg: IncendiaryMessage, buffer: FriendlyByteBuf) {
+        fun encoder(msg: FireGrenadeMessage, buffer: FriendlyByteBuf) {
 //            Logger.info("Encoding message $msg")
             buffer.writeUtf(Json.encodeToString(msg))
         }
 
-        fun decoder(buffer: FriendlyByteBuf): IncendiaryMessage {
+        fun decoder(buffer: FriendlyByteBuf): FireGrenadeMessage {
             val text = buffer.readUtf()
 //            Logger.info("Decoding string $text")
-            return Json.decodeFromString<IncendiaryMessage>(text)
+            return Json.decodeFromString<FireGrenadeMessage>(text)
         }
 
-        fun handler(msg: IncendiaryMessage, ctx: Supplier<NetworkEvent.Context>) {
+        fun handler(msg: FireGrenadeMessage, ctx: Supplier<NetworkEvent.Context>) {
             val context = ctx.get()
             context.packetHandled = true
             when (msg.messageType) {

@@ -16,6 +16,7 @@ object ModCreativeTabs {
             event.accept(ModItems.SMOKE_GRENADE_ITEM.get())
             event.accept(ModItems.HEGRENADE_ITEM.get())
             event.accept(ModItems.INCENDIARY_ITEM.get())
+            event.accept(ModItems.MOLOTOV_ITEM.get())
         }
     }
 }

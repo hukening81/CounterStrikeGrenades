@@ -1,10 +1,7 @@
 package club.pisquad.minecraft.csgrenades.registery
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.item.FlashBangItem
-import club.pisquad.minecraft.csgrenades.item.HEGrenadeItem
-import club.pisquad.minecraft.csgrenades.item.IncendiaryItem
-import club.pisquad.minecraft.csgrenades.item.SmokeGrenadeItem
+import club.pisquad.minecraft.csgrenades.item.*
 import net.minecraft.world.item.Item
 import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.ForgeRegistries
@@ -21,4 +18,6 @@ object ModItems {
     val HEGRENADE_ITEM: RegistryObject<Item> = ITEMS.register("hegrenade") { HEGrenadeItem(Item.Properties()) }
 
     val INCENDIARY_ITEM: RegistryObject<Item> = ITEMS.register("incendiary") { IncendiaryItem(Item.Properties()) }
+
+    val MOLOTOV_ITEM: RegistryObject<Item> = ITEMS.register("molotov") { MolotovItem(Item.Properties()) }
 }

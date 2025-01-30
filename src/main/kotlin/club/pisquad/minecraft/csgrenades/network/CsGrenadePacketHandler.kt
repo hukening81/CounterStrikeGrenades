@@ -3,7 +3,7 @@ package club.pisquad.minecraft.csgrenades.network
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessage
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
-import club.pisquad.minecraft.csgrenades.network.message.IncendiaryMessage
+import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.network.NetworkEvent
@@ -52,10 +52,10 @@ object CsGrenadePacketHandler {
         )
         INSTANCE.registerMessage(
             messageTypeCount,
-            IncendiaryMessage::class.java,
-            IncendiaryMessage::encoder,
-            IncendiaryMessage::decoder,
-            IncendiaryMessage::handler,
+            FireGrenadeMessage::class.java,
+            FireGrenadeMessage::encoder,
+            FireGrenadeMessage::decoder,
+            FireGrenadeMessage::handler,
         )
     }
 }

@@ -2,10 +2,7 @@ package club.pisquad.minecraft.csgrenades.registery
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE
-import club.pisquad.minecraft.csgrenades.entity.FlashBangEntity
-import club.pisquad.minecraft.csgrenades.entity.HEGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.IncendiaryEntity
-import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
@@ -48,6 +45,14 @@ object ModEntities {
             MobCategory.MISC
         ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "incendiary").toString())
+    }
+
+    val MOLOTOV_ENTITY: RegistryObject<EntityType<MolotovEntity>> = ENTITIES.register("molotov") {
+        EntityType.Builder.of(
+            { pEntityType: EntityType<MolotovEntity>, pLevel: Level -> MolotovEntity(pEntityType, pLevel) },
+            MobCategory.MISC
+        ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
+            .build(ResourceLocation(CounterStrikeGrenades.ID, "molotov").toString())
     }
 
 }

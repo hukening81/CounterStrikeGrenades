@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.client.input
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.item.*
+import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrowType
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
@@ -41,15 +41,8 @@ object ThrowActionHandler {
             else -> null
         }
         if (hand == null) return
-
-        val grenadeType = when (player.getItemInHand(hand).item) {
-            is FlashBangItem -> GrenadeType.FLASH_BANG
-            is HEGrenadeItem -> GrenadeType.HEGRENADE
-            is IncendiaryItem -> GrenadeType.INCENDIARY
-            is SmokeGrenadeItem -> GrenadeType.SMOKE_GRENADE
-            else -> null
-        }
-        if (grenadeType == null) return
+        val grenadeItem = player.getItemInHand(hand).item as CounterStrikeGrenadeItem
+        val grenadeType = grenadeItem.grenadeType
 
 
         val buttonState = getButtonState()

@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.client.renderer
 
 import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.entity.AbstractFireGrenade
 import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity.Companion.isExplodedAccessor
-import club.pisquad.minecraft.csgrenades.entity.IncendiaryEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.Mod
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object IncendiaryEffectRenderer {
     val randomSource = RandomSource.createNewThreadLocalInstance()
-    val particlePerTick = (INCENDIARY_RANGE * INCENDIARY_RANGE * INCENDIARY_PARTICLE_DENSITY).toInt()
+    val particlePerTick = (FIREGRENADE_RANGE * FIREGRENADE_RANGE * INCENDIARY_PARTICLE_DENSITY).toInt()
 
     @SubscribeEvent
     fun tick(event: TickEvent.RenderTickEvent) {
@@ -29,7 +29,7 @@ object IncendiaryEffectRenderer {
             val renderDistance = minecraft.options.renderDistance().get()
             val incendiaries = player.level()
                 .getEntitiesOfClass(
-                    IncendiaryEntity::class.java,
+                    AbstractFireGrenade::class.java,
                     player.boundingBox.inflate(renderDistance.toDouble() * 16)
                 ) { it.entityData.get(isExplodedAccessor) }
             for (incendiary in incendiaries) {
@@ -44,7 +44,7 @@ object IncendiaryEffectRenderer {
         for (i in 0 until particlePerTick) {
             val pos = getRandomLocationFromCircle(
                 Vec2(position.x.toFloat(), position.z.toFloat()),
-                INCENDIARY_RANGE
+                FIREGRENADE_RANGE
             )
             if (isPositionInSmoke(
                     position,
@@ -83,6 +83,6 @@ object IncendiaryEffectRenderer {
 
 fun getLifetimeFromDistance(distance: Double): Int {
     val randomSource = RandomSource.createNewThreadLocalInstance()
-    return (INCENDIARY_RANGE - distance).div(INCENDIARY_LIFETIME).times(INCENDIARY_PARTICLE_LIFETIME)
+    return (FIREGRENADE_RANGE - distance).div(FIREGRENADE_LIFETIME).times(INCENDIARY_PARTICLE_LIFETIME)
         .toInt() + randomSource.nextInt(0, 5)
 }
