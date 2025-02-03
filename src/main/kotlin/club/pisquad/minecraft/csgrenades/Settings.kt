@@ -43,7 +43,7 @@ const val SMOKE_GRENADE_TOTAL_GENERATION_TIME = 1.5
 const val SMOKE_GRENADE_SMOKE_LIFETIME = 20
 
 // HE GRENADES
-const val HEGRENADE_BASE_DAMAGE = 59.0
+const val HEGRENADE_BASE_DAMAGE = 30
 const val HEGRENADE_DAMAGE_RANGE = 6.5
 
 // Incendiary
@@ -53,3 +53,8 @@ const val FIREGRENADE_FUSE_TIME = 2.0
 const val INCENDIARY_PARTICLE_DENSITY = 1
 const val INCENDIARY_PARTICLE_LIFETIME = 30
 const val FIRE_EXTINGUISH_RANGE = SMOKE_GRENADE_RADIUS
+
+// Objectives key
+const val KILLCOUNT_HEGRENADE = "csgrenade_killcount_hegrenade"
+const val KILLCOUNT_INCENDIARY = "csgrenade_killcount_incendiary"
+const val KILLCOUNT_MOLOTOV = "csgrenade_killcount_molotov"
