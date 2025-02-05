@@ -13,6 +13,7 @@ object UpdateObjectives {
     fun onPlayerDied(event: LivingDeathEvent) {
         if (event.entity is Player) {
             val server = event.entity.server ?: return
+            val attackName = event.source.entity?.name?.string ?: return
             val commandSource = server.createCommandSourceStack()
             if (event.source.`is`(ModDamageType.HEGRENADE_EXPLOSION_DAMAGE) && server.scoreboard.getObjective(
                     OBJECTIVE_KILLCOUNT_HEGRENADE
@@ -20,21 +21,22 @@ object UpdateObjectives {
             ) {
 
                 server.commands.dispatcher.execute(
-                    COMMAND_INCREASE_OBJECTIVE_KILLCOUNT_HEGRENADE.format(event.entity.name.string), commandSource
+                    COMMAND_INCREASE_OBJECTIVE_KILLCOUNT_HEGRENADE.format(attackName),
+                    commandSource
                 )
             } else if (event.source.`is`(ModDamageType.INCENDIARY_FIRE_DAMAGE) && server.scoreboard.getObjective(
                     OBJECTIVE_KILLCOUNT_INCENDIARY
                 ) != null
             ) {
                 server.commands.dispatcher.execute(
-                    COMMAND_INCREASE_OBJECTIVE_KILLCOUNT_INCENDIARY.format(event.entity.name.string), commandSource
+                    COMMAND_INCREASE_OBJECTIVE_KILLCOUNT_INCENDIARY.format(attackName), commandSource
                 )
             } else if (event.source.`is`(ModDamageType.MOLOTOV_FIRE_DAMAGE) && server.scoreboard.getObjective(
                     OBJECTIVE_KILLCOUNT_MOLOTOV
                 ) != null
             ) {
                 server.commands.dispatcher.execute(
-                    COMMAND_INCREASE_OBJECTIVE_KILLCOUNT_MOLOTOV.format(event.entity.name.string), commandSource
+                    COMMAND_INCREASE_OBJECTIVE_KILLCOUNT_MOLOTOV.format(attackName), commandSource
                 )
             }
         }
