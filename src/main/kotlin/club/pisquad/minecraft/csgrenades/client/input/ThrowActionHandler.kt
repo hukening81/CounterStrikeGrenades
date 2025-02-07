@@ -55,10 +55,11 @@ object ThrowActionHandler {
                     player.getItemInHand(InteractionHand.OFF_HAND).item is CounterStrikeGrenadeItem -> InteractionHand.OFF_HAND
                     else -> null
                 }
-                if (hand == null) return
-                val grenadeItem = player.getItemInHand(hand).item as CounterStrikeGrenadeItem
-                val grenadeType = grenadeItem.grenadeType
-                throwAction(this.currentThrowSpeed ?: 0.0, hand, grenadeType)
+                if (hand != null) {
+                    val grenadeItem = player.getItemInHand(hand).item as CounterStrikeGrenadeItem
+                    val grenadeType = grenadeItem.grenadeType
+                    throwAction(this.currentThrowSpeed ?: 0.0, hand, grenadeType)
+                }
             }
             this.currentThrowSpeed = null
             this.throwSpeedTransientTarget = null
