@@ -41,25 +41,24 @@ object ThrowActionHandler {
         // Test if any screen is opened (e.g. inventory, chat, menu, etc.)
         if (Minecraft.getInstance().screen != null) return
 
+        val player = Minecraft.getInstance().player ?: return
+        val hand: InteractionHand? = when {
+            player.getItemInHand(InteractionHand.MAIN_HAND).item is CounterStrikeGrenadeItem -> InteractionHand.MAIN_HAND
+            player.getItemInHand(InteractionHand.OFF_HAND).item is CounterStrikeGrenadeItem -> InteractionHand.OFF_HAND
+            else -> null
+        }
+        if (hand == null) return
+
         // TODO: We should let player press the throw key in advanced and trigger throw action after cooldown
         if (Duration.between(this.grenadeLastThrow, Instant.now()).toMillis() < GRENADE_THROW_COOLDOWN) return
-        val timeNow = Instant.now()
         val (primaryButtonPressed, secondaryButtonPressed) = getButtonState()
 
         if (!primaryButtonPressed && !secondaryButtonPressed) {
             if (this.primaryButtonPressed || this.secondaryButtonPressed) {
-                val player = Minecraft.getInstance().player ?: return
+                val grenadeItem = player.getItemInHand(hand).item as CounterStrikeGrenadeItem
+                val grenadeType = grenadeItem.grenadeType
+                throwAction(this.currentThrowSpeed ?: 0.0, hand, grenadeType)
 
-                val hand: InteractionHand? = when {
-                    player.getItemInHand(InteractionHand.MAIN_HAND).item is CounterStrikeGrenadeItem -> InteractionHand.MAIN_HAND
-                    player.getItemInHand(InteractionHand.OFF_HAND).item is CounterStrikeGrenadeItem -> InteractionHand.OFF_HAND
-                    else -> null
-                }
-                if (hand != null) {
-                    val grenadeItem = player.getItemInHand(hand).item as CounterStrikeGrenadeItem
-                    val grenadeType = grenadeItem.grenadeType
-                    throwAction(this.currentThrowSpeed ?: 0.0, hand, grenadeType)
-                }
             }
             this.currentThrowSpeed = null
             this.throwSpeedTransientTarget = null
