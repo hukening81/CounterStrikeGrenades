@@ -32,7 +32,7 @@ object ThrowActionHandler {
     private var secondaryButtonPressed: Boolean = false
     private var throwSpeedTransientTarget: Double? = null
     private var throwSpeedTransientOrigin: Double? = null
-    private var currentThrowSpeed: Double? = null
+    var currentThrowSpeed: Double? = null
     private var transientBeginTime: Instant = Instant.now()
 
     @SubscribeEvent
