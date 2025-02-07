@@ -5,15 +5,14 @@ import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
 import club.pisquad.minecraft.csgrenades.sound.FlashbangRingSound
-import club.pisquad.minecraft.csgrenades.toVec3i
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
-import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.FastColor
 import net.minecraft.util.RandomSource
-import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
@@ -41,7 +40,7 @@ data class FlashbangEffectData(
             val angle = acos(player.lookAngle.dot(playerToFlashVec.normalize())).times(180).times(1 / PI)
 
             val distanceFactor = getDistanceFactor(distance)
-            val blockingFactor = getBlockingFactor(flashbangPos, player.position())
+            val blockingFactor = getBlockingFactor(flashbangPos, player.eyePosition)
 
             val fullyBlindedTime = max(
                 0.0, when (angle) {
@@ -77,32 +76,11 @@ data class FlashbangEffectData(
         }
 
         private fun getBlockingFactor(flashbangPos: Vec3, playerEyePos: Vec3): Double {
-
-            var blockingFactor = 1.0
-            val playerToFlashBangVec = flashbangPos.add(playerEyePos.reverse())
-            val direction = playerToFlashBangVec.normalize()
-            val level = Minecraft.getInstance().level ?: return blockingFactor
-
-            for (i in 1..playerToFlashBangVec.length().toInt()) {
-                val blockState =
-                    level.getBlockState(BlockPos(playerEyePos.add(direction.scale(i.toDouble())).toVec3i()))
-                blockingFactor -= getBlockingFactorDelta(blockState)
-                if (blockingFactor <= 0.0) {
-                    return 0.0
-                }
-
-            }
-            return blockingFactor
-        }
-
-        private fun getBlockingFactorDelta(blockState: BlockState): Double {
-            if (blockState.isAir) {
-                return 0.0
-            }
-            if (blockState.canOcclude()) {
-                return 1.0
-            }
-            return 0.2
+            val level = Minecraft.getInstance().level ?: return 1.0
+            val context =
+                ClipContext(playerEyePos, flashbangPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null)
+            val result = level.clip(context)
+            return if (result.type.equals(HitResult.Type.MISS)) 1.0 else 0.0
         }
     }
 
