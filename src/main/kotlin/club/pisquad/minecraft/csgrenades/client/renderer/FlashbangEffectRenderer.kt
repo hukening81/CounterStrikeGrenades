@@ -124,7 +124,7 @@ object FlashbangEffectRenderer {
             }
 
             RenderState.DecayStage -> {
-                renderStartTime = Instant.now() + Duration.ofMillis(effectData.effectDecay.toLong())
+                renderStartTime = Instant.now() - Duration.ofMillis(effectData.effectAttack.toLong())
                 effectAttack = effectData.effectAttack
                 effectSustain = effectData.effectSustain
                 effectDecay = effectData.effectDecay
