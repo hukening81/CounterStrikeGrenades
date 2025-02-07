@@ -3,9 +3,7 @@ package club.pisquad.minecraft.csgrenades.compatibility
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.*
 import com.mojang.brigadier.CommandDispatcher
-import net.minecraft.client.Minecraft
 import net.minecraft.commands.CommandSourceStack
-import net.minecraft.server.MinecraftServer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.scores.Scoreboard
 import net.minecraftforge.event.entity.living.LivingDeathEvent

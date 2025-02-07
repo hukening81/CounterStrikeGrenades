@@ -7,11 +7,9 @@ import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
 import club.pisquad.minecraft.csgrenades.network.message.SettingsChangeMessage
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.network.NetworkDirection
-import net.minecraftforge.network.NetworkEvent
 import net.minecraftforge.network.NetworkRegistry
 import net.minecraftforge.network.simple.SimpleChannel
 import java.util.*
-import java.util.function.Supplier
 
 private const val PROTOCOL_VERSION = "1"
 
