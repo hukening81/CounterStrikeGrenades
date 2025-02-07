@@ -50,7 +50,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         val level = this.level()
         val registryAccess = this.level().registryAccess()
         val damageSource = DamageSource(
-            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION_DAMAGE),
+            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION),
             this.owner
         )
         for (player in level.players()) {
@@ -62,6 +62,14 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
                 player.deltaMovement = playerMovement
             }
         }
+    }
+
+    override fun getHitDamageSource(): DamageSource {
+        val registryAccess = this.level().registryAccess()
+        return DamageSource(
+            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_HIT),
+            this.owner
+        )
     }
 }
 

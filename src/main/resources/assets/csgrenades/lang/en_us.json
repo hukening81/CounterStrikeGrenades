@@ -6,6 +6,11 @@
   "item.csgrenades.incendiary": "Incendiary",
   "item.csgrenades.molotov": "Molotov",
   "death.attack.csgrenade.hegrenade_explosion": "%1$s was blown up by %2$s",
+  "death.attack.csgrenade.hegrenade_hit": "%1$s dead by hitting HE grenade from %2$s",
   "death.attack.csgrenade.incendiary_fire": "%1$s was cooked by %2$s",
-  "death.attack.csgrenade.molotov_fire": "%1$s was cooked by %2$s"
+  "death.attack.csgrenade.incendiary_hit": "%1$s dead by hitting incendiary from %2$s",
+  "death.attack.csgrenade.molotov_fire": "%1$s was cooked by %2$s",
+  "death.attack.csgrenade.molotov_hit": "%1$s dead by hitting molotov from %2$s",
+  "death.attack.csgrenade.flashbang_hit": "%1$s dead by hitting flashbang from %2$s",
+  "death.attack.csgrenade.smokegrenade_hit": "%1$s dead by hitting smoke grenade from %2$s"
 }

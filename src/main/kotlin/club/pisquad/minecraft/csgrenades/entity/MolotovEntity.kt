@@ -19,7 +19,15 @@ class MolotovEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel
     override fun getDamageSource(): DamageSource {
         val registryAccess = this.level().registryAccess()
         return DamageSource(
-            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.MOLOTOV_FIRE_DAMAGE),
+            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.MOLOTOV_FIRE),
+            this.owner
+        )
+    }
+
+    override fun getHitDamageSource(): DamageSource {
+        val registryAccess = this.level().registryAccess()
+        return DamageSource(
+            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.MOLOTOV_HIT),
             this.owner
         )
     }

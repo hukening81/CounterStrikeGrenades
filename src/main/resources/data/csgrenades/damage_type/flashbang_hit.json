@@ -1,7 +1,6 @@
 {
-  "message_id": "csgrenade.molotov_fire",
+  "message_id": "csgrenade.flashbang_hit",
   "scaling": "never",
   "exhaustion": 0.1,
-  "effects": "burning",
   "death_message_type": "default"
 }
