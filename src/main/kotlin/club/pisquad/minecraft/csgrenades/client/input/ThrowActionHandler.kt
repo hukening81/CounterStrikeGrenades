@@ -20,11 +20,6 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.math.min
 
-private data class ButtonState(
-    val pressed: Boolean,
-    val pressedSince: Instant
-)
-
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object ThrowActionHandler {
     private var grenadeLastThrow: Instant = Instant.now()
