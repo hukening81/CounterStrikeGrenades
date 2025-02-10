@@ -1,10 +1,10 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.network.serializer.RotationSerializer
+import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import club.pisquad.minecraft.csgrenades.registery.ModEntities
-import club.pisquad.minecraft.csgrenades.serializer.RotationSerializer
-import club.pisquad.minecraft.csgrenades.serializer.UUIDSerializer
-import club.pisquad.minecraft.csgrenades.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

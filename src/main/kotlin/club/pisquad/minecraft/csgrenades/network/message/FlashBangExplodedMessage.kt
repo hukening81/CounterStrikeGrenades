@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangEffectData
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangEffectRenderer
-import club.pisquad.minecraft.csgrenades.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

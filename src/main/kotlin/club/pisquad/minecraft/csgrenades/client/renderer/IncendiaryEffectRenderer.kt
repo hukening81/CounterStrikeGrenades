@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec2
-import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.event.TickEvent
@@ -17,8 +16,7 @@ import net.minecraftforge.fml.common.Mod
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object IncendiaryEffectRenderer {
-    val randomSource = RandomSource.createNewThreadLocalInstance()
-    val particlePerTick = (FIREGRENADE_RANGE * FIREGRENADE_RANGE * INCENDIARY_PARTICLE_DENSITY).toInt()
+    private val randomSource = RandomSource.createNewThreadLocalInstance()
 
     @SubscribeEvent
     fun tick(event: TickEvent.RenderTickEvent) {
@@ -33,19 +31,22 @@ object IncendiaryEffectRenderer {
                     player.boundingBox.inflate(renderDistance.toDouble() * 16)
                 ) { it.entityData.get(isExplodedAccessor) }
             for (incendiary in incendiaries) {
-                renderOneIncendiary(incendiary.position())
+                renderOneIncendiary(incendiary)
             }
         }
     }
 
-    private fun renderOneIncendiary(position: Vec3) {
+    private fun renderOneIncendiary(incendiary: AbstractFireGrenade) {
         val particleEngine = Minecraft.getInstance().particleEngine
+        val spreadBlocks = incendiary.entityData.get(AbstractFireGrenade.spreadBlocksAccessor) ?: return
+        val particlePerTick =
+            (FIREGRENADE_RANGE * FIREGRENADE_RANGE * INCENDIARY_PARTICLE_DENSITY) * spreadBlocks.size / (FIREGRENADE_RANGE * FIREGRENADE_RANGE)
 
         for (i in 0 until particlePerTick) {
-            val pos = getRandomLocationFromCircle(
-                Vec2(position.x.toFloat(), position.z.toFloat()),
-                FIREGRENADE_RANGE
-            )
+            val position = incendiary.position()
+
+
+            val pos = getRandomLocationFromBlockSurface(spreadBlocks.random())
             if (isPositionInSmoke(
                     position,
                     SMOKE_GRENADE_RADIUS.toDouble() - 0.5
@@ -56,7 +57,7 @@ object IncendiaryEffectRenderer {
 
             val distance = Vec2(
                 position.x.minus(pos.x).toFloat(),
-                position.z.minus(pos.y).toFloat()
+                position.z.minus(pos.z).toFloat()
             ).length().toDouble()
 
             val random = randomSource.nextDouble()
@@ -69,9 +70,9 @@ object IncendiaryEffectRenderer {
 
             particleEngine.createParticle(
                 particleType,
-                pos.x.toDouble(),
-                position.y,
-                pos.y.toDouble(),
+                pos.x,
+                pos.y,
+                pos.z,
                 0.0,
                 0.1,
                 0.0

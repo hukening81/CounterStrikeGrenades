@@ -37,6 +37,7 @@ object CounterStrikeGrenades {
         ModParticles.PARTICLE_TYPES.register(KotlinModLoadingContext.get().getKEventBus())
         CsGrenadePacketHandler.registerMessage()
         MinecraftForge.EVENT_BUS.register(ModCommands)
+        ModSerializers.register()
     }
 
     /**

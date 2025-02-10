@@ -4,17 +4,23 @@ import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
+import club.pisquad.minecraft.csgrenades.registery.ModSerializers
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
 import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.PacketDistributor
+import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.toVec3
 
 abstract class AbstractFireGrenade(
     pEntityType: EntityType<out ThrowableItemProjectile>,
@@ -30,6 +36,18 @@ abstract class AbstractFireGrenade(
     init {
         hitBlockSound = ModSoundEvents.INCENDIARY_BOUNCE.get()
         throwSound = ModSoundEvents.INCENDIARY_THROW.get()
+    }
+
+    companion object {
+        val spreadBlocksAccessor: EntityDataAccessor<List<BlockPos>> = SynchedEntityData.defineId(
+            AbstractFireGrenade::class.java,
+            ModSerializers.blockPosListEntityDataSerializer
+        )
+    }
+
+    override fun defineSynchedData() {
+        super.defineSynchedData()
+        this.entityData.define(spreadBlocksAccessor, listOf())
     }
 
     override fun tick() {
@@ -77,16 +95,26 @@ abstract class AbstractFireGrenade(
                 if (size > 0) {
                     this.extinguished = true
                 }
+                this.entityData.set(
+                    spreadBlocksAccessor,
+                    getSpreadBlocks(this.level(), this.position())
+                )
                 CsGrenadePacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
                     FireGrenadeMessage(
-                        FireGrenadeMessage.MessageType.GroundExploded, this.position()
+                        FireGrenadeMessage.MessageType.GroundExploded, this.position(),
                     )
                 )
+                turnIntoBedRock(this.entityData.get(spreadBlocksAccessor))
                 return
             }
         }
         super.onHitBlock(result)
+    }
+
+    private fun turnIntoBedRock(blockPoses: List<BlockPos>) {
+        blockPoses.forEach { this.level().setBlock(it, Blocks.BEDROCK.defaultBlockState(), 2) }
+
     }
 
     fun extinguish() {
@@ -104,17 +132,38 @@ abstract class AbstractFireGrenade(
         //Should only be run on the server
         val level = this.level() as ServerLevel
         val damageSource = this.getDamageSource()
+        val spreadBlocks = this.entityData.get(spreadBlocksAccessor) ?: return
         for (player in level.players()) {
-            val distance = player.distanceTo(this).toDouble()
-            if (distance < FIREGRENADE_RANGE && !isPositionInSmoke(
-                    player.position(),
-                    SMOKE_GRENADE_RADIUS.toDouble()
-                )
-            ) {
-                val playerMovement = player.deltaMovement
-                player.hurt(damageSource, 3f)
-                player.deltaMovement = playerMovement
+            for (block in spreadBlocks) {
+                if (block.offset(0, 1, 0).toVec3()
+                        .distanceToSqr(player.position()) < 0.5 && !isPositionInSmoke(
+                        player.position(),
+                        SMOKE_GRENADE_RADIUS.toDouble()
+                    )
+                ) {
+                    val playerMovement = player.deltaMovement
+                    player.hurt(damageSource, 3f)
+                    player.deltaMovement = playerMovement
+                }
             }
         }
+    }
+
+    private fun getSpreadBlocks(level: Level, center: Vec3): List<BlockPos> {
+        val blocksAround = getBlockPosAround(center, FIREGRENADE_RANGE)
+        return blocksAround.mapNotNull { getGroundBelow(level, it) }
+    }
+
+    private fun getGroundBelow(level: Level, position: BlockPos): BlockPos? {
+        var currentPos = position
+        var emptySpaceAbove = false
+        repeat(FIRE_MAX_SPREAD_DOWNWARD) {
+            if (level.getBlockState(currentPos).canOcclude() && emptySpaceAbove) {
+                return currentPos
+            }
+            emptySpaceAbove = true
+            currentPos = currentPos.below()
+        }
+        return null
     }
 }

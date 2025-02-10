@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
+import kotlin.random.Random
 
 /**
  *Since KFF is not mapping those methods correctly
@@ -49,6 +50,12 @@ fun getRandomLocationFromCircle(center: Vec2, radius: Double): Vec2 {
     }
 }
 
+fun getRandomLocationFromBlockSurface(position: BlockPos): Vec3 {
+    val x = Random.nextDouble()
+    val z = Random.nextDouble()
+    return Vec3(position.x + x, position.y + 1.0, position.z + z)
+}
+
 fun getFireExtinguishRange(center: Vec3): AABB {
     return AABB(
         center.x - FIRE_EXTINGUISH_RANGE,
@@ -71,12 +78,17 @@ fun isPositionInSmoke(pos: Vec3, radius: Double): Boolean {
     }
 }
 
-fun linearInterpolate(from: Vec3, to: Vec3, t: Double): Vec3 {
-    return Vec3(
-        from.x + (to.x - from.x) * t,
-        from.y + (to.y - from.y) * t,
-        from.z + (to.z - from.z) * t
-    )
+fun getBlockPosAround(pos: Vec3, radius: Int): List<BlockPos> {
+    val pos = BlockPos.containing(pos)
+    val begin = pos.offset(-radius, 0, -radius)
+    val result = mutableListOf<BlockPos>()
+    repeat(radius * 2) { xOffset ->
+        repeat(radius * 2) { zOffset ->
+            result.add(BlockPos(begin.offset(xOffset, 0, zOffset)))
+        }
+    }
+    val center2D = Vec2(pos.x.toFloat(), pos.z.toFloat())
+    return result.filter { center2D.distanceToSqr(Vec2(it.x.toFloat(), it.z.toFloat())) < radius * radius }
 }
 
 fun linearInterpolate(from: Double, to: Double, t: Double): Double {

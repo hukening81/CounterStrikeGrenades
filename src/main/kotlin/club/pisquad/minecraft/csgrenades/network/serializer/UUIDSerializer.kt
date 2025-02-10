@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.serializer
+package club.pisquad.minecraft.csgrenades.network.serializer
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
