@@ -23,9 +23,11 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
+import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import java.time.Duration
 import java.time.Instant
@@ -97,6 +99,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && this.explosionTime == null) {
                 if (this.level() is ClientLevel) {
                     this.clientRenderEffect()
+                } else {
+                    this.entityData.set(spreadBlocksAccessor, getSpreadBlocks())
                 }
                 this.entityData.set(isExplodedAccessor, true)
                 this.explosionTime = Instant.now()
@@ -141,7 +145,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             bb
         ) {
             this.position().distanceTo(it.position()) < FIRE_EXTINGUISH_RANGE &&
-                    it.entityData.get(isExplodedAccessor) }
+                    it.entityData.get(isExplodedAccessor)
+        }
 
         if (this.level() is ServerLevel) {
             extinguishedFires.forEach {
@@ -175,6 +180,24 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
         // Particles
         SmokeRenderManager.render(Minecraft.getInstance().particleEngine, this.position(), this)
+    }
+
+    private fun getSpreadBlocks(): List<BlockPos> {
+        val result = getBlocksAround3D(
+            this.position(),
+            SMOKE_GRENADE_RADIUS
+        ).filter { it.center.distanceToSqr(this.position()) < (SMOKE_GRENADE_RADIUS * SMOKE_GRENADE_RADIUS) + 1 }
+            .filter { pos ->
+                val context = ClipContext(
+                    this.position(),
+                    pos.center,
+                    ClipContext.Block.COLLIDER,
+                    ClipContext.Fluid.NONE,
+                    null
+                ); this.level().clip(context).type == HitResult.Type.MISS
+            }
+        return result
+
     }
 
     override fun getHitDamageSource(): DamageSource {

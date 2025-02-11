@@ -143,7 +143,7 @@ abstract class AbstractFireGrenade(
     }
 
     private fun getSpreadBlocks(level: Level, center: Vec3): List<BlockPos> {
-        val blocksAround = getBlockPosAround(center, FIREGRENADE_RANGE)
+        val blocksAround = getBlockPosAround2D(center, FIREGRENADE_RANGE)
         return blocksAround.mapNotNull { getGroundBelow(level, it) }
     }
 

@@ -86,7 +86,7 @@ fun isPositionInSmoke(pos: Vec3, radius: Double): Boolean {
     }
 }
 
-fun getBlockPosAround(pos: Vec3, radius: Int): List<BlockPos> {
+fun getBlockPosAround2D(pos: Vec3, radius: Int): List<BlockPos> {
     val posVec3 = BlockPos.containing(pos)
     val begin = posVec3.offset(-radius, 0, -radius)
     val result = mutableListOf<BlockPos>()
@@ -97,6 +97,28 @@ fun getBlockPosAround(pos: Vec3, radius: Int): List<BlockPos> {
     }
     val center2D = Vec2(pos.x.toFloat(), pos.z.toFloat())
     return result.filter { center2D.distanceToSqr(Vec2(it.x.toFloat(), it.z.toFloat())) < radius * radius }
+}
+
+fun getBlocksAround3D(pos: Vec3, radius: Int): List<BlockPos> {
+    val posVec3 = BlockPos.containing(pos)
+    val begin = posVec3.offset(-radius, 0, -radius)
+    val result = mutableListOf<BlockPos>()
+    repeat(radius * 2) { xOffset ->
+        repeat(radius * 2) { yOffset ->
+            repeat(radius * 2) { zOffset ->
+                result.add(
+                    BlockPos(
+                        begin.offset(
+                            xOffset,
+                            yOffset,
+                            zOffset
+                        )
+                    )
+                )
+            }
+        }
+    }
+    return result
 }
 
 fun linearInterpolate(from: Double, to: Double, t: Double): Double {

@@ -35,14 +35,20 @@ object SmokeRenderManager {
     }
 
     fun render(particleEngine: ParticleEngine, position: Vec3, smokeEntity: SmokeGrenadeEntity) {
-        renderers.add(SmokeRenderer(particleEngine, position, smokeEntity))
+        renderers.add(
+            SmokeRenderer(
+                particleEngine,
+                position,
+                smokeEntity,
+            )
+        )
     }
 }
 
 class SmokeRenderer(
     private val particleEngine: ParticleEngine,
     private val center: Vec3,
-    private val smokeEntity: SmokeGrenadeEntity
+    private val smokeEntity: SmokeGrenadeEntity,
 ) {
     var done: Boolean = false
     private var tickCount = 0
@@ -58,17 +64,21 @@ class SmokeRenderer(
         // unify generation rate should be ok>?
         for (i in 0..particlePerTick) {
             val location = getRandomLocationFromSphere(center, radius)
-            val particle = particleEngine.createParticle(
-                ModParticles.SMOKE_PARTICLE.get(),
-                location.x,
-                location.y,
-                location.z,
-                0.0,
-                0.0,
-                0.0
-            )
-            if (particle != null) {
-                this.smokeEntity.registerParticle(particle as SmokeGrenadeParticle)
+            if (smokeEntity.entityData.get(SmokeGrenadeEntity.spreadBlocksAccessor)
+                    .any { it.closerToCenterThan(location, 1.0) }
+            ) {
+                val particle = particleEngine.createParticle(
+                    ModParticles.SMOKE_PARTICLE.get(),
+                    location.x,
+                    location.y,
+                    location.z,
+                    0.0,
+                    0.0,
+                    0.0
+                )
+                if (particle != null) {
+                    this.smokeEntity.registerParticle(particle as SmokeGrenadeParticle)
+                }
             }
         }
         if (time > SMOKE_GRENADE_TOTAL_GENERATION_TIME) {
