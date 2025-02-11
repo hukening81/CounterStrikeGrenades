@@ -77,7 +77,7 @@ class HEGrenadeRenderer(
         val particleEngine = Minecraft.getInstance().particleEngine
         val randomSource = RandomSource.createNewThreadLocalInstance()
 
-        for (i in 1..1000) {
+        for (i in 1..500) {
             particleEngine.createParticle(
                 ParticleTypes.SMOKE,
                 data.position.x,
@@ -88,7 +88,7 @@ class HEGrenadeRenderer(
                 randomSource.nextDouble().times(1.4) - 0.7,
             )?.lifetime = 10
         }
-        for (i in 1..300) {
+        for (i in 1..100) {
             val location = getRandomLocationFromSphere(data.position, 4.0)
             particleEngine.createParticle(
                 ParticleTypes.LARGE_SMOKE,
@@ -98,7 +98,7 @@ class HEGrenadeRenderer(
                 0.0,
                 0.0,
                 0.0,
-            )?.scale(2f)?.lifetime = 20
+            )?.scale(1.5f)?.lifetime = 20
         }
     }
 

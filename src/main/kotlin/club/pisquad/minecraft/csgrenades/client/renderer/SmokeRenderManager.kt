@@ -1,6 +1,8 @@
 package club.pisquad.minecraft.csgrenades.client.renderer
 
 import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registery.ModParticles
 import net.minecraft.client.particle.ParticleEngine
 import net.minecraft.world.phys.Vec3
@@ -32,14 +34,15 @@ object SmokeRenderManager {
         }
     }
 
-    fun render(particleEngine: ParticleEngine, position: Vec3) {
-        renderers.add(SmokeRenderer(particleEngine, position))
+    fun render(particleEngine: ParticleEngine, position: Vec3, smokeEntity: SmokeGrenadeEntity) {
+        renderers.add(SmokeRenderer(particleEngine, position, smokeEntity))
     }
 }
 
 class SmokeRenderer(
     private val particleEngine: ParticleEngine,
-    private val center: Vec3
+    private val center: Vec3,
+    private val smokeEntity: SmokeGrenadeEntity
 ) {
     var done: Boolean = false
     private var tickCount = 0
@@ -55,7 +58,7 @@ class SmokeRenderer(
         // unify generation rate should be ok>?
         for (i in 0..particlePerTick) {
             val location = getRandomLocationFromSphere(center, radius)
-            particleEngine.createParticle(
+            val particle = particleEngine.createParticle(
                 ModParticles.SMOKE_PARTICLE.get(),
                 location.x,
                 location.y,
@@ -64,6 +67,9 @@ class SmokeRenderer(
                 0.0,
                 0.0
             )
+            if (particle != null) {
+                this.smokeEntity.registerParticle(particle as SmokeGrenadeParticle)
+            }
         }
         if (time > SMOKE_GRENADE_TOTAL_GENERATION_TIME) {
             this.done = true

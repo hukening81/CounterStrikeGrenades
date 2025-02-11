@@ -2,10 +2,11 @@ package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.HEGRENADE_BASE_DAMAGE
 import club.pisquad.minecraft.csgrenades.HEGRENADE_DAMAGE_RANGE
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
+import club.pisquad.minecraft.csgrenades.SMOKE_GRENADE_RADIUS
 import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeExplosionData
 import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeRenderManager
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
 import club.pisquad.minecraft.csgrenades.registery.ModDamageType
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
@@ -36,6 +37,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
                 this.doDamage()
             } else {
                 HEGrenadeRenderManager.render(HEGrenadeExplosionData(this.position()))
+                this.blowUpNearbySmokeGrenade()
             }
             this.entityData.set(isExplodedAccessor, true)
         }
@@ -70,6 +72,15 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_HIT),
             this
         )
+    }
+
+    private fun blowUpNearbySmokeGrenade() {
+        this.level().getEntitiesOfClass(
+            SmokeGrenadeEntity::class.java,
+            this.boundingBox.inflate(HEGRENADE_DAMAGE_RANGE + SMOKE_GRENADE_RADIUS)
+        ).forEach {
+            it.clearSmokeWithinRange(this.position(), HEGRENADE_DAMAGE_RANGE + 2.5)
+        }
     }
 }
 

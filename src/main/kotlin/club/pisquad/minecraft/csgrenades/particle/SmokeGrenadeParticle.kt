@@ -1,6 +1,8 @@
 package club.pisquad.minecraft.csgrenades.particle
 
 import club.pisquad.minecraft.csgrenades.SMOKE_GRENADE_SMOKE_LIFETIME
+import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.client.Camera
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.ParticleProvider
 import net.minecraft.client.particle.ParticleRenderType
@@ -8,7 +10,7 @@ import net.minecraft.client.particle.SpriteSet
 import net.minecraft.client.particle.TextureSheetParticle
 import net.minecraft.core.particles.SimpleParticleType
 
-class SmokeParticle(
+class SmokeGrenadeParticle(
     level: ClientLevel,
     x: Double,
     y: Double,
@@ -17,17 +19,32 @@ class SmokeParticle(
     ySpeed: Double,
     zSpeed: Double
 ) : TextureSheetParticle(level, x, y, z, xSpeed, ySpeed, zSpeed) {
+    var opacityTime: Int = 0
+
     init {
         this.gravity = 0f
         this.setParticleSpeed(0.0, 0.0, 0.0)
-        this.lifetime = (SMOKE_GRENADE_SMOKE_LIFETIME * 20).toInt()
-        this.scale(5f)
+        this.lifetime = (SMOKE_GRENADE_SMOKE_LIFETIME * 20)
+        this.scale(4f)
+    }
+
+    override fun tick() {
+        super.tick()
+        if (this.opacityTime > 0) {
+            this.alpha = 0f
+            this.opacityTime--
+        } else {
+            this.alpha = 1f
+        }
     }
 
     override fun getRenderType(): ParticleRenderType {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
     }
 
+    override fun render(pBuffer: VertexConsumer, pRenderInfo: Camera, pPartialTicks: Float) {
+        super.render(pBuffer, pRenderInfo, pPartialTicks)
+    }
 }
 
 class SmokeParticleFactory(
@@ -42,8 +59,8 @@ class SmokeParticleFactory(
         xSpeed: Double,
         ySpeed: Double,
         zSpeed: Double
-    ): SmokeParticle {
-        val particle = SmokeParticle(level, x, y, z, 0.0, 0.0, 0.0)
+    ): SmokeGrenadeParticle {
+        val particle = SmokeGrenadeParticle(level, x, y, z, 0.0, 0.0, 0.0)
         particle.pickSprite(spriteSet)
         return particle
     }

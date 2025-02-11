@@ -1,8 +1,9 @@
 package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.client.renderer.SmokeRenderManager
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registery.ModDamageType
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import club.pisquad.minecraft.csgrenades.registery.ModSerializers
@@ -23,14 +24,19 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import java.time.Duration
+import java.time.Instant
 
 class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
     CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
 
     private var lastPos: Vec3i = Vec3i(0, 0, 0)
     private var localIsExploded = false
+    private val particles = mutableMapOf<Vec3i, List<SmokeGrenadeParticle>>()
+    private var explosionTime: Instant? = null
 
     override fun getDefaultItem(): Item {
         return ModItems.SMOKE_GRENADE_ITEM.get()
@@ -48,27 +54,63 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         this.entityData.define(SmokeGrenadeEntity.spreadBlocksAccessor, listOf())
     }
 
+    fun registerParticle(particle: SmokeGrenadeParticle) {
+        val pos = particle.pos.toVec3i()
+        if (this.particles.containsKey(pos)) {
+            this.particles[pos] = this.particles[pos]!!.plus(particle)
+        } else {
+            this.particles[pos] = listOf(particle)
+        }
+    }
+
+    fun clearSmokeWithinRange(position: Vec3, range: Double) {
+        val bb = AABB(BlockPos(position.toVec3i())).inflate(range)
+        this.particles.filter { bb.contains(it.key.toVec3()) }.forEach {
+            it.value.forEach { particle ->
+                if (particle.pos.distanceTo(position) < range) {
+                    particle.opacityTime = getRegenerationTime(particle.pos.distanceTo(position), range)
+                }
+            }
+        }
+    }
+
+    private fun getRegenerationTime(distance: Double, radius: Double): Int {
+        return linearInterpolate(
+            0.0,
+            SMOKE_GRENADE_TIME_BEFORE_REGENERATE * 20,
+            distance / radius
+        ).toInt() + linearInterpolate(
+            SMOKE_GRENADE_REGENERATE_TIME * 20,
+            0.0,
+            distance / radius
+        ).toInt()
+    }
+
     override fun tick() {
         super.tick()
-
-
         if (this.entityData.get(isLandedAccessor)) {
             if (this.position() == Vec3(this.xOld, this.yOld, this.zOld)) {
                 this.tickCount++
             } else {
                 tickCount = 0
             }
-            if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && !localIsExploded) {
+            if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && this.explosionTime == null) {
                 if (this.level() is ClientLevel) {
                     this.clientRenderEffect()
-                    localIsExploded = true
                 }
                 this.entityData.set(isExplodedAccessor, true)
+                this.explosionTime = Instant.now()
             }
         }
         if (this.level() is ServerLevel) {
-            if (this.entityData.get(isLandedAccessor)) {
-                if (getTimeFromTickCount(tickCount.toDouble()) > SMOKE_GRENADE_SMOKE_LIFETIME) {
+            if (this.entityData.get(isExplodedAccessor)) {
+                if (this.explosionTime != null && Duration.between(
+                        this.explosionTime,
+                        Instant.now()
+                    ) > Duration.ofSeconds(
+                        SMOKE_GRENADE_SMOKE_LIFETIME.toLong()
+                    )
+                ) {
                     this.kill()
                 }
                 extinguishNearbyFires()
@@ -95,15 +137,18 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         val bb = getFireExtinguishRange(this.position())
 
         val extinguishedFires = this.level().getEntitiesOfClass(
-            IncendiaryEntity::class.java,
+            AbstractFireGrenade::class.java,
             bb
-        ) { this.position().distanceTo(it.position()) < FIRE_EXTINGUISH_RANGE && it.entityData.get(isExplodedAccessor) }
+        ) {
+            this.position().distanceTo(it.position()) < FIRE_EXTINGUISH_RANGE &&
+                    it.entityData.get(isExplodedAccessor) }
 
         if (this.level() is ServerLevel) {
-            extinguishedFires.forEach { it.extinguish() }
+            extinguishedFires.forEach {
+                it.extinguish()
+            }
         }
         return extinguishedFires.size
-
     }
 
     private fun clientRenderEffect() {
@@ -129,7 +174,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         soundManager.play(soundInstance)
 
         // Particles
-        SmokeRenderManager.render(Minecraft.getInstance().particleEngine, this.position())
+        SmokeRenderManager.render(Minecraft.getInstance().particleEngine, this.position(), this)
     }
 
     override fun getHitDamageSource(): DamageSource {
