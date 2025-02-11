@@ -185,11 +185,15 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         soundManager.play(soundInstance)
 
         // Particles
-        SmokeRenderManager.render(Minecraft.getInstance().particleEngine, this.position(), this)
+        SmokeRenderManager.render(
+            Minecraft.getInstance().particleEngine,
+            this.position(),
+            this,
+        )
     }
 
     private fun calculateSpreadBlocks(): List<BlockPos> {
-        val result = getBlocksAround3D(
+        val initialSmoke = getBlocksAround3D(
             this.position(),
             SMOKE_GRENADE_RADIUS + 1, SMOKE_GRENADE_RADIUS - 1, SMOKE_GRENADE_RADIUS + 1
         ).filter { it.center.distanceToSqr(this.position()) < (SMOKE_GRENADE_RADIUS * SMOKE_GRENADE_RADIUS) + 1 }
@@ -202,8 +206,30 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                     null
                 ); this.level().clip(context).type == HitResult.Type.MISS
             }
-        return result
+        val fallDownSmoke = mutableListOf<BlockPos>()
+        initialSmoke.forEach {
+            fallDownSmoke.addAll(
+                getSpaceBelow(it)
+            )
+        }
+        return (initialSmoke + fallDownSmoke).distinct()
 
+    }
+
+    private fun getSpaceBelow(position: BlockPos): List<BlockPos> {
+        // Temporarily set the maximum fall down height to 10
+        val result = mutableListOf<BlockPos>()
+        var currentPos = position
+        repeat(20) {
+            if (this.level().getBlockState(currentPos.below()).isAir
+            ) {
+                result.add(currentPos)
+                currentPos = currentPos.below()
+            } else {
+                return result
+            }
+        }
+        return result
     }
 
     override fun getHitDamageSource(): DamageSource {

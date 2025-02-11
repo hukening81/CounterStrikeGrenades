@@ -5,6 +5,8 @@ import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registery.ModParticles
 import net.minecraft.client.particle.ParticleEngine
+import net.minecraft.core.BlockPos
+import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.event.TickEvent
@@ -34,7 +36,11 @@ object SmokeRenderManager {
         }
     }
 
-    fun render(particleEngine: ParticleEngine, position: Vec3, smokeEntity: SmokeGrenadeEntity) {
+    fun render(
+        particleEngine: ParticleEngine,
+        position: Vec3,
+        smokeEntity: SmokeGrenadeEntity,
+    ) {
         renderers.add(
             SmokeRenderer(
                 particleEngine,
@@ -52,26 +58,52 @@ class SmokeRenderer(
 ) {
     var done: Boolean = false
     private var tickCount = 0
-    private val particlePerTick =
-        SMOKE_GRENADE_PARTICLE_COUNT.div(SMOKE_GRENADE_TOTAL_GENERATION_TIME.times(20)).toInt()
+    private val randomSource = RandomSource.createNewThreadLocalInstance()
+
+    private val baseBlockPerTick = 200
+    private val blockPerTickDistanceRatio = 0.5
+    private val particlePerBlock = 5
+    private var rendered = false
+
+    //        SMOKE_GRENADE_PARTICLE_COUNT.div(SMOKE_GRENADE_TOTAL_GENERATION_TIME.times(20)).toInt()
+    private var renderBlockPos: MutableList<BlockPos> = mutableListOf()
 
     fun update() {
-        val time = getTimeFromTickCount(tickCount.toDouble())
-        val radius: Double = when {
-            time < SMOKE_GRENADE_SPREAD_TIME -> (time.div(SMOKE_GRENADE_SPREAD_TIME).times(SMOKE_GRENADE_RADIUS)) + .1
-            else -> SMOKE_GRENADE_RADIUS.toDouble()
+        tickCount++
+//        In case there is an error, we will force quite the renderer
+        if (getTimeFromTickCount(tickCount.toDouble()) > SMOKE_GRENADE_SMOKE_LIFETIME) {
+            this.done = true
+            return
         }
+//        We will wait for the spreadBlock property is calculated and synced from the server
+
+        if (!this.rendered) {
+            this.renderBlockPos = this.smokeEntity.getSpreadBlocks().toMutableList()
+            if (this.renderBlockPos.isNotEmpty()) {
+                this.renderBlockPos.sortBy { it.distSqr(center.toVec3i()) }
+                this.rendered = true
+            } else {
+                return
+            }
+        }
+
+
         // unify generation rate should be ok>?
-        for (i in 0..particlePerTick) {
-            val location = getRandomLocationFromSphere(center, radius)
-            if (smokeEntity.entityData.get(SmokeGrenadeEntity.spreadBlocksAccessor)
-                    .any { it.closerToCenterThan(location, 1.0) }
-            ) {
+        val blockPerTick =
+            (this.renderBlockPos[0].distSqr(center.toVec3i()) * (1 + blockPerTickDistanceRatio)).toInt() + 1
+        repeat(blockPerTick) { blockCount ->
+            if (this.renderBlockPos.isEmpty()) {
+                this.done = true
+                return
+            }
+            val position = this.renderBlockPos[0].toVec3()
+            repeat(particlePerBlock) { particleCount ->
+                val shuffledPosition = position.offsetRandom(this.randomSource, 1f)
                 val particle = particleEngine.createParticle(
                     ModParticles.SMOKE_PARTICLE.get(),
-                    location.x,
-                    location.y,
-                    location.z,
+                    shuffledPosition.x,
+                    shuffledPosition.y,
+                    shuffledPosition.z,
                     0.0,
                     0.0,
                     0.0
@@ -80,11 +112,8 @@ class SmokeRenderer(
                     this.smokeEntity.registerParticle(particle as SmokeGrenadeParticle)
                 }
             }
+            this.renderBlockPos.removeAt(0)
         }
-        if (time > SMOKE_GRENADE_TOTAL_GENERATION_TIME) {
-            this.done = true
-            return
-        }
-        tickCount++
+
     }
 }
