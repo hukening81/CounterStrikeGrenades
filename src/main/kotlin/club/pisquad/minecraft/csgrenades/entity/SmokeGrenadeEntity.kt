@@ -129,12 +129,15 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
     override fun onHitBlock(result: BlockHitResult) {
         // If the smoke hit the ground with in any incendiary's range, it will emit right away
+        super.onHitBlock(result)
         if (result.direction == Direction.UP) {
             if (extinguishNearbyFires() > 0) {
                 this.entityData.set(isLandedAccessor, true)
+                if (this.level() is ServerLevel && result.isInside) {
+                    this.setPos(Vec3(this.position().x, result.blockPos.y + 1.0, this.position().z))
+                }
             }
         }
-        super.onHitBlock(result)
     }
 
     private fun extinguishNearbyFires(): Int {
@@ -185,7 +188,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private fun getSpreadBlocks(): List<BlockPos> {
         val result = getBlocksAround3D(
             this.position(),
-            SMOKE_GRENADE_RADIUS + 1, SMOKE_GRENADE_RADIUS-1, SMOKE_GRENADE_RADIUS + 1
+            SMOKE_GRENADE_RADIUS + 1, SMOKE_GRENADE_RADIUS - 1, SMOKE_GRENADE_RADIUS + 1
         ).filter { it.center.distanceToSqr(this.position()) < (SMOKE_GRENADE_RADIUS * SMOKE_GRENADE_RADIUS) + 1 }
             .filter { pos ->
                 val context = ClipContext(
