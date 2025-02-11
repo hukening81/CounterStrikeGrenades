@@ -1,12 +1,9 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.HEGRENADE_BASE_DAMAGE
-import club.pisquad.minecraft.csgrenades.HEGRENADE_DAMAGE_RANGE
-import club.pisquad.minecraft.csgrenades.SMOKE_GRENADE_RADIUS
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeExplosionData
 import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeRenderManager
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
 import club.pisquad.minecraft.csgrenades.registery.ModDamageType
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
@@ -78,6 +75,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         this.level().getEntitiesOfClass(
             SmokeGrenadeEntity::class.java,
             this.boundingBox.inflate(HEGRENADE_DAMAGE_RANGE + SMOKE_GRENADE_RADIUS)
+                .inflate(0.0, SMOKE_GRENADE_FALLDOWN_HEIGHT.toDouble(), 0.0)
         ).forEach {
             it.clearSmokeWithinRange(this.position(), HEGRENADE_DAMAGE_RANGE + 2.5)
         }

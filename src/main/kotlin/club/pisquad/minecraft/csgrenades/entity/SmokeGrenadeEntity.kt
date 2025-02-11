@@ -220,7 +220,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         // Temporarily set the maximum fall down height to 10
         val result = mutableListOf<BlockPos>()
         var currentPos = position
-        repeat(20) {
+        repeat(SMOKE_GRENADE_FALLDOWN_HEIGHT) {
             if (this.level().getBlockState(currentPos.below()).isAir
             ) {
                 result.add(currentPos)
