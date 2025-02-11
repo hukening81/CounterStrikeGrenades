@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.client.renderer.FireGrenadeRenderer
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
@@ -25,11 +26,13 @@ abstract class AbstractFireGrenade(
     pLevel: Level,
     grenadeType: GrenadeType,
 ) :
+
     CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
 
-    var explosionTick = 0
-    var extinguished = false
-    var poppedInAir = false
+    private var explosionTick = 0
+    private var extinguished = false
+    private var poppedInAir = false
+    private var spreadBlocks: MutableList<BlockPos> = mutableListOf()
 
     init {
         hitBlockSound = ModSoundEvents.INCENDIARY_BOUNCE.get()
@@ -50,24 +53,29 @@ abstract class AbstractFireGrenade(
 
     override fun tick() {
         super.tick()
-        if (this.level() is ClientLevel) return
-        if (this.entityData.get(isExplodedAccessor)) {
-            // Damage players within range
-            this.doDamage()
-
-            if (getTimeFromTickCount((this.tickCount - this.explosionTick).toDouble()) > FIREGRENADE_LIFETIME) {
-                this.kill()
-                return
+        if (this.level() is ClientLevel) {
+            if (!this.poppedInAir && this.entityData.get(isExplodedAccessor)) {
+                FireGrenadeRenderer.renderOne(this)
             }
-        }
-        if (!this.entityData.get(isExplodedAccessor) && getTimeFromTickCount(this.tickCount.toDouble()) > FIREGRENADE_FUSE_TIME) {
-            this.entityData.set(isExplodedAccessor, true)
-            this.poppedInAir = true
-            CsGrenadePacketHandler.INSTANCE.send(
-                PacketDistributor.ALL.noArg(),
-                FireGrenadeMessage(FireGrenadeMessage.MessageType.AirExploded, this.position())
-            )
-            this.kill()
+        } else {
+            if (this.entityData.get(isExplodedAccessor)) {
+                // Damage players within range
+                this.doDamage()
+
+                if (getTimeFromTickCount((this.tickCount - this.explosionTick).toDouble()) > FIREGRENADE_LIFETIME) {
+                    this.kill()
+                    return
+                }
+            }
+            if (!this.entityData.get(isExplodedAccessor) && getTimeFromTickCount(this.tickCount.toDouble()) > FIREGRENADE_FUSE_TIME) {
+                this.entityData.set(isExplodedAccessor, true)
+                this.poppedInAir = true
+                CsGrenadePacketHandler.INSTANCE.send(
+                    PacketDistributor.ALL.noArg(),
+                    FireGrenadeMessage(FireGrenadeMessage.MessageType.AirExploded, this.position())
+                )
+                this.kill()
+            }
         }
     }
 
@@ -95,7 +103,7 @@ abstract class AbstractFireGrenade(
                 }
                 this.entityData.set(
                     spreadBlocksAccessor,
-                    getSpreadBlocks(this.level(), this.position())
+                    calculateSpreadBlocks(this.level(), this.position())
                 )
                 CsGrenadePacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
@@ -131,7 +139,6 @@ abstract class AbstractFireGrenade(
                 if (Vec3.atCenterOf(offset)
                         .distanceToSqr(player.position()) < 0.5 && !isPositionInSmoke(
                         player.position(),
-                        SMOKE_GRENADE_RADIUS.toDouble()
                     )
                 ) {
                     val playerMovement = player.deltaMovement
@@ -142,7 +149,7 @@ abstract class AbstractFireGrenade(
         }
     }
 
-    private fun getSpreadBlocks(level: Level, center: Vec3): List<BlockPos> {
+    private fun calculateSpreadBlocks(level: Level, center: Vec3): List<BlockPos> {
         val blocksAround = getBlockPosAround2D(center, FIREGRENADE_RANGE)
         return blocksAround.mapNotNull { getGroundBelow(level, it) }
     }
@@ -158,5 +165,12 @@ abstract class AbstractFireGrenade(
             currentPos = currentPos.below()
         }
         return null
+    }
+
+    fun getSpreadBlocks(): List<BlockPos> {
+        if (spreadBlocks.isEmpty()) {
+            this.spreadBlocks.addAll(this.entityData.get(spreadBlocksAccessor))
+        }
+        return this.spreadBlocks
     }
 }

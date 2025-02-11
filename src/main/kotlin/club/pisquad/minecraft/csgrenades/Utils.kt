@@ -1,6 +1,5 @@
 package club.pisquad.minecraft.csgrenades
 
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
@@ -75,14 +74,14 @@ fun getFireExtinguishRange(center: Vec3): AABB {
     )
 }
 
-fun isPositionInSmoke(pos: Vec3, radius: Double): Boolean {
+fun isPositionInSmoke(pos: Vec3): Boolean {
     val level = Minecraft.getInstance().level ?: return false
-
+    val blockPos = BlockPos.containing(pos)
     return level.getEntitiesOfClass(
         SmokeGrenadeEntity::class.java,
-        AABB(BlockPos(pos.toVec3i())).inflate(radius)
+        AABB(BlockPos(pos.toVec3i())).inflate(SMOKE_GRENADE_RADIUS.toDouble())
     ).any {
-        it.entityData.get(CounterStrikeGrenadeEntity.isExplodedAccessor) && it.position().distanceTo(pos) < radius
+        it.getSpreadBlocks().any { block -> block == blockPos }
     }
 }
 

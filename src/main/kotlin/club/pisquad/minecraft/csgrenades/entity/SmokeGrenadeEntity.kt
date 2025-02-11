@@ -36,9 +36,9 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
 
     private var lastPos: Vec3i = Vec3i(0, 0, 0)
-    private var localIsExploded = false
     private val particles = mutableMapOf<Vec3i, List<SmokeGrenadeParticle>>()
     private var explosionTime: Instant? = null
+    private val spreadBlocksCache: MutableList<BlockPos> = mutableListOf()
 
     override fun getDefaultItem(): Item {
         return ModItems.SMOKE_GRENADE_ITEM.get()
@@ -100,7 +100,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 if (this.level() is ClientLevel) {
                     this.clientRenderEffect()
                 } else {
-                    this.entityData.set(spreadBlocksAccessor, getSpreadBlocks())
+                    this.entityData.set(spreadBlocksAccessor, calculateSpreadBlocks())
                 }
                 this.entityData.set(isExplodedAccessor, true)
                 this.explosionTime = Instant.now()
@@ -147,8 +147,11 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             AbstractFireGrenade::class.java,
             bb
         ) {
-            this.position().distanceTo(it.position()) < FIRE_EXTINGUISH_RANGE &&
-                    it.entityData.get(isExplodedAccessor)
+            it.entityData.get(isExplodedAccessor) && it.getSpreadBlocks().any { blockPos: BlockPos ->
+                blockPos.distSqr(
+                    this.position().toVec3i()
+                ) < 1
+            }
         }
 
         if (this.level() is ServerLevel) {
@@ -185,7 +188,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         SmokeRenderManager.render(Minecraft.getInstance().particleEngine, this.position(), this)
     }
 
-    private fun getSpreadBlocks(): List<BlockPos> {
+    private fun calculateSpreadBlocks(): List<BlockPos> {
         val result = getBlocksAround3D(
             this.position(),
             SMOKE_GRENADE_RADIUS + 1, SMOKE_GRENADE_RADIUS - 1, SMOKE_GRENADE_RADIUS + 1
@@ -208,6 +211,13 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         return DamageSource(
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.SMOKEGRENADE_HIT), this
         )
+    }
+
+    fun getSpreadBlocks(): List<BlockPos> {
+        if (this.spreadBlocksCache.isEmpty()) {
+            this.spreadBlocksCache.addAll(this.entityData.get(spreadBlocksAccessor))
+        }
+        return this.spreadBlocksCache
     }
 }
 
