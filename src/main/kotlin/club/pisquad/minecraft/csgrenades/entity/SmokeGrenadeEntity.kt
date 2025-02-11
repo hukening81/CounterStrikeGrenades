@@ -185,7 +185,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private fun getSpreadBlocks(): List<BlockPos> {
         val result = getBlocksAround3D(
             this.position(),
-            SMOKE_GRENADE_RADIUS
+            SMOKE_GRENADE_RADIUS + 1, SMOKE_GRENADE_RADIUS-1, SMOKE_GRENADE_RADIUS + 1
         ).filter { it.center.distanceToSqr(this.position()) < (SMOKE_GRENADE_RADIUS * SMOKE_GRENADE_RADIUS) + 1 }
             .filter { pos ->
                 val context = ClipContext(

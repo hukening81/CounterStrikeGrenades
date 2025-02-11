@@ -99,13 +99,13 @@ fun getBlockPosAround2D(pos: Vec3, radius: Int): List<BlockPos> {
     return result.filter { center2D.distanceToSqr(Vec2(it.x.toFloat(), it.z.toFloat())) < radius * radius }
 }
 
-fun getBlocksAround3D(pos: Vec3, radius: Int): List<BlockPos> {
+fun getBlocksAround3D(pos: Vec3, xRange: Int, yRange: Int, zRange: Int): List<BlockPos> {
     val posVec3 = BlockPos.containing(pos)
-    val begin = posVec3.offset(-radius, 0, -radius)
+    val begin = posVec3.offset(-xRange, -yRange, -zRange)
     val result = mutableListOf<BlockPos>()
-    repeat(radius * 2) { xOffset ->
-        repeat(radius * 2) { yOffset ->
-            repeat(radius * 2) { zOffset ->
+    repeat(xRange * 2) { xOffset ->
+        repeat(yRange * 2) { yOffset ->
+            repeat(zRange * 2) { zOffset ->
                 result.add(
                     BlockPos(
                         begin.offset(
