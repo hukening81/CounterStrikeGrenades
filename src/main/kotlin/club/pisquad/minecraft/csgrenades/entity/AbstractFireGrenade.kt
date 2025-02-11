@@ -19,7 +19,6 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.PacketDistributor
-import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.toVec3
 
 abstract class AbstractFireGrenade(
     pEntityType: EntityType<out ThrowableItemProjectile>,
@@ -128,7 +127,8 @@ abstract class AbstractFireGrenade(
         val spreadBlocks = this.entityData.get(spreadBlocksAccessor) ?: return
         for (player in level.players()) {
             for (block in spreadBlocks) {
-                if (block.offset(0, 1, 0).toVec3()
+                val offset = block.offset(0, 1, 0)
+                if (Vec3.atCenterOf(offset)
                         .distanceToSqr(player.position()) < 0.5 && !isPositionInSmoke(
                         player.position(),
                         SMOKE_GRENADE_RADIUS.toDouble()
