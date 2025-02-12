@@ -157,7 +157,7 @@ abstract class AbstractFireGrenade(
     }
 
     private fun calculateSpreadBlocks(level: Level, center: Vec3): List<BlockPos> {
-        val blocksAround = getBlockPosAround2D(center, FIREGRENADE_RANGE)
+        val blocksAround = getBlockPosAround2D(center.add(0.0, 1.0, 0.0), FIREGRENADE_RANGE)
         return blocksAround.mapNotNull { getGroundBelow(level, it) }
     }
 
@@ -165,10 +165,15 @@ abstract class AbstractFireGrenade(
         var currentPos = position
         var emptySpaceAbove = false
         repeat(FIRE_MAX_SPREAD_DOWNWARD) {
-            if (!level.getBlockState(currentPos).isAir && emptySpaceAbove) {
-                return currentPos
+            if (!level.getBlockState(currentPos).isAir) {
+                return if (emptySpaceAbove) {
+                    currentPos
+                } else {
+                    null
+                }
+            } else {
+                emptySpaceAbove = true
             }
-            emptySpaceAbove = true
             currentPos = currentPos.below()
         }
         return null
