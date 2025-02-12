@@ -23,14 +23,13 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
-import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import java.time.Duration
 import java.time.Instant
+import kotlin.random.Random
 
 class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
     CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
@@ -205,19 +204,9 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     }
 
     private fun calculateSpreadBlocks(): List<BlockPos> {
-        val initialSmoke = getBlocksAround3D(
-            this.position(),
-            SMOKE_GRENADE_RADIUS, SMOKE_GRENADE_RADIUS - 2, SMOKE_GRENADE_RADIUS
-        ).filter { it.center.distanceToSqr(this.position()) < (SMOKE_GRENADE_RADIUS * SMOKE_GRENADE_RADIUS) + 1 }
-            .filter { pos ->
-                val context = ClipContext(
-                    this.position(),
-                    pos.center,
-                    ClipContext.Block.COLLIDER,
-                    ClipContext.Fluid.NONE,
-                    null
-                ); this.level().clip(context).type == HitResult.Type.MISS
-            }
+        val initialSmoke = SmokeGrenadeSpreadBlockCalculator(
+            5, 1500, 2, this.blockPosition()
+        ).calculate(this.level())
         val fallDownSmoke = mutableListOf<BlockPos>()
         initialSmoke.forEach {
             fallDownSmoke.addAll(
@@ -225,7 +214,6 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             )
         }
         return (initialSmoke + fallDownSmoke).distinct()
-
     }
 
     private fun getSpaceBelow(position: BlockPos): List<BlockPos> {
@@ -260,5 +248,62 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
     fun canDistinguishFire(position: Vec3): Boolean {
         return this.getSpreadBlocks().any { it.center.distanceToSqr(position) < 2.0 }
+    }
+}
+
+private class SmokeGrenadeSpreadBlockCalculator(
+    val generateCycle: Int,
+    val blockPerCycle: Int,
+    val stepPerMove: Int,
+    val origin: BlockPos,
+) {
+
+    fun calculate(level: Level): List<BlockPos> {
+        val blocks = mutableListOf<BlockPos>()
+        var generatedInLastCycle = mutableListOf<BlockPos>(origin)
+        var generatedInCurrentCycle = mutableListOf<BlockPos>()
+        repeat(generateCycle) {
+            repeat(blockPerCycle) {
+                generatedInLastCycle.random().let {
+                    var currentLocation = it
+                    repeat(stepPerMove) {
+                        currentLocation = randomMoveOnce(level, currentLocation)
+                    }
+                    generatedInCurrentCycle.add(currentLocation)
+                }
+            }
+            blocks.addAll(generatedInLastCycle)
+            generatedInLastCycle = generatedInCurrentCycle
+            generatedInCurrentCycle = mutableListOf()
+        }
+        return blocks.distinct()
+    }
+
+    private fun randomMoveOnce(level: Level, blockPos: BlockPos): BlockPos {
+        val newLocation = when (randomDirection()) {
+            Direction.UP -> blockPos.below()
+            Direction.DOWN -> blockPos.above()
+            Direction.NORTH -> blockPos.north()
+            Direction.SOUTH -> blockPos.south()
+            Direction.WEST -> blockPos.west()
+            Direction.EAST -> blockPos.east()
+        }
+        if (level.getBlockState(newLocation).isAir) {
+            return newLocation
+        }
+
+        return blockPos
+    }
+
+    private fun randomDirection(): Direction {
+        return when ((Random.nextInt(10))) {
+            0 -> Direction.UP
+            1, 5 -> Direction.DOWN
+            2, 6 -> Direction.NORTH
+            3, 7 -> Direction.SOUTH
+            4, 8 -> Direction.WEST
+            else -> Direction.EAST
+
+        }
     }
 }

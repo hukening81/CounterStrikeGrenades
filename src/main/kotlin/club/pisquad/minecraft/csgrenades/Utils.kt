@@ -115,12 +115,3 @@ fun getBlocksAround3D(pos: Vec3, xRange: Int, yRange: Int, zRange: Int): List<Bl
 fun linearInterpolate(from: Double, to: Double, t: Double): Double {
     return from + (to - from) * t
 }
-
-fun randomDirection(origin: BlockPos): BlockPos {
-    return when ((Random.nextInt(4))) {
-        0 -> origin.north()
-        1 -> origin.south()
-        2 -> origin.west()
-        else -> origin.east()
-    }
-}
