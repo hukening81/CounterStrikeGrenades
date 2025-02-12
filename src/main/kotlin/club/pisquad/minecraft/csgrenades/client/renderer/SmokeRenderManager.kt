@@ -86,8 +86,11 @@ class SmokeRenderer(
                 return
             }
         }
-
-
+        // Sometime there will be an OutOfBound error, this is a safety treatment
+        if (this.renderBlockPos.isEmpty()) {
+            this.done = true
+            return
+        }
         // unify generation rate should be ok>?
         val blockPerTick =
             (this.renderBlockPos[0].distSqr(center.toVec3i()) * (1 + blockPerTickDistanceRatio)).toInt() + 1
