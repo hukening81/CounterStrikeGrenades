@@ -1,14 +1,20 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
+import club.pisquad.minecraft.csgrenades.SoundTypes
+import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangBlindEffectRenderer
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangParticleEffectRenderer
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.minecraft.client.Minecraft
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.sounds.SoundSource
+import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
@@ -19,6 +25,7 @@ import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.acos
 import kotlin.math.max
+import kotlin.math.sqrt
 
 @Serializable
 data class FlashbangEffectData(
@@ -83,15 +90,13 @@ data class FlashbangEffectData(
 
 @Serializable
 data class AffectedPlayerInfo(
-    @Serializable(with = UUIDSerializer::class) val uuid: UUID,
-    val effectData: FlashbangEffectData
+    @Serializable(with = UUIDSerializer::class) val uuid: UUID, val effectData: FlashbangEffectData
 )
 
 
 @Serializable
 class FlashBangExplodedMessage(
-    @Serializable(with = Vec3Serializer::class) val position: Vec3,
-    val affectedPlayers: List<AffectedPlayerInfo>
+    @Serializable(with = Vec3Serializer::class) val position: Vec3, val affectedPlayers: List<AffectedPlayerInfo>
 ) {
     companion object {
 
@@ -116,8 +121,33 @@ class FlashBangExplodedMessage(
                         FlashbangParticleEffectRenderer.render(playerInfo)
                     }
                 }
-
+                playExplosionSound(msg.position)
             }
         }
     }
+}
+
+private fun playExplosionSound(position: Vec3) {
+    val distance = sqrt(Minecraft.getInstance().player!!.distanceToSqr(position))
+    val soundEvent = when {
+        distance <= 15 -> ModSoundEvents.FLASHBANG_EXPLODE.get()
+        else -> ModSoundEvents.FLASHBANG_EXPLODE_DISTANT.get()
+    }
+    val soundType = when {
+        distance <= 15 -> SoundTypes.FLASHBANG_EXPLODE
+        else -> SoundTypes.FLASHBANG_EXPLODE_DISTANT
+    }
+    Minecraft.getInstance().soundManager.play(
+        SimpleSoundInstance(
+            soundEvent,
+            SoundSource.AMBIENT,
+            SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
+            1f,
+            RandomSource.createNewThreadLocalInstance(),
+            position.x,
+            position.y,
+            position.z
+        )
+    )
+
 }

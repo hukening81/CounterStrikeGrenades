@@ -68,7 +68,6 @@ object FlashbangBlindEffectRenderer {
                 effectDecay = effectData.effectDecay
             }
         }
-        playExplosionSound(effectData)
         playRingSound(effectData)
     }
 
@@ -131,25 +130,5 @@ object FlashbangBlindEffectRenderer {
                 targetVolume = SoundUtils.getVolumeFromDistance(distance, SoundTypes.FLASHBANG_RING).toFloat()
             )
         )
-    }
-
-    private fun playExplosionSound(effectData: FlashbangEffectData) {
-        val distance = sqrt(Minecraft.getInstance().player!!.distanceToSqr(effectData.position))
-        val soundEvent = when {
-            distance <= 15 -> ModSoundEvents.FLASHBANG_EXPLODE.get()
-            else -> ModSoundEvents.FLASHBANG_EXPLODE_DISTANT.get()
-        }
-        val soundType = when {
-            distance <= 15 -> SoundTypes.FLASHBANG_EXPLODE
-            else -> SoundTypes.FLASHBANG_EXPLODE_DISTANT
-        }
-        Minecraft.getInstance().soundManager.play(
-            SimpleSoundInstance(
-                soundEvent, SoundSource.AMBIENT, SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(), 1f,
-                RandomSource.createNewThreadLocalInstance(),
-                effectData.position.x, effectData.position.y, effectData.position.z
-            )
-        )
-
     }
 }
