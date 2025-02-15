@@ -8,6 +8,7 @@ import club.pisquad.minecraft.csgrenades.registery.ModDamageType
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import club.pisquad.minecraft.csgrenades.registery.ModSerializers
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
@@ -37,14 +38,14 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private var lastPos: Vec3i = Vec3i(0, 0, 0)
     private val particles = mutableMapOf<Vec3i, List<SmokeGrenadeParticle>>()
     private var explosionTime: Instant? = null
-    private val spreadBlocksCache: MutableList<BlockPos> = mutableListOf()
+    private val spreadBlocksCache: MutableList<@Serializable BlockPos> = mutableListOf()
 
     override fun getDefaultItem(): Item {
         return ModItems.SMOKE_GRENADE_ITEM.get()
     }
 
     companion object {
-        val spreadBlocksAccessor: EntityDataAccessor<List<BlockPos>> = SynchedEntityData.defineId(
+        val spreadBlocksAccessor: EntityDataAccessor<List<@Serializable BlockPos>> = SynchedEntityData.defineId(
             SmokeGrenadeEntity::class.java,
             ModSerializers.blockPosListEntityDataSerializer
         )
@@ -96,7 +97,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 tickCount = 0
             }
             if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && this.explosionTime == null) {
-                if (this.level() is ClientLevel) {
+                if (this.level().isClientSide) {
                     this.clientRenderEffect()
                 } else {
                     this.entityData.set(spreadBlocksAccessor, calculateSpreadBlocks())

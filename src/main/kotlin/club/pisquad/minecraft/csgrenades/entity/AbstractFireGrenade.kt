@@ -7,7 +7,6 @@ import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
 import club.pisquad.minecraft.csgrenades.registery.ModSerializers
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -54,7 +53,7 @@ abstract class AbstractFireGrenade(
 
     override fun tick() {
         super.tick()
-        if (this.level() is ClientLevel) {
+        if (this.level().isClientSide) {
             if (!this.poppedInAir && this.entityData.get(isExplodedAccessor)) {
                 FireGrenadeRenderer.renderOne(this)
             }
@@ -85,7 +84,7 @@ abstract class AbstractFireGrenade(
         // But in MC, all grounds are flat and horizontal
         // we only want the server to handle this logic
         if (this.extinguished) return
-        if (this.level() !is ClientLevel) {
+        if (!this.level().isClientSide) {
             if (this.entityData.get(isExplodedAccessor) || this.entityData.get(isLandedAccessor)) return
             if (result.direction == Direction.UP) {
                 this.entityData.set(isExplodedAccessor, true)

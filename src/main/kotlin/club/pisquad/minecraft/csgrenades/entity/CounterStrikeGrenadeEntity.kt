@@ -6,7 +6,6 @@ import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
 import net.minecraft.client.Minecraft
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -94,7 +93,7 @@ abstract class CounterStrikeGrenadeEntity(
         // This function seems to be work fine when calling from server and client side?
         // So I just make a test here
         // (In integrated server, haven't tested on other configurations yet)
-        if (this.level() is ClientLevel && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(
+        if (this.level().isClientSide && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(
                 isLandedAccessor
             )
         ) {
