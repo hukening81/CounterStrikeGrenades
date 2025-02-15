@@ -141,7 +141,7 @@ abstract class AbstractFireGrenade(
         val spreadBlocks = this.entityData.get(spreadBlocksAccessor) ?: return
         for (player in level.players()) {
             spreadBlocks.any {
-                if (it == player.blockPosition().offset(0, -1, 0) && !isPositionInSmoke(
+                if (it == player.blockPosition() && !isPositionInSmoke(
                         player.position(),
                     )
                 ) {
