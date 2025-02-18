@@ -29,17 +29,22 @@ jobs:
           for jar in build/libs/*.jar; do
             cp "$jar" "csgrenade-${TAG}.jar"
           done
+      
+      - name: Generate Changelog
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{github.ref_name}}
 
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          tag: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changes }}
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
@@ -50,3 +55,12 @@ jobs:
           asset_path: csgrenade-${{ github.ref_name }}.jar
           asset_name: csgrenade-${{ github.ref_name }}.jar
           asset_content_type: application/java-archive
+
+      - name: Push to Modrinth
+        uses: cloudnode-pro/modrinth-publish@2.0.0
+        with:
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: "DfhBvciR"
+          version: ${{ github.ref_name }}
+          changelog: ${{ steps.changelog.outputs.changes }}
+    
