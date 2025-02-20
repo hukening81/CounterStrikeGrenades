@@ -4,6 +4,7 @@ import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangBlindEffectRenderer
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangParticleEffectRenderer
+import club.pisquad.minecraft.csgrenades.linearInterpolate
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
@@ -23,10 +24,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
 import java.util.*
 import java.util.function.Supplier
-import kotlin.math.PI
-import kotlin.math.acos
-import kotlin.math.max
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @Serializable
 data class FlashbangEffectData(
@@ -75,7 +73,7 @@ data class FlashbangEffectData(
         }
 
         private fun getDistanceFactor(distance: Double): Double {
-            return max(-0.015 * distance + 1, 0.0)
+            return max(linearInterpolate(1.0, 0.0, (distance / 64.0)), 0.0)
         }
 
         private fun getBlockingFactor(level: Level, flashbangPos: Vec3, playerEyePos: Vec3): Double {
