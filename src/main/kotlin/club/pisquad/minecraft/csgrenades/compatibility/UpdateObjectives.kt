@@ -37,7 +37,10 @@ object ObjectiveManager {
         dispatcher: CommandDispatcher<CommandSourceStack>,
         commandSource: CommandSourceStack
     ) {
-        dispatcher.execute("scoreboard objectives remove ${objective.objectiveName}", commandSource)
+        dispatcher.execute(
+            "scoreboard objectives remove ${objective.objectiveName}",
+            commandSource.withSuppressedOutput()
+        )
     }
 
     fun increaseObjective(
@@ -48,7 +51,19 @@ object ObjectiveManager {
         commandSource: CommandSourceStack
     ) {
         if (scoreboard.getObjective(objective.objectiveName) != null) {
-            dispatcher.execute("scoreboard players add $player ${objective.objectiveName} 1", commandSource)
+            dispatcher.execute(
+                "scoreboard players add $player ${objective.objectiveName} 1",
+                commandSource.withSuppressedOutput()
+            )
+        } else {
+            dispatcher.execute(
+                "scoreboard objectives add ${objective.objectiveName} dummy",
+                commandSource.withSuppressedOutput()
+            )
+            dispatcher.execute(
+                "scoreboard players add $player ${objective.objectiveName} 1",
+                commandSource.withSuppressedOutput()
+            )
         }
     }
 }
@@ -61,7 +76,7 @@ object UpdateObjectives {
         if (event.entity is Player && event.source.entity is CounterStrikeGrenadeEntity) {
             val server = event.entity.server ?: return
             val attackerName = (event.source.entity as CounterStrikeGrenadeEntity).owner?.name?.string ?: return
-            val commandSource = server.createCommandSourceStack()
+            val commandSource = server.createCommandSourceStack().withSuppressedOutput()
 
             val objective = when (event.source.entity) {
                 is FlashBangEntity -> ModObjectives.KILLCOUNT_FLASHBANG
