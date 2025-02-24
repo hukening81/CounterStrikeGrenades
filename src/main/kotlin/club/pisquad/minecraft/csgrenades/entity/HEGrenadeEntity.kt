@@ -50,7 +50,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         val registryAccess = this.level().registryAccess()
         val damageSource = DamageSource(
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION),
-            this
+            this.owner
         )
         for (player in level.players()) {
             val distance = player.distanceTo(this).toDouble()
