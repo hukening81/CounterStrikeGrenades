@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.client.renderer.SmokeRenderManager
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registery.ModDamageType
@@ -78,10 +79,10 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private fun getRegenerationTime(distance: Double, radius: Double): Int {
         return linearInterpolate(
             0.0,
-            SMOKE_GRENADE_TIME_BEFORE_REGENERATE * 20,
+            ModConfig.SmokeGrenade.TIME_BEFORE_REGENERATE.get().div(50),
             distance / radius
         ).toInt() + linearInterpolate(
-            SMOKE_GRENADE_REGENERATE_TIME * 20,
+            ModConfig.SmokeGrenade.REGENERATION_TIME.get().div(50),
             0.0,
             distance / radius
         ).toInt()
@@ -95,7 +96,9 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             } else {
                 tickCount = 0
             }
-            if (getTimeFromTickCount(this.tickCount.toDouble()) > SMOKE_FUSE_TIME_AFTER_LAND && this.explosionTime == null) {
+            if (getTimeFromTickCount(this.tickCount.toDouble()) > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get()
+                    .div(1000) && this.explosionTime == null
+            ) {
                 if (this.level().isClientSide) {
                     this.clientRenderEffect()
                 } else {
@@ -110,8 +113,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 if (this.explosionTime != null && Duration.between(
                         this.explosionTime,
                         Instant.now()
-                    ) > Duration.ofSeconds(
-                        SMOKE_GRENADE_SMOKE_LIFETIME.toLong()
+                    ) > Duration.ofMillis(
+                        ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().toLong()
                     )
                 ) {
                     this.kill()
@@ -140,12 +143,14 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     }
 
     private fun extinguishNearbyFires(): Int {
-        var extinguishedFires: List<AbstractFireGrenade> = listOf()
+        val extinguishedFires: List<AbstractFireGrenade>
+        val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get()
+        val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()
         if (this.entityData.get(isExplodedAccessor)) {
             val bb = AABB(this.blockPosition()).inflate(
-                SMOKE_GRENADE_RADIUS.toDouble(),
-                SMOKE_GRENADE_FALLDOWN_HEIGHT.toDouble(),
-                SMOKE_GRENADE_RADIUS.toDouble()
+                smokeRadius.toDouble(),
+                smokeFallingHeight.toDouble(),
+                smokeRadius.toDouble()
             )
 
             extinguishedFires = this.level().getEntitiesOfClass(
@@ -155,7 +160,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 it.entityData.get(isExplodedAccessor) && canDistinguishFire(it.position())
             }
         } else {
-            val bb = AABB(this.blockPosition()).inflate(FIREGRENADE_RANGE.toDouble())
+            val bb = AABB(this.blockPosition()).inflate(ModConfig.FireGrenade.FIRE_RANGE.get().toDouble())
             extinguishedFires = this.level().getEntitiesOfClass(
                 AbstractFireGrenade::class.java,
                 bb
@@ -220,7 +225,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         // Temporarily set the maximum fall down height to 10
         val result = mutableListOf<BlockPos>()
         var currentPos = position
-        repeat(SMOKE_GRENADE_FALLDOWN_HEIGHT) {
+        repeat(ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()) {
             if (this.level().getBlockState(currentPos.below()).isAir
             ) {
                 result.add(currentPos)

@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.renderer
 
 import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.AbstractFireGrenade
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
@@ -11,19 +12,23 @@ import net.minecraftforge.api.distmarker.OnlyIn
 
 
 fun getLifetimeFromDistance(distance: Double): Int {
-    val randomSource = RandomSource.createNewThreadLocalInstance()
-    return (FIREGRENADE_RANGE - distance).div(FIREGRENADE_LIFETIME).times(INCENDIARY_PARTICLE_LIFETIME)
-        .toInt() + randomSource.nextInt(0, 5)
+    return linearInterpolate(
+        INCENDIARY_PARTICLE_LIFETIME.toDouble(),
+        0.0,
+        distance.div(ModConfig.FireGrenade.FIRE_RANGE.get())
+    ).div(50).toInt()
 }
 
 @OnlyIn(Dist.CLIENT)
 object FireGrenadeRenderer {
     private val randomSource = RandomSource.createNewThreadLocalInstance()
+
     fun renderOne(grenade: AbstractFireGrenade) {
         val particleEngine = Minecraft.getInstance().particleEngine
         val spreadBlocks = grenade.getSpreadBlocks()
+        val fireRange = ModConfig.FireGrenade.FIRE_RANGE.get()
         val particlePerTick =
-            (FIREGRENADE_RANGE * FIREGRENADE_RANGE * INCENDIARY_PARTICLE_DENSITY) * spreadBlocks.size / (FIREGRENADE_RANGE * FIREGRENADE_RANGE)
+            (fireRange * fireRange * INCENDIARY_PARTICLE_DENSITY) * spreadBlocks.size / (fireRange * fireRange)
 
         for (i in 0 until particlePerTick) {
             val position = grenade.position()

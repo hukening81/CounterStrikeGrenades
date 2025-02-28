@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
 import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
@@ -9,7 +10,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.core.Rotations
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.event.TickEvent
@@ -71,20 +71,25 @@ object ThrowActionHandler {
         if (itemInHand.item is CounterStrikeGrenadeItem
             && previousSlot == selectedSlot
         ) {
-            if (Duration.between(this.grenadeLastThrow, Instant.now()).toMillis() > GRENADE_THROW_COOLDOWN) {
+            if (Duration.between(this.grenadeLastThrow, Instant.now())
+                    .toMillis() > ModConfig.GRENADE_THROW_COOLDOWN.get()
+            ) {
                 when (Pair(this.primaryButtonPressed, this.secondaryButtonPressed)) {
                     Pair(false, false) -> {
                         when (Pair(primaryButtonPressed, secondaryButtonPressed)) {
                             Pair(true, true) -> {
-                                this.setNewTransientTarget(MODERATE_THROW_SPEED, MODERATE_THROW_SPEED)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_MODERATE.get(), ModConfig.THROW_SPEED_MODERATE.get())
                             }
 
                             Pair(true, false) -> {
-                                this.setNewTransientTarget(STRONG_THROW_SPEED, STRONG_THROW_SPEED)
+                                this.setNewTransientTarget(
+                                    ModConfig.THROW_SPEED_STRONG.get(),
+                                    ModConfig.THROW_SPEED_STRONG.get()
+                                )
                             }
 
                             Pair(false, true) -> {
-                                this.setNewTransientTarget(WEAK_THROW_SPEED, WEAK_THROW_SPEED)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_WEAK.get(), ModConfig.THROW_SPEED_WEAK.get())
                             }
                         }
                     }
@@ -92,11 +97,11 @@ object ThrowActionHandler {
                     Pair(true, false) -> {
                         when (Pair(primaryButtonPressed, secondaryButtonPressed)) {
                             Pair(true, true) -> {
-                                this.setNewTransientTarget(MODERATE_THROW_SPEED, null)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_MODERATE.get(), null)
                             }
 
                             Pair(false, true) -> {
-                                this.setNewTransientTarget(WEAK_THROW_SPEED, null)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_WEAK.get(), null)
                             }
                         }
                     }
@@ -104,11 +109,11 @@ object ThrowActionHandler {
                     Pair(false, true) -> {
                         when (Pair(primaryButtonPressed, secondaryButtonPressed)) {
                             Pair(true, true) -> {
-                                this.setNewTransientTarget(MODERATE_THROW_SPEED, null)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_MODERATE.get(), null)
                             }
 
                             Pair(true, false) -> {
-                                this.setNewTransientTarget(STRONG_THROW_SPEED, null)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_STRONG.get(), null)
                             }
                         }
                     }
@@ -116,11 +121,11 @@ object ThrowActionHandler {
                     Pair(true, true) -> {
                         when (Pair(primaryButtonPressed, secondaryButtonPressed)) {
                             Pair(true, false) -> {
-                                this.setNewTransientTarget(STRONG_THROW_SPEED, null)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_STRONG.get(), null)
                             }
 
                             Pair(false, true) -> {
-                                this.setNewTransientTarget(WEAK_THROW_SPEED, null)
+                                this.setNewTransientTarget(ModConfig.THROW_SPEED_WEAK.get(), null)
                             }
                         }
                     }
@@ -168,7 +173,7 @@ object ThrowActionHandler {
             min(
                 1.0,
                 Duration.between(this.transientBeginTime, Instant.now()).toMillis()
-                    .toDouble() / THROW_TYPE_TRANSIENT_TIME
+                    .toDouble() / ModConfig.THROW_TYPE_TRANSIENT_TIME.get()
             )
         )
     }
@@ -186,22 +191,22 @@ object ThrowActionHandler {
 
 fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
     val player: Player = Minecraft.getInstance().player ?: return
-    val speedFactor = (throwSpeed - WEAK_THROW_SPEED) / (STRONG_THROW_SPEED - WEAK_THROW_SPEED)
+    val speedFactor = (throwSpeed - ModConfig.THROW_SPEED_WEAK.get()) / (ModConfig.THROW_SPEED_STRONG.get() - ModConfig.THROW_SPEED_WEAK.get())
     val playerSpeedFactor =
-        linearInterpolate(WEAK_THROW_PLAYER_SPEED_FACTOR, STRONG_THROW_PLAYER_SPEED_FACTOR, speedFactor)
+        linearInterpolate(ModConfig.PLAYER_SPEED_FACTOR_WEAK.get(), ModConfig.PLAYER_SPEED_FACTOR_STRONG.get(), speedFactor)
 
     val speed = player.deltaMovement.scale(playerSpeedFactor)
         .add(
-            player.lookAngle.normalize().scale(linearInterpolate(WEAK_THROW_SPEED, STRONG_THROW_SPEED, speedFactor))
+            player.lookAngle.normalize()
+                .scale(linearInterpolate(ModConfig.THROW_SPEED_WEAK.get(), ModConfig.THROW_SPEED_STRONG.get(), speedFactor))
         )
         .length()
-    val playerPos = player.position()
     CsGrenadePacketHandler.INSTANCE.sendToServer(
         GrenadeThrownMessage(
             player.uuid,
             speed,
             grenadeType,
-            Vec3(playerPos.x, playerPos.y + PLAYER_EYESIGHT_OFFSET, playerPos.z),
+            player.eyePosition,
             Rotations(player.xRot, player.yRot, 0.0f),
         )
     )
@@ -210,7 +215,7 @@ fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
 fun setItemCoolDown(player: Player) {
     player.inventory.items.forEach {
         if (it.item is CounterStrikeGrenadeItem) {
-            player.cooldowns.addCooldown(it.item, GRENADE_THROW_COOLDOWN / 1000 * 20)
+            player.cooldowns.addCooldown(it.item, ModConfig.GRENADE_THROW_COOLDOWN.get() / 1000 * 20)
         }
     }
 

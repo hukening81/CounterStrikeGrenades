@@ -1,9 +1,10 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeExplosionData
 import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeRenderManager
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
 import club.pisquad.minecraft.csgrenades.registery.ModDamageType
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
@@ -48,6 +49,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     private fun doDamage() {
         val level = this.level()
         val registryAccess = this.level().registryAccess()
+        val damageRange = ModConfig.HEGrenade.DAMAGE_RANGE.get()
         val damageSource = DamageSource(
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION),
             this.owner
@@ -55,7 +57,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         for (player in level.players()) {
             val distance = player.distanceTo(this).toDouble()
 
-            if (distance < HEGRENADE_DAMAGE_RANGE) {
+            if (distance < damageRange) {
                 val playerMovement = player.deltaMovement
                 player.hurt(damageSource, calculateHEGrenadeDamage(distance, 0.0).toFloat())
                 player.deltaMovement = playerMovement
@@ -72,17 +74,22 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     }
 
     private fun blowUpNearbySmokeGrenade() {
+        val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get()
+        val heDamageRange = ModConfig.HEGrenade.DAMAGE_RANGE.get()
+        val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()
         this.level().getEntitiesOfClass(
             SmokeGrenadeEntity::class.java,
-            this.boundingBox.inflate(HEGRENADE_DAMAGE_RANGE + SMOKE_GRENADE_RADIUS)
-                .inflate(0.0, SMOKE_GRENADE_FALLDOWN_HEIGHT.toDouble(), 0.0)
+            this.boundingBox.inflate(heDamageRange + smokeRadius)
+                .inflate(0.0, smokeFallingHeight.toDouble(), 0.0)
         ).forEach {
-            it.clearSmokeWithinRange(this.position(), HEGRENADE_DAMAGE_RANGE + 2.5)
+            it.clearSmokeWithinRange(this.position(), heDamageRange + 2.5)
         }
     }
 }
 
 private fun calculateHEGrenadeDamage(distance: Double, armorReduction: Double): Double {
-    return HEGRENADE_BASE_DAMAGE.times(1.0.minus(distance.div(HEGRENADE_DAMAGE_RANGE)))
+    val baseDamage = ModConfig.HEGrenade.BASE_DAMAGE.get()
+    val damageRange = ModConfig.HEGrenade.DAMAGE_RANGE.get()
+    return baseDamage.times(1.0.minus(distance.div(damageRange)))
         .times(1.0.minus(armorReduction))
 }

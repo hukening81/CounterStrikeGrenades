@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.CsGrenadeConfigManager
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
 import net.minecraft.client.Minecraft
@@ -81,7 +81,7 @@ abstract class CounterStrikeGrenadeEntity(
      * @param result The block hit result.
      */
     override fun onHitBlock(result: BlockHitResult) {
-        if (CsGrenadeConfigManager.config.ignoreBarrierBlock && this.level()
+        if (ModConfig.IGNORE_BARRIER_BLOCK.get() && this.level()
                 .getBlockState(result.blockPos).block is BarrierBlock
         ) {
             return
