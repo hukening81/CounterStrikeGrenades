@@ -97,6 +97,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 tickCount = 0
             }
             if (getTimeFromTickCount(this.tickCount.toDouble()) > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get()
+                    .div(50)
                     .div(1000) && this.explosionTime == null
             ) {
                 if (this.level().isClientSide) {

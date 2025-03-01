@@ -17,7 +17,7 @@ object ModConfig {
 
     object SmokeGrenade {
         lateinit var SMOKE_RADIUS: ForgeConfigSpec.IntValue
-        lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.DoubleValue
+        lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.LongValue
         lateinit var SMOKE_LIFETIME: ForgeConfigSpec.IntValue
         lateinit var TIME_BEFORE_REGENERATE: ForgeConfigSpec.DoubleValue
         lateinit var REGENERATION_TIME: ForgeConfigSpec.DoubleValue
@@ -42,21 +42,29 @@ object ModConfig {
         builder.comment("Configs for Counter Strike Grenade")
         builder.comment("Configs are separated into different scopes based on the type of grenade")
 
-//        Common configs
+//      Common configs
+        builder.comment("Should grenade entities fly through barrier block?")
         IGNORE_BARRIER_BLOCK = builder.define("ignore_barrier_block", false)
-//        GRENADE_ENTITY_SIZE = builder.defineInRange("grenade_entity_size", 0.3, 0.1, 10.0)
+//      GRENADE_ENTITY_SIZE = builder.defineInRange("grenade_entity_size", 0.3, 0.1, 10.0)
+        builder.comment("Throw cooldown, in milliseconds")
         GRENADE_THROW_COOLDOWN = builder.defineInRange("grenade_throw_cooldown", 1000, 0, 60 * 1000)
+        builder.comment("Throw speed when using primary button (left click by default)")
         THROW_SPEED_STRONG = builder.defineInRange("throw_speed_strong", 1.3, 0.0, 10.0)
+        builder.comment("Throw speed when using secondary button (right click by default)")
         THROW_SPEED_WEAK = builder.defineInRange("throw_speed_weak", 0.4, 0.0, 10.0)
+        builder.comment("Throw speed when using holding both button at the same time")
         THROW_SPEED_MODERATE = builder.defineInRange("throw_speed_moderate", 1.0, 0.0, 10.0)
         PLAYER_SPEED_FACTOR_STRONG = builder.defineInRange("player_speed_factor_strong", 1.3, 0.0, 10.0)
         PLAYER_SPEED_FACTOR_WEAK = builder.defineInRange("player_speed_factor_weak", 0.5, 0.0, 10.0)
+        builder.comment("Transient time for throw type, in milliseconds")
         THROW_TYPE_TRANSIENT_TIME = builder.defineInRange("throw_type_transient_time", 1000, 0, 60 * 1000)
         FOV_EFFECT_AMOUNT = builder.defineInRange("fov_effect_amount", 0.12, 0.0, 1.0)
 
         builder.push("SmokeGrenade")
+        builder.comment("Smoke radius, in block")
         SmokeGrenade.SMOKE_RADIUS = builder.defineInRange("smoke_radius", 6, 2, 10)
-        SmokeGrenade.FUSE_TIME_AFTER_LANDING = builder.defineInRange("fuse_time_after_landing", 0.5, 0.0, 10.0)
+        SmokeGrenade.FUSE_TIME_AFTER_LANDING =
+            builder.defineInRange("fuse_time_after_landing", 500, 0, 10 * 1000.toLong())
         SmokeGrenade.SMOKE_LIFETIME = builder.defineInRange("smoke_lifetime", 20000, 0, 60 * 1000)
         SmokeGrenade.TIME_BEFORE_REGENERATE = builder.defineInRange("time_before_regenerate", 1000.0, 0.0, 10000.0)
         SmokeGrenade.REGENERATION_TIME = builder.defineInRange("regeneration_time", 3000.0, 0.0, 10000.0)
@@ -64,13 +72,16 @@ object ModConfig {
         builder.pop()
 
         builder.push("HEGrenade")
+        builder.comment("HE grenade's damage follow a linear decay function")
         HEGrenade.BASE_DAMAGE = builder.defineInRange("base_damage", 30.0, 0.0, 100.0)
         HEGrenade.DAMAGE_RANGE = builder.defineInRange("damage_range", 5.0, 0.0, 100.0)
         builder.pop()
 
         builder.push("FireGrenade")
         FireGrenade.FIRE_RANGE = builder.defineInRange("fire_range", 6, 0, 100)
+        builder.comment("Lifetime of the fire, in milliseconds")
         FireGrenade.LIFETIME = builder.defineInRange("lifetime", 7000, 0, 100 * 1000.toLong())
+        builder.comment("Fuse time before air explode, in milliseconds")
         FireGrenade.FUSE_TIME = builder.defineInRange("fuse_time", 2000.toLong(), 0, 100 * 1000.toLong())
         FireGrenade.FIRE_EXTINGUISH_RANGE = builder.defineInRange("fire_extinguish_range", 6, 0, 100)
         FireGrenade.FIRE_MAX_SPREAD_DOWNWARD = builder.defineInRange("fire_max_spread_downward", 10, 0, 100)
