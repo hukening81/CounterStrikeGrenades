@@ -1,9 +1,13 @@
 package club.pisquad.minecraft.csgrenades.client.renderer
 
-import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
 import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registery.ModParticles
+import club.pisquad.minecraft.csgrenades.toVec3
+import club.pisquad.minecraft.csgrenades.toVec3i
 import net.minecraft.client.particle.ParticleEngine
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
@@ -60,7 +64,6 @@ class SmokeRenderer(
     private var tickCount = 0
     private val randomSource = RandomSource.createNewThreadLocalInstance()
 
-    private val baseBlockPerTick = 200
     private val blockPerTickDistanceRatio = 0.5
     private val particlePerBlock = 5
     private var rendered = false
@@ -71,7 +74,7 @@ class SmokeRenderer(
     fun update() {
         tickCount++
 //        In case there is an error, we will force quite the renderer
-        if (getTimeFromTickCount(tickCount.toDouble()) > SMOKE_GRENADE_SMOKE_LIFETIME) {
+        if (getTimeFromTickCount(tickCount.toDouble()) > ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().div(50)) {
             this.done = true
             return
         }

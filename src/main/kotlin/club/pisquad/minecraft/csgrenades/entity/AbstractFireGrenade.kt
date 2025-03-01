@@ -1,8 +1,11 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.client.renderer.FireGrenadeRenderer
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.getBlockPosAround2D
+import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
+import club.pisquad.minecraft.csgrenades.isPositionInSmoke
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
 import club.pisquad.minecraft.csgrenades.registery.ModSerializers
@@ -62,12 +65,16 @@ abstract class AbstractFireGrenade(
                 // Damage players within range
                 this.doDamage()
 
-                if (getTimeFromTickCount((this.tickCount - this.explosionTick).toDouble()) > FIREGRENADE_LIFETIME) {
+                if (getTimeFromTickCount((this.tickCount - this.explosionTick).toDouble()) > ModConfig.FireGrenade.LIFETIME.get()
+                        .div(50)
+                ) {
                     this.kill()
                     return
                 }
             }
-            if (!this.entityData.get(isExplodedAccessor) && getTimeFromTickCount(this.tickCount.toDouble()) > FIREGRENADE_FUSE_TIME) {
+            if (!this.entityData.get(isExplodedAccessor) && getTimeFromTickCount(this.tickCount.toDouble()) > ModConfig.FireGrenade.FUSE_TIME.get()
+                    .div(50)
+            ) {
                 this.entityData.set(isExplodedAccessor, true)
                 this.poppedInAir = true
                 CsGrenadePacketHandler.INSTANCE.send(
@@ -94,13 +101,15 @@ abstract class AbstractFireGrenade(
                 this.isNoGravity = true
 
                 // Test if any smoke nearby that extinguish this fire
+                val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
                 val bb = AABB(this.blockPosition()).inflate(
-                    SMOKE_GRENADE_RADIUS.toDouble(), SMOKE_GRENADE_FALLDOWN_HEIGHT.toDouble(),
-                    SMOKE_GRENADE_RADIUS.toDouble()
+                    smokeRadius, ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get().toDouble(),
+                    smokeRadius
                 )
+                val fireExtinguishRange = ModConfig.FireGrenade.FIRE_EXTINGUISH_RANGE.get().toDouble()
                 if (this.level()
                         .getEntitiesOfClass(SmokeGrenadeEntity::class.java, bb) {
-                            this.position().distanceTo(it.position()) < FIRE_EXTINGUISH_RANGE
+                            this.position().distanceTo(it.position()) < fireExtinguishRange
                         }.any {
                             it.canDistinguishFire(this.position())
                         }
@@ -158,14 +167,14 @@ abstract class AbstractFireGrenade(
     }
 
     private fun calculateSpreadBlocks(level: Level, center: Vec3): List<BlockPos> {
-        val blocksAround = getBlockPosAround2D(center.add(0.0, 1.0, 0.0), FIREGRENADE_RANGE)
+        val blocksAround = getBlockPosAround2D(center.add(0.0, 1.0, 0.0), ModConfig.FireGrenade.FIRE_RANGE.get())
         return blocksAround.mapNotNull { getGroundBelow(level, it) }
     }
 
     private fun getGroundBelow(level: Level, position: BlockPos): BlockPos? {
         var currentPos = position
         var emptySpaceAbove = false
-        repeat(FIRE_MAX_SPREAD_DOWNWARD) {
+        repeat(ModConfig.FireGrenade.FIRE_MAX_SPREAD_DOWNWARD.get()) {
             if (!level.getBlockState(currentPos).isAir) {
                 return if (emptySpaceAbove) {
 //                    we want the air block above the ground

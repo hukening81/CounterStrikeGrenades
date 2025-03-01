@@ -1,9 +1,8 @@
 package club.pisquad.minecraft.csgrenades.client.renderer
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.FOV_EFFECT_AMOUNT
-import club.pisquad.minecraft.csgrenades.STRONG_THROW_SPEED
 import club.pisquad.minecraft.csgrenades.client.input.ThrowActionHandler
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.linearInterpolate
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.event.ComputeFovModifierEvent
@@ -18,8 +17,8 @@ object FovEffectRenderer {
             return
         }
         val throwSpeedFactor =
-            ThrowActionHandler.currentThrowSpeed!! / STRONG_THROW_SPEED
-        event.newFovModifier = event.fovModifier + linearInterpolate(0.0, FOV_EFFECT_AMOUNT, throwSpeedFactor).toFloat()
+            ThrowActionHandler.currentThrowSpeed!! / ModConfig.THROW_SPEED_STRONG.get()
+        event.newFovModifier = event.fovModifier + linearInterpolate(0.0, ModConfig.FOV_EFFECT_AMOUNT.get(), throwSpeedFactor).toFloat()
 
     }
 }

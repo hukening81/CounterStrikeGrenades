@@ -1,0 +1,80 @@
+package club.pisquad.minecraft.csgrenades.config
+
+import net.minecraftforge.common.ForgeConfigSpec
+
+object ModConfig {
+    val SPEC: ForgeConfigSpec
+
+    var IGNORE_BARRIER_BLOCK: ForgeConfigSpec.BooleanValue
+    var GRENADE_THROW_COOLDOWN: ForgeConfigSpec.IntValue
+    var THROW_SPEED_STRONG: ForgeConfigSpec.DoubleValue
+    var THROW_SPEED_WEAK: ForgeConfigSpec.DoubleValue
+    var THROW_SPEED_MODERATE: ForgeConfigSpec.DoubleValue
+    var PLAYER_SPEED_FACTOR_STRONG: ForgeConfigSpec.DoubleValue
+    var PLAYER_SPEED_FACTOR_WEAK: ForgeConfigSpec.DoubleValue
+    var THROW_TYPE_TRANSIENT_TIME: ForgeConfigSpec.IntValue
+    var FOV_EFFECT_AMOUNT: ForgeConfigSpec.DoubleValue
+
+    object SmokeGrenade {
+        lateinit var SMOKE_RADIUS: ForgeConfigSpec.IntValue
+        lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.DoubleValue
+        lateinit var SMOKE_LIFETIME: ForgeConfigSpec.IntValue
+        lateinit var TIME_BEFORE_REGENERATE: ForgeConfigSpec.DoubleValue
+        lateinit var REGENERATION_TIME: ForgeConfigSpec.DoubleValue
+        lateinit var SMOKE_MAX_FALLING_HEIGHT: ForgeConfigSpec.IntValue
+    }
+
+    object HEGrenade {
+        lateinit var BASE_DAMAGE: ForgeConfigSpec.DoubleValue
+        lateinit var DAMAGE_RANGE: ForgeConfigSpec.DoubleValue
+    }
+
+    object FireGrenade {
+        lateinit var FIRE_RANGE: ForgeConfigSpec.IntValue
+        lateinit var LIFETIME: ForgeConfigSpec.LongValue
+        lateinit var FUSE_TIME: ForgeConfigSpec.LongValue
+        lateinit var FIRE_EXTINGUISH_RANGE: ForgeConfigSpec.IntValue
+        lateinit var FIRE_MAX_SPREAD_DOWNWARD: ForgeConfigSpec.IntValue
+    }
+
+    init {
+        val builder = ForgeConfigSpec.Builder()
+        builder.comment("Configs for Counter Strike Grenade")
+        builder.comment("Configs are separated into different scopes based on the type of grenade")
+
+//        Common configs
+        IGNORE_BARRIER_BLOCK = builder.define("ignore_barrier_block", false)
+//        GRENADE_ENTITY_SIZE = builder.defineInRange("grenade_entity_size", 0.3, 0.1, 10.0)
+        GRENADE_THROW_COOLDOWN = builder.defineInRange("grenade_throw_cooldown", 1000, 0, 60 * 1000)
+        THROW_SPEED_STRONG = builder.defineInRange("throw_speed_strong", 1.3, 0.0, 10.0)
+        THROW_SPEED_WEAK = builder.defineInRange("throw_speed_weak", 0.4, 0.0, 10.0)
+        THROW_SPEED_MODERATE = builder.defineInRange("throw_speed_moderate", 1.0, 0.0, 10.0)
+        PLAYER_SPEED_FACTOR_STRONG = builder.defineInRange("player_speed_factor_strong", 1.3, 0.0, 10.0)
+        PLAYER_SPEED_FACTOR_WEAK = builder.defineInRange("player_speed_factor_weak", 0.5, 0.0, 10.0)
+        THROW_TYPE_TRANSIENT_TIME = builder.defineInRange("throw_type_transient_time", 1000, 0, 60 * 1000)
+        FOV_EFFECT_AMOUNT = builder.defineInRange("fov_effect_amount", 0.12, 0.0, 1.0)
+
+        builder.push("SmokeGrenade")
+        SmokeGrenade.SMOKE_RADIUS = builder.defineInRange("smoke_radius", 6, 2, 10)
+        SmokeGrenade.FUSE_TIME_AFTER_LANDING = builder.defineInRange("fuse_time_after_landing", 0.5, 0.0, 10.0)
+        SmokeGrenade.SMOKE_LIFETIME = builder.defineInRange("smoke_lifetime", 20000, 0, 60 * 1000)
+        SmokeGrenade.TIME_BEFORE_REGENERATE = builder.defineInRange("time_before_regenerate", 1000.0, 0.0, 10000.0)
+        SmokeGrenade.REGENERATION_TIME = builder.defineInRange("regeneration_time", 3000.0, 0.0, 10000.0)
+        SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT = builder.defineInRange("smoke_max_falling_height", 30, 0, 100)
+        builder.pop()
+
+        builder.push("HEGrenade")
+        HEGrenade.BASE_DAMAGE = builder.defineInRange("base_damage", 30.0, 0.0, 100.0)
+        HEGrenade.DAMAGE_RANGE = builder.defineInRange("damage_range", 5.0, 0.0, 100.0)
+        builder.pop()
+
+        builder.push("FireGrenade")
+        FireGrenade.FIRE_RANGE = builder.defineInRange("fire_range", 6, 0, 100)
+        FireGrenade.LIFETIME = builder.defineInRange("lifetime", 7000, 0, 100 * 1000.toLong())
+        FireGrenade.FUSE_TIME = builder.defineInRange("fuse_time", 2000.toLong(), 0, 100 * 1000.toLong())
+        FireGrenade.FIRE_EXTINGUISH_RANGE = builder.defineInRange("fire_extinguish_range", 6, 0, 100)
+        FireGrenade.FIRE_MAX_SPREAD_DOWNWARD = builder.defineInRange("fire_max_spread_downward", 10, 0, 100)
+
+        SPEC = builder.build()
+    }
+}

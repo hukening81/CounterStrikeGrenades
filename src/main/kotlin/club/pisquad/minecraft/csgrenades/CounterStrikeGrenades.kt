@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades
 
 import club.pisquad.minecraft.csgrenades.command.ModCommands
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.registery.*
 import net.minecraftforge.common.MinecraftForge
@@ -38,6 +39,9 @@ object CounterStrikeGrenades {
         CsGrenadePacketHandler.registerMessage()
         MinecraftForge.EVENT_BUS.register(ModCommands)
         ModSerializers.register()
+        net.minecraftforge.fml.ModLoadingContext.get()
+            .registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC)
+
     }
 
     /**
