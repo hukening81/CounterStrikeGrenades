@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.particle
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.millToTick
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Camera
 import net.minecraft.client.multiplayer.ClientLevel
@@ -24,7 +25,7 @@ class SmokeGrenadeParticle(
     init {
         this.gravity = 0f
         this.setParticleSpeed(0.0, 0.0, 0.0)
-        this.lifetime = (ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().div(50))
+        this.lifetime = (ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().millToTick()).toInt()
         this.scale(4f)
     }
 

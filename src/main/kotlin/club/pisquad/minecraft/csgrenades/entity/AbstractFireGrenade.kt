@@ -4,8 +4,8 @@ import club.pisquad.minecraft.csgrenades.client.renderer.FireGrenadeRenderer
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.getBlockPosAround2D
-import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
 import club.pisquad.minecraft.csgrenades.isPositionInSmoke
+import club.pisquad.minecraft.csgrenades.millToTick
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
 import club.pisquad.minecraft.csgrenades.registery.ModSerializers
@@ -65,14 +65,13 @@ abstract class AbstractFireGrenade(
                 // Damage players within range
                 this.doDamage()
 
-                if (getTimeFromTickCount((this.tickCount - this.explosionTick).toDouble()) > ModConfig.FireGrenade.LIFETIME.get()
-                        .div(50)
+                if ((this.tickCount - this.explosionTick) > ModConfig.FireGrenade.LIFETIME.get().millToTick()
                 ) {
                     this.kill()
                     return
                 }
             }
-            if (!this.entityData.get(isExplodedAccessor) && getTimeFromTickCount(this.tickCount.toDouble()) > ModConfig.FireGrenade.FUSE_TIME.get()
+            if (!this.entityData.get(isExplodedAccessor) && this.tickCount > ModConfig.FireGrenade.FUSE_TIME.get()
                     .div(50)
             ) {
                 this.entityData.set(isExplodedAccessor, true)

@@ -18,9 +18,9 @@ object ModConfig {
     object SmokeGrenade {
         lateinit var SMOKE_RADIUS: ForgeConfigSpec.IntValue
         lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.LongValue
-        lateinit var SMOKE_LIFETIME: ForgeConfigSpec.IntValue
-        lateinit var TIME_BEFORE_REGENERATE: ForgeConfigSpec.DoubleValue
-        lateinit var REGENERATION_TIME: ForgeConfigSpec.DoubleValue
+        lateinit var SMOKE_LIFETIME: ForgeConfigSpec.LongValue
+        lateinit var TIME_BEFORE_REGENERATE: ForgeConfigSpec.LongValue
+        lateinit var REGENERATION_TIME: ForgeConfigSpec.LongValue
         lateinit var SMOKE_MAX_FALLING_HEIGHT: ForgeConfigSpec.IntValue
     }
 
@@ -65,9 +65,9 @@ object ModConfig {
         SmokeGrenade.SMOKE_RADIUS = builder.defineInRange("smoke_radius", 6, 2, 10)
         SmokeGrenade.FUSE_TIME_AFTER_LANDING =
             builder.defineInRange("fuse_time_after_landing", 500, 0, 10 * 1000.toLong())
-        SmokeGrenade.SMOKE_LIFETIME = builder.defineInRange("smoke_lifetime", 20000, 0, 60 * 1000)
-        SmokeGrenade.TIME_BEFORE_REGENERATE = builder.defineInRange("time_before_regenerate", 1000.0, 0.0, 10000.0)
-        SmokeGrenade.REGENERATION_TIME = builder.defineInRange("regeneration_time", 3000.0, 0.0, 10000.0)
+        SmokeGrenade.SMOKE_LIFETIME = builder.defineInRange("smoke_lifetime", 20000, 0, 60 * 1000.toLong())
+        SmokeGrenade.TIME_BEFORE_REGENERATE = builder.defineInRange("time_before_regenerate", 1000, 0, 10000.toLong())
+        SmokeGrenade.REGENERATION_TIME = builder.defineInRange("regeneration_time", 3000, 0, 10000.toLong())
         SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT = builder.defineInRange("smoke_max_falling_height", 30, 0, 100)
         builder.pop()
 

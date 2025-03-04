@@ -77,12 +77,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     }
 
     private fun getRegenerationTime(distance: Double, radius: Double): Int {
-        return linearInterpolate(
-            0.0,
-            ModConfig.SmokeGrenade.TIME_BEFORE_REGENERATE.get().div(50),
-            distance / radius
-        ).toInt() + linearInterpolate(
-            ModConfig.SmokeGrenade.REGENERATION_TIME.get().div(50),
+        return ModConfig.SmokeGrenade.TIME_BEFORE_REGENERATE.get().millToTick().toInt() + linearInterpolate(
+            ModConfig.SmokeGrenade.REGENERATION_TIME.get().millToTick().toDouble(),
             0.0,
             distance / radius
         ).toInt()
@@ -96,9 +92,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             } else {
                 tickCount = 0
             }
-            if (getTimeFromTickCount(this.tickCount.toDouble()) > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get()
-                    .div(50)
-                    .div(1000) && this.explosionTime == null
+            if (this.tickCount > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get().millToTick()
+                && this.explosionTime == null
             ) {
                 if (this.level().isClientSide) {
                     this.clientRenderEffect()

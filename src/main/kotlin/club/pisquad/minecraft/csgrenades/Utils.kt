@@ -118,3 +118,7 @@ fun getBlocksAround3D(pos: Vec3, xRange: Int, yRange: Int, zRange: Int): List<Bl
 fun linearInterpolate(from: Double, to: Double, t: Double): Double {
     return from + (to - from) * t
 }
+
+fun Long.millToTick(): Long {
+    return this.div(50);
+}

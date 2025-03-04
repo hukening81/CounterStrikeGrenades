@@ -3,7 +3,7 @@ package club.pisquad.minecraft.csgrenades.client.renderer
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
+import club.pisquad.minecraft.csgrenades.millToTick
 import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registery.ModParticles
 import club.pisquad.minecraft.csgrenades.toVec3
@@ -74,7 +74,7 @@ class SmokeRenderer(
     fun update() {
         tickCount++
 //        In case there is an error, we will force quite the renderer
-        if (getTimeFromTickCount(tickCount.toDouble()) > ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().div(50)) {
+        if (tickCount > ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().millToTick()) {
             this.done = true
             return
         }
