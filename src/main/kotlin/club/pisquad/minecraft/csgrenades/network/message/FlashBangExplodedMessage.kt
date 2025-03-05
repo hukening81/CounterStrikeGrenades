@@ -24,7 +24,10 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
 import java.util.*
 import java.util.function.Supplier
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.acos
+import kotlin.math.max
+import kotlin.math.sqrt
 
 @Serializable
 data class FlashbangEffectData(

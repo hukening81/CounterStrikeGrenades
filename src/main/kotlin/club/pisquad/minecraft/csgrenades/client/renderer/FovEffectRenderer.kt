@@ -18,7 +18,8 @@ object FovEffectRenderer {
         }
         val throwSpeedFactor =
             ThrowActionHandler.currentThrowSpeed!! / ModConfig.THROW_SPEED_STRONG.get()
-        event.newFovModifier = event.fovModifier + linearInterpolate(0.0, ModConfig.FOV_EFFECT_AMOUNT.get(), throwSpeedFactor).toFloat()
+        event.newFovModifier =
+            event.fovModifier + linearInterpolate(0.0, ModConfig.FOV_EFFECT_AMOUNT.get(), throwSpeedFactor).toFloat()
 
     }
 }

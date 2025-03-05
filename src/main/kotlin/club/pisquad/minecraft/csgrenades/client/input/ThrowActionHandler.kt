@@ -1,9 +1,10 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
-import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
+import club.pisquad.minecraft.csgrenades.linearInterpolate
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
 import net.minecraft.client.Minecraft
@@ -78,7 +79,10 @@ object ThrowActionHandler {
                     Pair(false, false) -> {
                         when (Pair(primaryButtonPressed, secondaryButtonPressed)) {
                             Pair(true, true) -> {
-                                this.setNewTransientTarget(ModConfig.THROW_SPEED_MODERATE.get(), ModConfig.THROW_SPEED_MODERATE.get())
+                                this.setNewTransientTarget(
+                                    ModConfig.THROW_SPEED_MODERATE.get(),
+                                    ModConfig.THROW_SPEED_MODERATE.get()
+                                )
                             }
 
                             Pair(true, false) -> {
@@ -89,7 +93,10 @@ object ThrowActionHandler {
                             }
 
                             Pair(false, true) -> {
-                                this.setNewTransientTarget(ModConfig.THROW_SPEED_WEAK.get(), ModConfig.THROW_SPEED_WEAK.get())
+                                this.setNewTransientTarget(
+                                    ModConfig.THROW_SPEED_WEAK.get(),
+                                    ModConfig.THROW_SPEED_WEAK.get()
+                                )
                             }
                         }
                     }
@@ -191,14 +198,25 @@ object ThrowActionHandler {
 
 fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
     val player: Player = Minecraft.getInstance().player ?: return
-    val speedFactor = (throwSpeed - ModConfig.THROW_SPEED_WEAK.get()) / (ModConfig.THROW_SPEED_STRONG.get() - ModConfig.THROW_SPEED_WEAK.get())
+    val speedFactor =
+        (throwSpeed - ModConfig.THROW_SPEED_WEAK.get()) / (ModConfig.THROW_SPEED_STRONG.get() - ModConfig.THROW_SPEED_WEAK.get())
     val playerSpeedFactor =
-        linearInterpolate(ModConfig.PLAYER_SPEED_FACTOR_WEAK.get(), ModConfig.PLAYER_SPEED_FACTOR_STRONG.get(), speedFactor)
+        linearInterpolate(
+            ModConfig.PLAYER_SPEED_FACTOR_WEAK.get(),
+            ModConfig.PLAYER_SPEED_FACTOR_STRONG.get(),
+            speedFactor
+        )
 
     val speed = player.deltaMovement.scale(playerSpeedFactor)
         .add(
             player.lookAngle.normalize()
-                .scale(linearInterpolate(ModConfig.THROW_SPEED_WEAK.get(), ModConfig.THROW_SPEED_STRONG.get(), speedFactor))
+                .scale(
+                    linearInterpolate(
+                        ModConfig.THROW_SPEED_WEAK.get(),
+                        ModConfig.THROW_SPEED_STRONG.get(),
+                        speedFactor
+                    )
+                )
         )
         .length()
     CsGrenadePacketHandler.INSTANCE.sendToServer(

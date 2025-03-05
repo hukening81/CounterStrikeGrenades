@@ -120,5 +120,5 @@ fun linearInterpolate(from: Double, to: Double, t: Double): Double {
 }
 
 fun Long.millToTick(): Long {
-    return this.div(50);
+    return this.div(50)
 }
