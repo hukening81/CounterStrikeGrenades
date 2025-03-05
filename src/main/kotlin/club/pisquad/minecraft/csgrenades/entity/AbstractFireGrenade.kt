@@ -164,11 +164,11 @@ abstract class AbstractFireGrenade(
                     )
                 ) {
                     val playerMovement = entity.deltaMovement
-                    entity.hurt(damageSource, 3f)
+                    val damage = ModConfig.FireGrenade.DAMAGE.get().toFloat()
+                    entity.hurt(damageSource, damage)
                     entity.deltaMovement = playerMovement
                     return@any true
                 }
-
                 return@any false
             }
         }
