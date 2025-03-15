@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades.client.renderer
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.AbstractFireGrenade
+import club.pisquad.minecraft.csgrenades.entity.IncendiaryEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
@@ -48,10 +49,14 @@ object FireGrenadeRenderer {
                 position.z.minus(pos.z).toFloat()
             ).length().toDouble()
 
+            val flameParticleType = when (grenade) {
+                is IncendiaryEntity -> ParticleTypes.SOUL_FIRE_FLAME
+                else -> ParticleTypes.FLAME
+            }
             val random = randomSource.nextDouble()
             val particleType = when {
                 random < 0.2 -> ParticleTypes.SMOKE
-                random < 0.5 -> ParticleTypes.FLAME
+                random < 0.5 -> flameParticleType
                 else -> ParticleTypes.SMALL_FLAME
             }
 
