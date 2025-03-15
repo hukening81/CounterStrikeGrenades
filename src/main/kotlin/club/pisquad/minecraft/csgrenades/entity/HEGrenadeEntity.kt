@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
@@ -66,9 +67,10 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             val distance = entity.distanceTo(this).toDouble()
 
             if (distance < damageRange) {
-                val playerMovement = entity.deltaMovement
+                val originalKnockBackResistance = entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
+                entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
                 entity.hurt(damageSource, calculateHEGrenadeDamage(distance, 0.0).toFloat())
-                entity.deltaMovement = playerMovement
+                entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
             }
         }
     }
