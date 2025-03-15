@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.level.Level
@@ -163,10 +164,12 @@ abstract class AbstractFireGrenade(
                         entity.position(),
                     )
                 ) {
-                    val playerMovement = entity.deltaMovement
+                    val originalKnockBackResistance =
+                        entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
                     val damage = ModConfig.FireGrenade.DAMAGE.get().toFloat()
+                    entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
                     entity.hurt(damageSource, damage)
-                    entity.deltaMovement = playerMovement
+                    entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
                     return@any true
                 }
                 return@any false
