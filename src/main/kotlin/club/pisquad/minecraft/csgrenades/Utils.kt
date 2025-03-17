@@ -3,12 +3,14 @@ package club.pisquad.minecraft.csgrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
+import kotlin.math.abs
 import kotlin.random.Random
 
 /**
@@ -17,6 +19,17 @@ import kotlin.random.Random
 
 fun Vec3.toVec3i(): Vec3i {
     return Vec3i(x.toInt(), y.toInt(), z.toInt())
+}
+
+fun Vec3.snapToAxis(): Direction {
+    val absX = abs(x)
+    val absY = abs(y)
+    val absZ = abs(z)
+    return when {
+        absX >= absY && absX >= absZ -> if (x > 0) Direction.NORTH else Direction.SOUTH
+        absY >= absX && absY >= absZ -> if (y > 0) Direction.UP else Direction.DOWN
+        else -> if (z > 0) Direction.EAST else Direction.WEST
+    }
 }
 
 fun BlockPos.toVec3(): Vec3 {

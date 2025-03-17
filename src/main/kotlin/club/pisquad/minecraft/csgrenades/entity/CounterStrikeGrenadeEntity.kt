@@ -5,6 +5,7 @@ import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.snapToAxis
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
 import net.minecraft.core.Direction
@@ -23,6 +24,7 @@ import net.minecraft.world.level.block.BarrierBlock
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
+import java.util.*
 
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out ThrowableItemProjectile>,
@@ -34,6 +36,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     var hitBlockSound = ModSoundEvents.GRENADE_HIT.get()
     var throwSound = ModSoundEvents.GRENADE_THROW.get()
+    var lastHitEntity: UUID? = null
 
     companion object {
         val speedAccessor: EntityDataAccessor<Float> =
@@ -57,6 +60,7 @@ abstract class CounterStrikeGrenadeEntity(
             result.entity.hurt(result.entity.damageSources().generic(), 1f)
         }
 
+
         if (result.entity is LivingEntity) {
             val entity = result.entity as LivingEntity
 
@@ -67,6 +71,11 @@ abstract class CounterStrikeGrenadeEntity(
             entity.hurt(this.getHitDamageSource(), 1f)
 
             entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
+        }
+        if (this.lastHitEntity == null || this.lastHitEntity != result.entity.uuid) {
+            val direction: Direction = this.deltaMovement.snapToAxis().opposite
+            this.bounce(direction, 0.1f, 0.08f)
+            this.lastHitEntity = result.entity.uuid
         }
     }
 
