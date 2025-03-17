@@ -37,6 +37,7 @@ object ModConfig {
         lateinit var FIRE_EXTINGUISH_RANGE: ForgeConfigSpec.IntValue
         lateinit var FIRE_MAX_SPREAD_DOWNWARD: ForgeConfigSpec.IntValue
         lateinit var DAMAGE: ForgeConfigSpec.DoubleValue
+        lateinit var DAMAGE_INCREASE_TIME: ForgeConfigSpec.LongValue
     }
 
     init {
@@ -90,6 +91,8 @@ object ModConfig {
         FireGrenade.FIRE_EXTINGUISH_RANGE = builder.defineInRange("fire_extinguish_range", 6, 0, 100)
         FireGrenade.FIRE_MAX_SPREAD_DOWNWARD = builder.defineInRange("fire_max_spread_downward", 10, 0, 100)
         FireGrenade.DAMAGE = builder.defineInRange("damage", 3.0, 0.0, 100.0)
+        builder.comment("In what time should fire damage reach its maximum damage (linearly)")
+        FireGrenade.DAMAGE_INCREASE_TIME = builder.defineInRange("damage_increase_time", 2000, 0, 100 * 1000.toLong())
 
         SPEC = builder.build()
     }

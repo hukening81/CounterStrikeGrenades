@@ -5,6 +5,7 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.getBlockPosAround2D
 import club.pisquad.minecraft.csgrenades.isPositionInSmoke
+import club.pisquad.minecraft.csgrenades.linearInterpolate
 import club.pisquad.minecraft.csgrenades.millToTick
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
@@ -26,6 +27,9 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.PacketDistributor
+import java.time.Instant
+import java.util.*
+import kotlin.math.min
 
 abstract class AbstractFireGrenade(
     pEntityType: EntityType<out ThrowableItemProjectile>,
@@ -39,6 +43,7 @@ abstract class AbstractFireGrenade(
     private var extinguished = false
     private var poppedInAir = false
     private var spreadBlocks: MutableList<BlockPos> = mutableListOf()
+    private var entitiesLastInRange: MutableMap<UUID, Long> = mutableMapOf()
 
     init {
         hitBlockSound = ModSoundEvents.INCENDIARY_BOUNCE.get()
@@ -145,6 +150,7 @@ abstract class AbstractFireGrenade(
 
     abstract fun getDamageSource(): DamageSource
 
+
     private fun doDamage() {
         //Should only be run on the server
         val level = this.level() as ServerLevel
@@ -156,24 +162,44 @@ abstract class AbstractFireGrenade(
                 if (ModConfig.DAMAGE_NON_PLAYER_ENTITY.get()) LivingEntity::class.java else Player::class.java,
                 AABB(this.blockPosition()).inflate(ModConfig.HEGrenade.DAMAGE_RANGE.get())
             )
-
-        for (entity in entities) {
+        val entitiesInRange = entities.filter { entity ->
             spreadBlocks.any {
-                if (it == entity.blockPosition() && !isPositionInSmoke(
-                        this.level(),
-                        entity.position(),
-                    )
-                ) {
-                    val originalKnockBackResistance =
-                        entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
-                    val damage = ModConfig.FireGrenade.DAMAGE.get().toFloat()
-                    entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
-                    entity.hurt(damageSource, damage)
-                    entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
-                    return@any true
-                }
-                return@any false
+                it == entity.blockPosition() && !isPositionInSmoke(
+                    this.level(),
+                    entity.position(),
+                )
             }
+        }
+
+        this.entitiesLastInRange =
+            this.entitiesLastInRange.filter { dataPair -> entitiesInRange.any { entity -> dataPair.key == entity.uuid } }
+                .toMutableMap()
+
+        val timeNow = Instant.now().toEpochMilli()
+        entitiesInRange.forEach { entity ->
+
+            var damage = ModConfig.FireGrenade.DAMAGE.get().toFloat()
+            if (entity.uuid in this.entitiesLastInRange.keys) {
+                damage = min(
+                    damage,
+                    linearInterpolate(
+                        0.0, damage.toDouble(), (timeNow - this.entitiesLastInRange[entity.uuid]!!).div(
+                            ModConfig.FireGrenade.DAMAGE_INCREASE_TIME.get().toDouble()
+                        )
+                    ).toFloat()
+                )
+            } else {
+                damage = 0.1f
+                this.entitiesLastInRange[entity.uuid] = timeNow
+            }
+
+            val originalKnockBackResistance =
+                entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
+            entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
+
+            entity.hurt(damageSource, damage)
+
+            entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
         }
     }
 
