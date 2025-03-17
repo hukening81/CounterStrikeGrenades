@@ -178,6 +178,10 @@ abstract class AbstractFireGrenade(
         val timeNow = Instant.now().toEpochMilli()
         entitiesInRange.forEach { entity ->
 
+            if (entity.invulnerableTime > 0) {
+                return
+            }
+
             var damage = ModConfig.FireGrenade.DAMAGE.get().toFloat()
             if (entity.uuid in this.entitiesLastInRange.keys) {
                 damage = min(
@@ -198,6 +202,7 @@ abstract class AbstractFireGrenade(
             entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
 
             entity.hurt(damageSource, damage)
+            entity.invulnerableTime = 10
 
             entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
         }
