@@ -16,6 +16,7 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.BarrierBlock
@@ -52,6 +53,10 @@ abstract class CounterStrikeGrenadeEntity(
 
 
     override fun onHitEntity(result: EntityHitResult) {
+        if (result.entity is EndCrystal) {
+            result.entity.hurt(result.entity.damageSources().generic(), 1f)
+        }
+
         if (result.entity is LivingEntity) {
             val entity = result.entity as LivingEntity
 
