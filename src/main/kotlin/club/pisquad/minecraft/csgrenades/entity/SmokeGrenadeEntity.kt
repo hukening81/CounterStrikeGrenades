@@ -222,7 +222,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         val result = mutableListOf<BlockPos>()
         var currentPos = position
         repeat(ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()) {
-            if (this.level().getBlockState(currentPos.below()).isAir
+            if (!this.level().getBlockState(currentPos.below()).canOcclude()
             ) {
                 result.add(currentPos)
                 currentPos = currentPos.below()
@@ -289,7 +289,7 @@ private class SmokeGrenadeSpreadBlockCalculator(
             Direction.WEST -> blockPos.west()
             Direction.EAST -> blockPos.east()
         }
-        if (level.getBlockState(newLocation).isAir) {
+        if (!level.getBlockState(newLocation).canOcclude()) {
             return newLocation
         }
 
