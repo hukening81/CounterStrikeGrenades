@@ -164,7 +164,7 @@ abstract class AbstractFireGrenade(
             )
         val entitiesInRange = entities.filter { entity ->
             spreadBlocks.any {
-                it == entity.blockPosition() && !isPositionInSmoke(
+                it == entity.blockPosition().below() && !isPositionInSmoke(
                     this.level(),
                     entity.position(),
                 )
@@ -215,12 +215,12 @@ abstract class AbstractFireGrenade(
 
     private fun getGroundBelow(level: Level, position: BlockPos): BlockPos? {
         var currentPos = position
+
         var emptySpaceAbove = false
         repeat(ModConfig.FireGrenade.FIRE_MAX_SPREAD_DOWNWARD.get()) {
-            if (!level.getBlockState(currentPos).isAir) {
+            if (level.getBlockState(currentPos).canOcclude()) {
                 return if (emptySpaceAbove) {
-//                    we want the air block above the ground
-                    currentPos.above()
+                    currentPos
                 } else {
                     null
                 }
