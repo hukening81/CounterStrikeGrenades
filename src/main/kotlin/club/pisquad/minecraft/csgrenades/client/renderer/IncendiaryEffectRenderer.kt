@@ -27,6 +27,9 @@ object FireGrenadeRenderer {
     fun renderOne(grenade: AbstractFireGrenade) {
         val particleEngine = Minecraft.getInstance().particleEngine
         val spreadBlocks = grenade.getSpreadBlocks()
+        if (spreadBlocks.isEmpty()) {
+            return
+        }
         val fireRange = ModConfig.FireGrenade.FIRE_RANGE.get()
         val particlePerTick =
             (fireRange * fireRange * INCENDIARY_PARTICLE_DENSITY) * spreadBlocks.size / (fireRange * fireRange)

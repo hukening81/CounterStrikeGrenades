@@ -19,11 +19,9 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
-import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.PacketDistributor
 import java.time.Instant
@@ -264,6 +262,11 @@ private object FireSpreadCalculator {
     private const val ROUNDS = 10
 
     fun calculate(level: Level, origin: BlockPos): List<BlockPos> {
+        val originBlockState = level.getBlockState(origin)
+        if (originBlockState.canOcclude() || !originBlockState.fluidState.isEmpty) {
+            return listOf()
+        }
+
         val result = mutableListOf<BlockPos>(origin)
         repeat(ROUNDS) {
             val pathData = SpreadPathData(origin)
@@ -278,13 +281,16 @@ private object FireSpreadCalculator {
 }
 
 private fun getGroundBelow(level: Level, position: BlockPos): Pair<BlockPos, Int>? {
-    if (level.getBlockState(position).canOcclude()) {
+    val blockState = level.getBlockState(position)
+    if (blockState.canOcclude() || !blockState.fluidState.isEmpty) {
         return null
     }
     var height = 1
     var currentPos = position.below()
     repeat(ModConfig.FireGrenade.FIRE_MAX_SPREAD_DOWNWARD.get()) {
-        if (level.getBlockState(currentPos).canOcclude()) {
+        val blockState = level.getBlockState(currentPos)
+        if (blockState.canOcclude() || !blockState.fluidState.isEmpty) {
+
             return Pair(currentPos, height)
         }
         currentPos = currentPos.below()
