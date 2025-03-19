@@ -274,10 +274,9 @@ private object FireSpreadCalculator {
 
     fun calculate(level: Level, origin: BlockPos): List<BlockPos> {
         val originBlockState = level.getBlockState(origin)
-        if (originBlockState.canOcclude() || !originBlockState.fluidState.isEmpty) {
+        if (!originBlockState.fluidState.isEmpty) {
             return listOf()
         }
-
         val result = mutableListOf<BlockPos>(origin)
         repeat(ROUNDS) {
             val pathData = SpreadPathData(origin)
@@ -292,8 +291,8 @@ private object FireSpreadCalculator {
 }
 
 private fun getGroundBelow(level: Level, position: BlockPos): Pair<BlockPos, Int>? {
-    val blockState = level.getBlockState(position)
-    if (blockState.canOcclude() || !blockState.fluidState.isEmpty) {
+    val originBlockState = level.getBlockState(position)
+    if (originBlockState.canOcclude() || !originBlockState.fluidState.isEmpty) {
         return null
     }
     var height = 1
@@ -301,8 +300,12 @@ private fun getGroundBelow(level: Level, position: BlockPos): Pair<BlockPos, Int
     repeat(ModConfig.FireGrenade.FIRE_MAX_SPREAD_DOWNWARD.get()) {
         val blockState = level.getBlockState(currentPos)
         if (blockState.canOcclude() || !blockState.fluidState.isEmpty) {
+            return if (blockState.isCollisionShapeFullBlock(level, currentPos)) {
+                Pair(currentPos, height)
+            } else {
 
-            return Pair(currentPos, height)
+                Pair(currentPos.below(), height + 1)
+            }
         }
         currentPos = currentPos.below()
         height++
