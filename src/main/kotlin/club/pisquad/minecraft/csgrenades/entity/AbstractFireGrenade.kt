@@ -1,12 +1,9 @@
 package club.pisquad.minecraft.csgrenades.entity
 
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.client.renderer.FireGrenadeRenderer
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.getBlockPosAround2D
-import club.pisquad.minecraft.csgrenades.isPositionInSmoke
-import club.pisquad.minecraft.csgrenades.linearInterpolate
-import club.pisquad.minecraft.csgrenades.millToTick
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
 import club.pisquad.minecraft.csgrenades.registery.ModSerializers
@@ -211,34 +208,9 @@ abstract class AbstractFireGrenade(
     }
 
     private fun calculateSpreadBlocks(level: Level, center: Vec3): List<BlockPos> {
-        val blocksAround = getBlockPosAround2D(center.add(0.0, 1.0, 0.0), ModConfig.FireGrenade.FIRE_RANGE.get())
-        return blocksAround.mapNotNull { getGroundBelow(level, it) }.filter { canPositionBeSpread(center, it) }
-    }
-
-    private fun canPositionBeSpread(origin: Vec3, position: BlockPos): Boolean {
-        val context =
-            ClipContext(origin, position.above().center, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null)
-        val result = this.level().clip(context)
-        return result.type.equals(HitResult.Type.MISS)
-    }
-
-    private fun getGroundBelow(level: Level, position: BlockPos): BlockPos? {
-        var currentPos = position
-
-        var emptySpaceAbove = false
-        repeat(ModConfig.FireGrenade.FIRE_MAX_SPREAD_DOWNWARD.get()) {
-            if (level.getBlockState(currentPos).canOcclude()) {
-                return if (emptySpaceAbove) {
-                    currentPos
-                } else {
-                    null
-                }
-            } else {
-                emptySpaceAbove = true
-            }
-            currentPos = currentPos.below()
-        }
-        return null
+//        val blocksAround = getBlockPosAround2D(center.add(0.0, 1.0, 0.0), ModConfig.FireGrenade.FIRE_RANGE.get())
+//        return blocksAround.mapNotNull { getGroundBelow(level, it) }.filter { canPositionBeSpread(center, it) }
+        return FireSpreadCalculator.calculate(level, BlockPos.containing(center))
     }
 
     fun getSpreadBlocks(): List<BlockPos> {
@@ -247,4 +219,76 @@ abstract class AbstractFireGrenade(
         }
         return this.spreadBlocks
     }
+}
+
+class SpreadPathData(
+    val visited: MutableList<BlockPos> = mutableListOf(),
+    private var currentPos: BlockPos
+) {
+    private var jumpCount: Int = 0
+
+    companion object {
+        val directions = listOf(
+            Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
+        )
+    }
+
+    constructor(origin: BlockPos) : this(mutableListOf(origin), origin)
+
+    fun move(level: Level, center: BlockPos) {
+        for (i in 0..4) {
+            val horizontalShifted = this.currentPos.relative(directions.random())
+            if (horizontalShifted.horizontalDistanceToSqr(center) > ModConfig.FireGrenade.FIRE_RANGE.get()
+            ) {
+                continue
+            }
+            val groundCalculateResult = getGroundBelow(level, horizontalShifted.above())
+
+            if (groundCalculateResult != null) {
+                if (groundCalculateResult.first !in this.visited) {
+                    if (groundCalculateResult.second == 1) {
+                        jumpCount++
+                    }
+                    if (jumpCount < 2 || groundCalculateResult.second < 2) {
+                        this.visited.add(groundCalculateResult.first.above())
+                        this.currentPos = groundCalculateResult.first.above()
+                        continue
+                    }
+                }
+            }
+        }
+    }
+}
+
+private object FireSpreadCalculator {
+    private const val ROUNDS = 10
+
+    fun calculate(level: Level, origin: BlockPos): List<BlockPos> {
+        val result = mutableListOf<BlockPos>(origin)
+        repeat(ROUNDS) {
+            val pathData = SpreadPathData(origin)
+            repeat(ModConfig.FireGrenade.FIRE_RANGE.get()) {
+                pathData.move(level, origin)
+            }
+            result.addAll(pathData.visited)
+        }
+        return result.distinct().map { it.below() }
+            .filter { it.horizontalDistanceTo(origin) < ModConfig.FireGrenade.FIRE_RANGE.get() }
+    }
+}
+
+private fun getGroundBelow(level: Level, position: BlockPos): Pair<BlockPos, Int>? {
+    if (level.getBlockState(position).canOcclude()) {
+        return null
+    }
+    var height = 1
+    var currentPos = position.below()
+    repeat(ModConfig.FireGrenade.FIRE_MAX_SPREAD_DOWNWARD.get()) {
+        if (level.getBlockState(currentPos).canOcclude()) {
+            return Pair(currentPos, height)
+        }
+        currentPos = currentPos.below()
+        height++
+    }
+    return null
 }

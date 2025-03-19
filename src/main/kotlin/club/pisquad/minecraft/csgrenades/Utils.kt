@@ -11,6 +11,7 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 /**
@@ -102,8 +103,7 @@ fun getBlockPosAround2D(pos: Vec3, radius: Int): List<BlockPos> {
             result.add(BlockPos(begin.offset(xOffset, 0, zOffset)))
         }
     }
-    val center2D = Vec2(pos.x.toFloat(), pos.z.toFloat())
-    return result.filter { center2D.distanceToSqr(Vec2(it.x.toFloat(), it.z.toFloat())) < radius * radius }
+    return result
 }
 
 fun getBlocksAround3D(pos: Vec3, xRange: Int, yRange: Int, zRange: Int): List<BlockPos> {
@@ -134,4 +134,20 @@ fun linearInterpolate(from: Double, to: Double, t: Double): Double {
 
 fun Long.millToTick(): Long {
     return this.div(50)
+}
+
+fun Vec3.horizontalDistanceTo(other: Vec3): Double {
+    return sqrt(
+        Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble()
+    )
+}
+
+fun BlockPos.horizontalDistanceToSqr(other: BlockPos): Double {
+    return Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble()
+}
+
+fun BlockPos.horizontalDistanceTo(other: BlockPos): Double {
+    return sqrt(
+        this.horizontalDistanceToSqr(other)
+    )
 }
