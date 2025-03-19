@@ -22,7 +22,6 @@ This mod provides utilities in CS2(with smoke falling mechanics) to Minecraft
     - [x] Interaction with Smoke Grenades
 - [x] Smoke Grenade
 
-Showcase: [YouTube](https://www.youtube.com/watch?v=wpVh0Wzt4uQ)
 
 ## Todos
 - [ ] Decoy
