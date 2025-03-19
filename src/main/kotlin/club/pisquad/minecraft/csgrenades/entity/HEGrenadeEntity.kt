@@ -17,8 +17,11 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
+import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.HitResult
+import kotlin.math.max
 
 class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
     CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
@@ -67,12 +70,55 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             val distance = entity.distanceTo(this).toDouble()
 
             if (distance < damageRange) {
-                val originalKnockBackResistance = entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
-                entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
-                entity.hurt(damageSource, calculateHEGrenadeDamage(distance, 0.0).toFloat())
-                entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
+                val damage = getDamageBlockingState(entity)
+                if (damage > 0.0) {
+                    val originalKnockBackResistance =
+                        entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
+                    entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
+                    entity.hurt(damageSource, damage.toFloat())
+                    entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
+                }
             }
         }
+    }
+
+    private fun getDamageBlockingState(entity: LivingEntity): Double {
+        val headDamage = ClipContext(
+            this.position(),
+            entity.eyePosition,
+            ClipContext.Block.COLLIDER,
+            ClipContext.Fluid.ANY,
+            null
+        ).let {
+            val clipResult = this.level().clip(it)
+            return@let if (clipResult.type == HitResult.Type.MISS) {
+                val distance = this.position().distanceTo(entity.eyePosition)
+                return@let if (distance < 1.5) {
+                    calculateHEGrenadeDamage(distance, 0.0, true)
+                } else {
+                    calculateHEGrenadeDamage(distance, 0.0)
+                }
+            } else {
+                0.0
+            }
+        }
+
+        val bodyDamage = ClipContext(
+            this.position(),
+            entity.position(),
+            ClipContext.Block.COLLIDER,
+            ClipContext.Fluid.ANY,
+            null
+        ).let {
+            val clipResult = this.level().clip(it)
+            return@let if (clipResult.type == HitResult.Type.MISS) {
+                calculateHEGrenadeDamage(this.position().distanceTo(entity.position()), 0.0)
+            } else {
+                0.0
+            }
+        }
+
+        return max(headDamage, bodyDamage)
     }
 
     override fun getHitDamageSource(): DamageSource {
@@ -97,8 +143,13 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     }
 }
 
-private fun calculateHEGrenadeDamage(distance: Double, armorReduction: Double): Double {
-    val baseDamage = ModConfig.HEGrenade.BASE_DAMAGE.get()
+private fun calculateHEGrenadeDamage(
+    distance: Double,
+    armorReduction: Double,
+    headDamageBoost: Boolean = false
+): Double {
+    val baseDamage =
+        if (headDamageBoost) ModConfig.HEGrenade.BASE_DAMAGE.get() * ModConfig.HEGrenade.HEAD_DAMAGE_BOOST.get() else ModConfig.HEGrenade.BASE_DAMAGE.get()
     val damageRange = ModConfig.HEGrenade.DAMAGE_RANGE.get()
     return baseDamage.times(1.0.minus(distance.div(damageRange)))
         .times(1.0.minus(armorReduction))
