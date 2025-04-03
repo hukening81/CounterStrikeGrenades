@@ -269,7 +269,7 @@ class SpreadPathData(
                 return if (clipResult.type == HitResult.Type.MISS) {
                     null
                 } else {
-                    Pair(clipResult.blockPos, clipResult.blockPos.y - origin.y)
+                    Pair(clipResult.blockPos, origin.y - clipResult.blockPos.y)
                 }
             }
         }
@@ -289,18 +289,21 @@ class SpreadPathData(
             return false
         }
         val groundCalculateResult = getGroundBelow(level, horizontalShifted.above()) ?: return false
-        if (groundCalculateResult.first in this.visited) {
-            return false
-        } else {
-            this.visited.add(groundCalculateResult.first)
-        }
+
         if (groundCalculateResult.second == 0) {
-            if (level.getBlockState(this.currentPos.above()).isAir) {
+            if (level.getBlockState(
+                    horizontalShifted.above().above()
+                ).isAir && level.getBlockState(this.currentPos.above()).isAir && this.jumpCount < 3
+            ) {
                 jumpCount++
             } else {
                 return false
             }
         }
+        if (groundCalculateResult.first in this.visited) {
+            return false
+        }
+        this.visited.add(groundCalculateResult.first)
         this.currentPos = groundCalculateResult.first
         return true
     }
