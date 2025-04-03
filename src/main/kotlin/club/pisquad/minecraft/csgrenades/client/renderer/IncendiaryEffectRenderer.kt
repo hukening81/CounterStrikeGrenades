@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec2
+import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
@@ -38,10 +39,10 @@ object FireGrenadeRenderer {
             val position = grenade.position()
 
 
-            val pos = getRandomLocationFromBlockSurface(spreadBlocks.random())
+            val pos = getRandomLocationFromBlockSurface(spreadBlocks.random().above())
             if (isPositionInSmoke(
                     grenade.level(),
-                    pos
+                    pos.add(Vec3(0.0, 0.5, 0.0))
                 )
             ) {
                 continue
@@ -62,8 +63,6 @@ object FireGrenadeRenderer {
                 random < 0.5 -> flameParticleType
                 else -> ParticleTypes.SMALL_FLAME
             }
-
-
             particleEngine.createParticle(
                 particleType,
                 pos.x,
