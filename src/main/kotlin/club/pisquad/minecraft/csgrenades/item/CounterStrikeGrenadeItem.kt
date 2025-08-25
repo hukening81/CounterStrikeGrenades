@@ -34,16 +34,6 @@ open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.st
         stack: ItemStack?
     ): Multimap<Attribute, AttributeModifier> {
         val modifiers = HashMultimap.create(super.getAttributeModifiers(slot, stack))
-        if (slot == EquipmentSlot.MAINHAND) {
-            modifiers.put(
-                Attributes.ATTACK_SPEED,
-                AttributeModifier(
-                    "Weapon attack speed",
-                    ModConfig.GRENADE_THROW_COOLDOWN.get().div(50.0) - 4,
-                    AttributeModifier.Operation.ADDITION
-                )
-            )
-        }
         return modifiers
     }
 
