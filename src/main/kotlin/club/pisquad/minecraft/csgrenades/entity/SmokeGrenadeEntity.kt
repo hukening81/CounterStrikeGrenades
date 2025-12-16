@@ -173,7 +173,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             if (delta.lengthSqr() < 0.001) {
                 this.clearSmokeWithinRange(posNow, ModConfig.SmokeGrenade.ARROW_CLEAR_RANGE.get(), true)
             } else {
-                val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(10) // Check every 50cm
+                val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(30) // Check every 50cm, with a higher cap
                 for (i in 0..steps) {
                     val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
                     this.clearSmokeWithinRange(interpolatedPos, ModConfig.SmokeGrenade.ARROW_CLEAR_RANGE.get(), i == 0)
@@ -191,30 +191,18 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             }
 
             val smokeCenter = this.position()
+            val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
+            // Create a bounding box for the entire smoke cloud
+            val smokeCloudBoundingBox = AABB(smokeCenter.x - smokeRadius, smokeCenter.y - smokeRadius, smokeCenter.z - smokeRadius,
+                                             smokeCenter.x + smokeRadius, smokeCenter.y + smokeRadius, smokeCenter.z + smokeRadius)
+
             allRenderEntities.forEach { entity ->
-                if (entity.position().distanceToSqr(smokeCenter) < 225) { // Pre-filter to check entities within 15 blocks
-                    println("CS-GRENADES DEBUG: Nearby entity in radius: ${entity::class.java.name}") // Re-added for debugging new gun packs
+                // Check if the entity's bounding box intersects with the smoke cloud's bounding box
+                if (smokeCloudBoundingBox.intersects(entity.boundingBox)) {
+                    // Check if it's the Kinetic Bullet
                     if (entity::class.java.name == "com.tacz.guns.entity.EntityKineticBullet") {
-                        println("CS-GRENADES DEBUG:     ^ FINAL MATCH! This is the bullet. Clearing smoke.")
-
                         val posNow = entity.position()
-
-                        // --- Reflection for Dynamic Range ---
-                        var finalClearRange = ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get() // Default/fallback value
-                        try {
-                            // 1. Get the getDamage(Vec3) method from the bullet entity
-                            val getDamageMethod = entity::class.java.getMethod("getDamage", Vec3::class.java)
-                            // 2. Invoke it to get the damage value
-                            val damage = getDamageMethod.invoke(entity, posNow) as Float
-                            // 3. Calculate a dynamic range based on damage
-                            // Formula: base_range + (damage/damage_divisor), clamped to a min/max
-                            val calculatedRange = (1.0 + (damage / 15.0f)).coerceIn(0.5, 5.0)
-                            finalClearRange = calculatedRange
-                            println("CS-GRENADES DEBUG: Bullet Damage: $damage -> Calculated Range: $finalClearRange")
-                        } catch (e: Exception) {
-                            println("CS-GRENADES DEBUG: Could not get dynamic damage via reflection, falling back to config value. Reason: ${e.message}")
-                        }
-                        // --- End Reflection ---
+                        val finalClearRange = ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get()
 
                         // Interpolate position to prevent tunneling
                         val delta = entity.deltaMovement
@@ -223,7 +211,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                         if (delta.lengthSqr() < 0.001) {
                             this.clearSmokeWithinRange(posNow, finalClearRange, true)
                         } else {
-                            val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(10) // Check every 50cm
+                            val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(30) // Check every 50cm, with a higher cap
                             for (i in 0..steps) {
                                 val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
                                 this.clearSmokeWithinRange(interpolatedPos, finalClearRange, i == 0)
