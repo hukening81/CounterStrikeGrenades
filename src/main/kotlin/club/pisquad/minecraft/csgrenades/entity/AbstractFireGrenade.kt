@@ -89,7 +89,6 @@ abstract class AbstractFireGrenade(
                     PacketDistributor.ALL.noArg(),
                     FireGrenadeMessage(FireGrenadeMessage.MessageType.AirExploded, this.position())
                 )
-                this.setPos(this.x, -1000.0, this.z)
                 this.kill()
             }
         }
@@ -134,11 +133,9 @@ abstract class AbstractFireGrenade(
                         }
                 ) {
                     this.extinguished = true
-                    this.setPos(this.x, -1000.0, this.z)
                 } else {
                     // Prevent fire grenade clipping inside a block
-                    val surfacePos = result.blockPos.center.add(Vec3(0.0, 0.5 + GRENADE_ENTITY_SIZE, 0.0))
-                    this.setPos(surfacePos)
+                    this.setPos(result.blockPos.center.add(Vec3(0.0, 0.5 + GRENADE_ENTITY_SIZE, 0.0)))
 
                     this.entityData.set(
                         spreadBlocksAccessor,
@@ -150,8 +147,6 @@ abstract class AbstractFireGrenade(
                             FireGrenadeMessage.MessageType.GroundExploded, this.position(),
                         )
                     )
-                    // Teleport after all position-dependent logic
-                    this.setPos(this.x, -1000.0, this.z)
                 }
             }
             return
@@ -169,9 +164,6 @@ abstract class AbstractFireGrenade(
             PacketDistributor.ALL.noArg(),
             FireGrenadeMessage(FireGrenadeMessage.MessageType.ExtinguishedBySmoke, this.position())
         )
-        if (!this.level().isClientSide) {
-            this.setPos(this.x, -1000.0, this.z)
-        }
         this.kill()
     }
 
