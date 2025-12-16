@@ -7,10 +7,12 @@ import club.pisquad.minecraft.csgrenades.network.message.FlashbangEffectData
 import club.pisquad.minecraft.csgrenades.sound.FlashbangRingSound
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.FastColor
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.client.event.RenderGuiOverlayEvent
+import net.minecraftforge.client.event.sound.PlaySoundEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
@@ -65,6 +67,30 @@ object FlashbangBlindEffectRenderer {
             }
         }
         playRingSound(effectData)
+    }
+
+    @SubscribeEvent
+    fun onPlaySound(event: PlaySoundEvent) {
+        // If the player is not flashed, do nothing.
+        if (renderState == RenderState.IDLE) {
+            return
+        }
+
+        // Read the mutable property into a local immutable variable to allow smart casting.
+        val sound = event.sound ?: return
+
+        // Allow our custom ringing sound to play
+        if (sound is FlashbangRingSound) {
+            return
+        }
+
+        // Also allow the vanilla UI button click sound, it feels better.
+        if (sound.location == SoundEvents.UI_BUTTON_CLICK.get().location) {
+            return
+        }
+
+        // Cancel all other sounds by replacing it with null
+        event.sound = null
     }
 
     @SubscribeEvent
