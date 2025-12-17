@@ -141,7 +141,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             this.boundingBox.inflate(heDamageRange + smokeRadius)
                 .inflate(0.0, smokeFallingHeight.toDouble(), 0.0)
         ).forEach {
-            it.clearSmokeWithinRange(this.position(), heDamageRange + 2.5)
+            it.clearSmokeWithinRange(this.position(), heDamageRange + 2.5, true)
         }
     }
 }

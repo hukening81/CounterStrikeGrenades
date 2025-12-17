@@ -28,6 +28,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraftforge.fml.ModList
 import java.time.Duration
 import java.time.Instant
 import kotlin.random.Random
@@ -65,14 +66,41 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         }
     }
 
-    fun clearSmokeWithinRange(position: Vec3, range: Double) {
-        val bb = AABB(BlockPos(position.toVec3i())).inflate(range)
-        this.particles.filter { bb.contains(it.key.toVec3()) }.forEach {
-            it.value.forEach { particle ->
-                if (particle.pos.distanceTo(position) < range) {
+    fun clearSmokeWithinRange(position: Vec3, range: Double, printHeader: Boolean) {
+        // if (printHeader) {
+        //     println("CS-GRENADES DEBUG: Clearing smoke at pos: $position with range: $range. Checking ALL particles.")
+        //     val totalParticles = this.particles.values.sumOf { it.size }
+        //     println("CS-GRENADES DEBUG: Total particles in map: $totalParticles")
+        //     if (totalParticles == 0) {
+        //         println("CS-GRENADES DEBUG: Cleared 0 particles because the map is empty.")
+        //         return // Nothing to do
+        //     }
+        // }
+
+        var clearedCount = 0
+        var checkedCount = 0 // To avoid spamming logs
+
+        // Iterate over all lists of particles in the map
+        this.particles.values.forEach { particleList ->
+            // Iterate over each particle in the list
+            particleList.forEach { particle ->
+                // New Debugging: Print first few particle positions
+                // if (printHeader && checkedCount < 5) {
+                //     val dist = particle.pos.distanceTo(position)
+                //     println("CS-GRENADES DEBUG:   - Checking particle at ${particle.pos}, distance to bullet: $dist")
+                // }
+                checkedCount++
+
+                // Directly check the distance between the bullet and the particle
+                if (particle.pos.distanceToSqr(position) < range * range) { // Use distanceToSqr for performance
                     particle.opacityTime = getRegenerationTime(particle.pos.distanceTo(position), range)
+                    clearedCount++
                 }
             }
+        }
+
+        if (clearedCount > 0) {
+            // println("CS-GRENADES DEBUG: Cleared $clearedCount particles at interpolated position.")
         }
     }
 
@@ -117,6 +145,74 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                     this.kill()
                 }
                 extinguishNearbyFires()
+            }
+        }
+        if (this.level().isClientSide && this.entityData.get(isExplodedAccessor)) {
+            this.disperseSmokeByProjectiles()
+        }
+    }
+
+    private fun disperseSmokeByProjectiles() {
+        val spreadBlocks = this.getSpreadBlocks()
+        if (spreadBlocks.isEmpty()) {
+            return
+        }
+
+        // --- Vanilla Arrow Logic ---
+        var smokeBB = AABB(this.blockPosition()).inflate(10.0) // Use a larger BB to find arrows near the cloud
+        val nearbyArrows = this.level().getEntitiesOfClass(
+            net.minecraft.world.entity.projectile.AbstractArrow::class.java,
+            smokeBB
+        ) { arrow -> arrow.deltaMovement.lengthSqr() > 0.01 } // Only consider moving arrows
+
+        nearbyArrows.forEach { arrow ->
+            // Interpolate position to prevent tunneling
+            val posNow = arrow.position()
+            val delta = arrow.deltaMovement
+            val posOld = posNow.subtract(delta)
+            if (delta.lengthSqr() < 0.001) {
+                this.clearSmokeWithinRange(posNow, ModConfig.SmokeGrenade.ARROW_CLEAR_RANGE.get(), true)
+            } else {
+                val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(10) // Check every 50cm
+                for (i in 0..steps) {
+                    val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
+                    this.clearSmokeWithinRange(interpolatedPos, ModConfig.SmokeGrenade.ARROW_CLEAR_RANGE.get(), i == 0)
+                }
+            }
+        }
+
+        // --- TACZ BULLET COMPATIBILITY ---
+        if (this.level().isClientSide && ModList.get().isLoaded("tacz")) {
+            val clientLevel = this.level() as? net.minecraft.client.multiplayer.ClientLevel ?: return
+            val allRenderEntities = clientLevel.entitiesForRendering()
+
+            if (allRenderEntities.none()) {
+                return
+            }
+
+            val smokeCenter = this.position()
+            allRenderEntities.forEach { entity ->
+                if (entity.position().distanceToSqr(smokeCenter) < 225) { // Pre-filter to check entities within 15 blocks
+                    // println("CS-GRENADES DEBUG: Nearby entity in radius: ${entity::class.java.name}") // Re-added for debugging new gun packs
+                    if (entity::class.java.name == "com.tacz.guns.entity.EntityKineticBullet") {
+                        // println("CS-GRENADES DEBUG:     ^ FINAL MATCH! This is the bullet. Clearing smoke.")
+
+                        // Interpolate position to prevent tunneling
+                        val posNow = entity.position()
+                        val delta = entity.deltaMovement
+                        val posOld = posNow.subtract(delta)
+
+                        if (delta.lengthSqr() < 0.001) {
+                            this.clearSmokeWithinRange(posNow, ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get(), true)
+                        } else {
+                            val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(10) // Check every 50cm
+                            for (i in 0..steps) {
+                                val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
+                                this.clearSmokeWithinRange(interpolatedPos, ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get(), i == 0)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -215,7 +311,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 getSpaceBelow(it)
             )
         }
-        return (initialSmoke + fallDownSmoke).distinct()
+        // Optimization: Use a Set to efficiently combine and find distinct blocks.
+        return initialSmoke.union(fallDownSmoke).toList()
     }
 
     private fun getSpaceBelow(position: BlockPos): List<BlockPos> {
@@ -260,10 +357,11 @@ private class SmokeGrenadeSpreadBlockCalculator(
     val origin: BlockPos,
 ) {
 
-    fun calculate(level: Level): List<BlockPos> {
-        val blocks = mutableListOf<BlockPos>()
-        var generatedInLastCycle = mutableListOf<BlockPos>(origin)
-        var generatedInCurrentCycle = mutableListOf<BlockPos>()
+    // Optimization: Use Sets instead of Lists to avoid duplicates from the start.
+    fun calculate(level: Level): Set<BlockPos> {
+        val blocks = mutableSetOf<BlockPos>()
+        var generatedInLastCycle = mutableSetOf<BlockPos>(origin)
+        var generatedInCurrentCycle = mutableSetOf<BlockPos>()
         repeat(generateCycle) {
             repeat(blockPerCycle) {
                 generatedInLastCycle.random().let {
@@ -276,9 +374,9 @@ private class SmokeGrenadeSpreadBlockCalculator(
             }
             blocks.addAll(generatedInLastCycle)
             generatedInLastCycle = generatedInCurrentCycle
-            generatedInCurrentCycle = mutableListOf()
+            generatedInCurrentCycle = mutableSetOf()
         }
-        return blocks.distinct()
+        return blocks
     }
 
     private fun randomMoveOnce(level: Level, blockPos: BlockPos): BlockPos {
