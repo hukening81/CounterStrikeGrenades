@@ -159,20 +159,27 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         }
 
         // --- Vanilla Arrow Logic ---
-        var smokeBB = AABB(this.blockPosition()).inflate(10.0) // Use a larger BB to find arrows near the cloud
+        // A large bounding box to catch any arrows that might be nearby. The swept BB check is more precise.
+        val searchBB = this.boundingBox.inflate(64.0)
         val nearbyArrows = this.level().getEntitiesOfClass(
             net.minecraft.world.entity.projectile.AbstractArrow::class.java,
-            smokeBB
+            searchBB
         ) { arrow -> arrow.deltaMovement.lengthSqr() > 0.01 } // Only consider moving arrows
 
+        val smokeCloudBoundingBox = AABB(BlockPos.containing(this.position())).inflate(ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble())
+
         nearbyArrows.forEach { arrow ->
-            // Interpolate position to prevent tunneling
-            val posNow = arrow.position()
+            // Use a "swept" bounding box to detect fast-moving entities that pass through the cloud in a single tick.
             val delta = arrow.deltaMovement
-            val posOld = posNow.subtract(delta)
-            if (delta.lengthSqr() < 0.001) {
-                this.clearSmokeWithinRange(posNow, ModConfig.SmokeGrenade.ARROW_CLEAR_RANGE.get(), true)
-            } else {
+            val currentBB = arrow.boundingBox
+            val oldBB = currentBB.move(-delta.x, -delta.y, -delta.z)
+            val sweptBB = currentBB.minmax(oldBB)
+
+            if (smokeCloudBoundingBox.intersects(sweptBB)) {
+                println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Arrow.")
+                // Interpolate position to prevent tunneling
+                val posNow = arrow.position()
+                val posOld = posNow.subtract(delta)
                 val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(30) // Check every 50cm, with a higher cap
                 for (i in 0..steps) {
                     val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
@@ -192,30 +199,32 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
             val smokeCenter = this.position()
             val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
-            // Create a bounding box for the entire smoke cloud
-            val smokeCloudBoundingBox = AABB(smokeCenter.x - smokeRadius, smokeCenter.y - smokeRadius, smokeCenter.z - smokeRadius,
-                                             smokeCenter.x + smokeRadius, smokeCenter.y + smokeRadius, smokeCenter.z + smokeRadius)
+            val smokeCloudBoundingBox = AABB(BlockPos.containing(smokeCenter)).inflate(smokeRadius)
 
             allRenderEntities.forEach { entity ->
-                // Check if the entity's bounding box intersects with the smoke cloud's bounding box
-                if (smokeCloudBoundingBox.intersects(entity.boundingBox)) {
-                    // Check if it's the Kinetic Bullet
+                // Use a "swept" bounding box to detect fast-moving entities that pass through the cloud in a single tick.
+                val delta = entity.deltaMovement
+                // If the entity hasn't moved, we don't need to check it.
+                if (delta.lengthSqr() == 0.0) return@forEach
+
+                val currentBB = entity.boundingBox
+                val oldBB = currentBB.move(-delta.x, -delta.y, -delta.z)
+                val sweptBB = currentBB.minmax(oldBB)
+
+                // Check if the swept path intersects the smoke cloud
+                if (smokeCloudBoundingBox.intersects(sweptBB)) {
                     if (entity::class.java.name == "com.tacz.guns.entity.EntityKineticBullet") {
+                        println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Kinetic Bullet.")
+
                         val posNow = entity.position()
                         val finalClearRange = ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get()
-
-                        // Interpolate position to prevent tunneling
-                        val delta = entity.deltaMovement
                         val posOld = posNow.subtract(delta)
 
-                        if (delta.lengthSqr() < 0.001) {
-                            this.clearSmokeWithinRange(posNow, finalClearRange, true)
-                        } else {
-                            val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(30) // Check every 50cm, with a higher cap
-                            for (i in 0..steps) {
-                                val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
-                                this.clearSmokeWithinRange(interpolatedPos, finalClearRange, i == 0)
-                            }
+                        // Interpolation logic remains the same
+                        val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(30)
+                        for (i in 0..steps) {
+                            val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
+                            this.clearSmokeWithinRange(interpolatedPos, finalClearRange, i == 0)
                         }
                     }
                 }
