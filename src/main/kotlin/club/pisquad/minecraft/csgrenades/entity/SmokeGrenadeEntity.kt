@@ -67,15 +67,15 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     }
 
     fun clearSmokeWithinRange(position: Vec3, range: Double, printHeader: Boolean) {
-        if (printHeader) {
-            println("CS-GRENADES DEBUG: Clearing smoke at pos: $position with range: $range. Checking ALL particles.")
-            val totalParticles = this.particles.values.sumOf { it.size }
-            println("CS-GRENADES DEBUG: Total particles in map: $totalParticles")
-            if (totalParticles == 0) {
-                println("CS-GRENADES DEBUG: Cleared 0 particles because the map is empty.")
-                return // Nothing to do
-            }
-        }
+        // if (printHeader) {
+        //     println("CS-GRENADES DEBUG: Clearing smoke at pos: $position with range: $range. Checking ALL particles.")
+        //     val totalParticles = this.particles.values.sumOf { it.size }
+        //     println("CS-GRENADES DEBUG: Total particles in map: $totalParticles")
+        //     if (totalParticles == 0) {
+        //         println("CS-GRENADES DEBUG: Cleared 0 particles because the map is empty.")
+        //         return // Nothing to do
+        //     }
+        // }
 
         var clearedCount = 0
         var checkedCount = 0 // To avoid spamming logs
@@ -85,10 +85,10 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             // Iterate over each particle in the list
             particleList.forEach { particle ->
                 // New Debugging: Print first few particle positions
-                if (printHeader && checkedCount < 5) {
-                    val dist = particle.pos.distanceTo(position)
-                    println("CS-GRENADES DEBUG:   - Checking particle at ${particle.pos}, distance to bullet: $dist")
-                }
+                // if (printHeader && checkedCount < 5) {
+                //     val dist = particle.pos.distanceTo(position)
+                //     println("CS-GRENADES DEBUG:   - Checking particle at ${particle.pos}, distance to bullet: $dist")
+                // }
                 checkedCount++
 
                 // Directly check the distance between the bullet and the particle
@@ -100,7 +100,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         }
 
         if (clearedCount > 0) {
-            println("CS-GRENADES DEBUG: Cleared $clearedCount particles at interpolated position.")
+            // println("CS-GRENADES DEBUG: Cleared $clearedCount particles at interpolated position.")
         }
     }
 
@@ -193,8 +193,9 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             val smokeCenter = this.position()
             allRenderEntities.forEach { entity ->
                 if (entity.position().distanceToSqr(smokeCenter) < 225) { // Pre-filter to check entities within 15 blocks
+                    // println("CS-GRENADES DEBUG: Nearby entity in radius: ${entity::class.java.name}") // Re-added for debugging new gun packs
                     if (entity::class.java.name == "com.tacz.guns.entity.EntityKineticBullet") {
-                        println("CS-GRENADES DEBUG:     ^ FINAL MATCH! This is the bullet. Clearing smoke.")
+                        // println("CS-GRENADES DEBUG:     ^ FINAL MATCH! This is the bullet. Clearing smoke.")
 
                         // Interpolate position to prevent tunneling
                         val posNow = entity.position()
