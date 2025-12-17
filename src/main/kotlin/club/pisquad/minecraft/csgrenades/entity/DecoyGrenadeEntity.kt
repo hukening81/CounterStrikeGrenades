@@ -109,7 +109,7 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             SoundEvents.CREEPER_HURT,
             SoundEvents.CREEPER_DEATH,
             SoundEvents.CREEPER_PRIMED,
-            SoundEvents.FIREWORK_ROCKET_BLAST,
+//            SoundEvents.FIREWORK_ROCKET_BLAST,
             SoundEvents.CHICKEN_HURT,
             SoundEvents.CHICKEN_AMBIENT
         )
