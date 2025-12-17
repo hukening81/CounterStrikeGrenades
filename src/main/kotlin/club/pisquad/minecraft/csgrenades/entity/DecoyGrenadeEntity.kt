@@ -4,6 +4,10 @@ import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registery.ModDamageType
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import net.minecraft.core.registries.Registries
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -22,9 +26,20 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private var nextSoundTick: Int = 0
 
     companion object {
-        private const val TOTAL_DURATION_TICKS = 15 * 20 // 15 seconds
-        private const val SOUND_INTERVAL_BASE_TICKS = 1 * 20   // 1 second
-        private const val SOUND_INTERVAL_RANDOM_TICKS = 2 * 20  // up to 2 extra seconds
+        private const val TOTAL_DURATION_TICKS = 15 * 20
+        private const val SOUND_INTERVAL_BASE_TICKS = 1 * 20
+        private const val SOUND_INTERVAL_RANDOM_TICKS = 2 * 20
+
+        // Synched data for custom sound
+        val CUSTOM_SOUND_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(
+            DecoyGrenadeEntity::class.java,
+            EntityDataSerializers.STRING
+        )
+    }
+
+    override fun defineSynchedData() {
+        super.defineSynchedData()
+        this.entityData.define(CUSTOM_SOUND_ACCESSOR, "") // Default to empty string
     }
 
     override fun getDefaultItem(): Item {
@@ -44,14 +59,10 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         } else {
             // Logic for when the decoy is active
             val currentActivationTick = tickCount - activationTick!!
-
-            // Check if it's time to play a sound
             if (tickCount >= nextSoundTick) {
                 playSoundLogic()
                 scheduleNextSound()
             }
-
-            // Check if it's time to end its life
             if (currentActivationTick > TOTAL_DURATION_TICKS) {
                 endOfLifeExplosion()
             }
@@ -66,23 +77,51 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         )
     }
 
+    // This method is called from the server-side network handler
+    fun setCustomSound(sound: String) {
+        this.entityData.set(CUSTOM_SOUND_ACCESSOR, sound)
+    }
+
     private fun scheduleNextSound() {
         nextSoundTick = tickCount + SOUND_INTERVAL_BASE_TICKS + Random.nextInt(SOUND_INTERVAL_RANDOM_TICKS)
     }
 
     private fun playSoundLogic() {
+        val customSound = this.entityData.get(CUSTOM_SOUND_ACCESSOR)
+
+        if (customSound.isNotBlank()) {
+            // Play the custom sound from NBT
+            try {
+                val soundEvent = SoundEvent.createVariableRangeEvent(ResourceLocation(customSound))
+                level().playSound(null, this.x, this.y, this.z, soundEvent, SoundSource.PLAYERS, 4.0f, 1.0f)
+            } catch (e: Exception) {
+                // If the custom sound name is invalid, fall back to default
+                playDefaultSound()
+            }
+        } else {
+            // Fallback to default random footstep sounds
+            playDefaultSound()
+        }
+    }
+
+    private fun playDefaultSound() {
         val footstepSounds = arrayOf(
-            SoundEvents.STEM_STEP,
+            SoundEvents.BLASTFURNACE_FIRE_CRACKLE,
+            SoundEvents.SHULKER_BULLET_HIT,
+            SoundEvents.SHULKER_HURT,
+            SoundEvents.SHULKER_SHOOT,
+            SoundEvents.SHULKER_TELEPORT,
+            SoundEvents.SHULKER_BULLET_HIT,
+            SoundEvents.SHULKER_OPEN,
+            SoundEvents.SHULKER_CLOSE,
+            SoundEvents.SHULKER_DEATH,
         )
         val randomSoundHolder = footstepSounds[Random.nextInt(footstepSounds.size)]
-
-        // Play the selected random footstep sound using the Holder directly
         level().playSound(null, this.blockPosition(), randomSoundHolder, SoundSource.PLAYERS, 1.0f, 1.0f)
     }
 
     private fun endOfLifeExplosion() {
         if (!level().isClientSide) {
-            // Creates a very small explosion with low damage and no fire/block destruction.
             this.level().explode(this, this.x, this.y, this.z, 1.0f, false, Level.ExplosionInteraction.NONE)
         }
         this.discard()
