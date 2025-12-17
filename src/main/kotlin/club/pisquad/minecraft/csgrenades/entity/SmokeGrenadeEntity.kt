@@ -171,12 +171,12 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             val delta = arrow.deltaMovement
             val posOld = posNow.subtract(delta)
             if (delta.lengthSqr() < 0.001) {
-                this.clearSmokeWithinRange(posNow, 1.5, true)
+                this.clearSmokeWithinRange(posNow, ModConfig.SmokeGrenade.ARROW_CLEAR_RANGE.get(), true)
             } else {
                 val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(10) // Check every 50cm
                 for (i in 0..steps) {
                     val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
-                    this.clearSmokeWithinRange(interpolatedPos, 1.5, i == 0)
+                    this.clearSmokeWithinRange(interpolatedPos, ModConfig.SmokeGrenade.ARROW_CLEAR_RANGE.get(), i == 0)
                 }
             }
         }
@@ -202,13 +202,12 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                         val posOld = posNow.subtract(delta)
 
                         if (delta.lengthSqr() < 0.001) {
-                            this.clearSmokeWithinRange(posNow, 2.0, true)
+                            this.clearSmokeWithinRange(posNow, ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get(), true)
                         } else {
-                            println("CS-GRENADES DEBUG: Bullet has moved. Interpolating path from $posOld to $posNow.")
                             val steps = (delta.length() / 0.5).toInt().coerceAtLeast(1).coerceAtMost(10) // Check every 50cm
                             for (i in 0..steps) {
                                 val interpolatedPos = posOld.lerp(posNow, i.toDouble() / steps)
-                                this.clearSmokeWithinRange(interpolatedPos, 2.0, i == 0)
+                                this.clearSmokeWithinRange(interpolatedPos, ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get(), i == 0)
                             }
                         }
                     }

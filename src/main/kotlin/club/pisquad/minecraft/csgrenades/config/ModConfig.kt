@@ -23,6 +23,8 @@ object ModConfig {
         lateinit var TIME_BEFORE_REGENERATE: ForgeConfigSpec.LongValue
         lateinit var REGENERATION_TIME: ForgeConfigSpec.LongValue
         lateinit var SMOKE_MAX_FALLING_HEIGHT: ForgeConfigSpec.IntValue
+        lateinit var ARROW_CLEAR_RANGE: ForgeConfigSpec.DoubleValue
+        lateinit var BULLET_CLEAR_RANGE: ForgeConfigSpec.DoubleValue
     }
 
     object HEGrenade {
@@ -75,6 +77,10 @@ object ModConfig {
         SmokeGrenade.TIME_BEFORE_REGENERATE = builder.defineInRange("time_before_regenerate", 1000, 0, 10000.toLong())
         SmokeGrenade.REGENERATION_TIME = builder.defineInRange("regeneration_time", 3000, 0, 10000.toLong())
         SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT = builder.defineInRange("smoke_max_falling_height", 8, 0, 100)
+        builder.comment("The radius of smoke cleared by a passing arrow, in blocks.")
+        SmokeGrenade.ARROW_CLEAR_RANGE = builder.defineInRange("arrow_clear_range", 1.2, 0.1, 10.0)
+        builder.comment("The radius of smoke cleared by a passing bullet (e.g. from Tacz), in blocks.")
+        SmokeGrenade.BULLET_CLEAR_RANGE = builder.defineInRange("bullet_clear_range", 1.0, 0.1, 10.0)
         builder.pop()
 
         builder.push("HEGrenade")
