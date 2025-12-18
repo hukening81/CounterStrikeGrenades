@@ -8,11 +8,12 @@
   "item.csgrenades.smokegrenade": "Smoke Grenade",
   "death.attack.csgrenades.decoy_hit": "%1$s was bonked by %2$'s decoy grenade",
   "death.attack.csgrenades.flashbang_hit": "%1$s was hit by %2$'s flashbang",
-  "death.attack.csgrenades.hegrenade_explosion": "%1$s was blown up by %2$'s HE grenade",
-  "death.attack.csgrenades.hegrenade_hit": "%1$s was hit by %2$'s HE grenade",
-  "death.attack.csgrenades.incendiary_fire": "%1$s burned to death from %2$'s incendiary",
-  "death.attack.csgrenades.incendiary_hit": "%1$s was hit by %2$'s incendiary grenade",
-  "death.attack.csgrenades.molotov_fire": "%1$s was burned to a crisp by %2$'s molotov",
-  "death.attack.csgrenades.molotov_hit": "%1$s was hit by %2$'s molotov cocktail",
+      "death.attack.csgrenades.hegrenade_explosion": "%1$s was blown up by %2$'s HE grenade",
+      "death.attack.csgrenades.hegrenade_explosion.self": "%1$s was blown up by their own HE grenade",  "death.attack.csgrenades.hegrenade_hit": "%1$s was hit by %2$'s HE grenade",
+      "death.attack.csgrenades.incendiary_fire": "%1$s burned to death from %2$'s incendiary",
+      "death.attack.csgrenades.incendiary_fire.self": "%1$s burned to death from their own incendiary",
+      "death.attack.csgrenades.incendiary_hit": "%1$s was hit by %2$'s incendiary grenade",
+      "death.attack.csgrenades.molotov_fire": "%1$s was burned to a crisp by %2$'s molotov",
+      "death.attack.csgrenades.molotov_fire.self": "%1$s was burned to a crisp by their own molotov",  "death.attack.csgrenades.molotov_hit": "%1$s was hit by %2$'s molotov cocktail",
   "death.attack.csgrenades.smokegrenade_hit": "%1$s was hit by %2$'s smoke grenade"
 }

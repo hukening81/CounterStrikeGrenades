@@ -64,6 +64,9 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION),
             this.owner
         )
+        val selfDamageSource = DamageSource(
+            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION_SELF)
+        )
         val entities =
             level.getEntitiesOfClass(
                 if (ModConfig.DAMAGE_NON_PLAYER_ENTITY.get()) LivingEntity::class.java else Player::class.java,
@@ -71,11 +74,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             )
         for (entity in entities) {
             val finalDamageSource = if (entity == this.owner) {
-                // For self-damage, use a source that bypasses team checks by not having an indirect entity.
-                DamageSource(
-                    registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION),
-                    this
-                )
+                selfDamageSource
             } else {
                 baseDamageSource
             }

@@ -175,6 +175,7 @@ abstract class AbstractFireGrenade(
     }
 
     abstract fun getFireDamageType(): ResourceKey<DamageType>
+    abstract fun getSelfFireDamageType(): ResourceKey<DamageType>
 
 
     private fun doDamage() {
@@ -203,15 +204,15 @@ abstract class AbstractFireGrenade(
 
         val timeNow = Instant.now().toEpochMilli()
 
-        val damageTypeKey = getFireDamageType()
-        val damageTypeHolder = level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(damageTypeKey)
+        val damageTypeHolder = level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(getFireDamageType())
+        val selfDamageTypeHolder = level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(getSelfFireDamageType())
 
         entitiesInRange.forEach { entity ->
 
             val finalDamageSource = if (entity == this.owner) {
-                DamageSource(damageTypeHolder, this) // Self-damage, direct cause is grenade
+                DamageSource(selfDamageTypeHolder) // No entity, for self-damage message
             } else {
-                DamageSource(damageTypeHolder, this, this.owner) // Other-damage, indirect cause is owner
+                DamageSource(damageTypeHolder, this, this.owner) // Attributed damage for others
             }
 
             if (entity.invulnerableTime > 0) {

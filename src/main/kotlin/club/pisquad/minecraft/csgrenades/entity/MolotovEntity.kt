@@ -23,6 +23,10 @@ class MolotovEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel
         return ModDamageType.MOLOTOV_FIRE
     }
 
+    override fun getSelfFireDamageType(): ResourceKey<DamageType> {
+        return ModDamageType.MOLOTOV_FIRE_SELF
+    }
+
     override fun getHitDamageSource(hitEntity: LivingEntity): DamageSource {
         val registryAccess = this.level().registryAccess()
         val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.MOLOTOV_HIT)

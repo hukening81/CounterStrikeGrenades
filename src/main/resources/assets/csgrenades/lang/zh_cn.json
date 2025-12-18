@@ -8,11 +8,12 @@
   "item.csgrenades.smokegrenade": "烟雾弹",
   "death.attack.csgrenades.decoy_hit": "%1$s 被 %2$s 的诱饵手雷砸死了",
   "death.attack.csgrenades.flashbang_hit": "%1$s 被 %2$s 的闪光弹砸了一下",
-  "death.attack.csgrenades.hegrenade_explosion": "%1$s 被 %2$s 的高爆手雷炸死了",
-  "death.attack.csgrenades.hegrenade_hit": "%1$s 被 %2$s 的高爆手雷砸了一下",
-  "death.attack.csgrenades.incendiary_fire": "%1$s 被 %2$s 的燃烧弹烧死了",
-  "death.attack.csgrenades.incendiary_hit": "%1$s 被 %2$s 的燃烧弹砸了一下",
-  "death.attack.csgrenades.molotov_fire": "%1$s 被 %2$s 的燃烧瓶烧成了灰",
-  "death.attack.csgrenades.molotov_hit": "%1$s 被 %2$s 的燃烧瓶砸了一下",
+      "death.attack.csgrenades.hegrenade_explosion": "%1$s 被 %2$s 的高爆手雷炸死了",
+      "death.attack.csgrenades.hegrenade_explosion.self": "%1$s 被自己的高爆手雷炸死了",  "death.attack.csgrenades.hegrenade_hit": "%1$s 被 %2$s 的高爆手雷砸了一下",
+      "death.attack.csgrenades.incendiary_fire": "%1$s 被 %2$s 的燃烧弹烧死了",
+      "death.attack.csgrenades.incendiary_fire.self": "%1$s 被自己的燃烧弹烧死了",
+      "death.attack.csgrenades.incendiary_hit": "%1$s 被 %2$s 的燃烧弹砸了一下",
+      "death.attack.csgrenades.molotov_fire": "%1$s 被 %2$s 的燃烧瓶烧成了灰",
+      "death.attack.csgrenades.molotov_fire.self": "%1$s 被自己的燃烧瓶烧成了灰",  "death.attack.csgrenades.molotov_hit": "%1$s 被 %2$s 的燃烧瓶砸了一下",
   "death.attack.csgrenades.smokegrenade_hit": "%1$s 被 %2$s 的烟雾弹砸了一下"
 }
