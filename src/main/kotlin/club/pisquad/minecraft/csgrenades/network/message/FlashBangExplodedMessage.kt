@@ -44,7 +44,7 @@ data class FlashbangEffectData(
             val angle = acos(player.lookAngle.dot(playerToFlashVec.normalize())).times(180).times(1 / PI)
 
             val distanceFactor = getDistanceFactor(distance)
-            val blockingFactor = getBlockingFactor(level, flashbangPos, player.eyePosition)
+            val blockingFactor = getBlockingFactor(flashbangPos, player)
 
             val fullyBlindedTime = max(
                 0.0, when (angle) {
@@ -79,10 +79,10 @@ data class FlashbangEffectData(
             return max(linearInterpolate(1.0, 0.0, (distance / 64.0)), 0.0)
         }
 
-        private fun getBlockingFactor(level: Level, flashbangPos: Vec3, playerEyePos: Vec3): Double {
+        private fun getBlockingFactor(flashbangPos: Vec3, player: Player): Double {
             val context =
-                ClipContext(playerEyePos, flashbangPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null)
-            val result = level.clip(context)
+                ClipContext(player.eyePosition, flashbangPos, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, player)
+            val result = player.level().clip(context)
             return if (result.type.equals(HitResult.Type.MISS)) 1.0 else 0.0
         }
     }
@@ -123,6 +123,24 @@ class FlashBangExplodedMessage(
                     }
                 }
                 playExplosionSound(msg.position)
+
+                // Add particle spawning
+                val level = Minecraft.getInstance().level
+                val random = RandomSource.createNewThreadLocalInstance()
+                for (i in 0 until 20) { // Spawn 20 particles
+                    val speedX = random.nextGaussian().toFloat() * 0.02f
+                    val speedY = random.nextGaussian().toFloat() * 0.02f
+                    val speedZ = random.nextGaussian().toFloat() * 0.02f
+                    if (level != null) {
+                        level.addParticle(
+                            net.minecraft.core.particles.ParticleTypes.FLASH, // The FLASH particle type
+                            msg.position.x,
+                            msg.position.y,
+                            msg.position.z,
+                            speedX.toDouble(), speedY.toDouble(), speedZ.toDouble()
+                        )
+                    }
+                }
             }
         }
     }

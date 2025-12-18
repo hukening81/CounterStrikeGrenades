@@ -10,10 +10,13 @@ import club.pisquad.minecraft.csgrenades.registery.ModSerializers
 import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.damagesource.DamageType
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -171,13 +174,13 @@ abstract class AbstractFireGrenade(
         this.kill()
     }
 
-    abstract fun getDamageSource(): DamageSource
+    abstract fun getFireDamageType(): ResourceKey<DamageType>
+    abstract fun getSelfFireDamageType(): ResourceKey<DamageType>
 
 
     private fun doDamage() {
         //Should only be run on the server
         val level = this.level() as ServerLevel
-        val damageSource = this.getDamageSource()
         val spreadBlocks = this.entityData.get(spreadBlocksAccessor) ?: return
 
         val entities =
@@ -200,10 +203,28 @@ abstract class AbstractFireGrenade(
                 .toMutableMap()
 
         val timeNow = Instant.now().toEpochMilli()
+
+        val damageTypeHolder = level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(getFireDamageType())
+        val selfDamageTypeHolder = level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(getSelfFireDamageType())
+
         entitiesInRange.forEach { entity ->
 
+            val finalDamageSource = if (entity == this.owner) {
+                when (ModConfig.FireGrenade.CAUSE_DAMAGE_TO_OWNER.get()) {
+                    ModConfig.SelfDamageSetting.NEVER -> null // Skip damage
+                    ModConfig.SelfDamageSetting.NOT_IN_TEAM -> DamageSource(damageTypeHolder, this, this.owner) // Vanilla team check
+                    ModConfig.SelfDamageSetting.ALWAYS -> DamageSource(selfDamageTypeHolder) // Bypass team check
+                }
+            } else {
+                DamageSource(damageTypeHolder, this, this.owner) // Attributed damage for others
+            }
+
+            if (finalDamageSource == null) {
+                return@forEach
+            }
+
             if (entity.invulnerableTime > 0) {
-                return
+                return@forEach
             }
 
             var damage = ModConfig.FireGrenade.DAMAGE.get().toFloat()
@@ -225,7 +246,7 @@ abstract class AbstractFireGrenade(
                 entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
             entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
 
-            entity.hurt(damageSource, damage)
+            entity.hurt(finalDamageSource, damage)
             entity.invulnerableTime = 10
 
             entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance

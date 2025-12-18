@@ -4,8 +4,8 @@
     
 
 
-| ![HE Grenade](src/main/resources/assets/csgrenades/textures/item/hegrenade.png) | ![Smoke Grenade](src/main/resources/assets/csgrenades/textures/item/smokegrenade.png) | ![Flash Bang](src/main/resources/assets/csgrenades/textures/item/flashbang.png) | ![Incendiary Grenade](src/main/resources/assets/csgrenades/textures/item/incendiary.png) | ![Molotov](src/main/resources/assets/csgrenades/textures/item/molotov.png) 
-|:--------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------|:---------------------------------------------------------------------------|
+| ![HE Grenade](src/main/resources/assets/csgrenades/textures/item/hegrenade.png) | ![Smoke Grenade](src/main/resources/assets/csgrenades/textures/item/smokegrenade.png) | ![Flash Bang](src/main/resources/assets/csgrenades/textures/item/flashbang.png) | ![Incendiary Grenade](src/main/resources/assets/csgrenades/textures/item/incendiary.png) | ![Molotov](src/main/resources/assets/csgrenades/textures/item/molotov.png) | ![Decoy](src/main/resources/assets/csgrenades/textures/item/decoy.png)
+|:--------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------|:---------------------------------------------------------------------------|:---------------------------------------------------------------------------|
 
 This mod provides utilities in CS2(with smoke falling mechanics) to Minecraft
 
@@ -21,14 +21,26 @@ This mod provides utilities in CS2(with smoke falling mechanics) to Minecraft
     - [x] Different varaints based on team
     - [x] Interaction with Smoke Grenades
 - [x] Smoke Grenade
-
+- [x] Decoy
 
 ## Todos
-- [ ] Decoy
 - [ ] 3D Models
 
 ## Recipes
 <p align="center"><img src="assets/recipes.png" width="500" height="450"></p>
+
+## Advanced Usage
+### Custom Decoy Sounds
+You can make a Decoy Grenade play a specific sound using NBT tags when giving the item. This is useful for map-making and custom scenarios.
+
+Use the `/give` command and add a `DecoySound` tag with the resource location of the desired sound.
+
+**Example:**
+To give yourself a decoy grenade that plays a creeper priming sound:
+```
+/give @p csgrenades:decoy{DecoySound:"minecraft:entity.creeper.primed"} 1
+```
+If the `DecoySound` tag is not provided, the decoy will play mob sounds by default.
 
 ## Config
 In version `1.2.*` or later, you can customize this mod's behavior via [Forge's server side config](https://docs.minecraftforge.net/en/1.20.1/misc/config/#registering-a-configuration).
@@ -78,7 +90,13 @@ damage_non_player_entity = true
 	#Range: 0 ~ 10000
 	regeneration_time = 3000
 	#Range: 0 ~ 100
-	smoke_max_falling_height = 30
+	smoke_max_falling_height = 8
+	#The radius of smoke cleared by a passing arrow, in blocks.
+	#Range: 0.1 ~ 10.0
+	arrow_clear_range = 1.2
+	#The radius of smoke cleared by a passing bullet (e.g. from Tacz), in blocks.
+	#Range: 0.1 ~ 10.0
+	bullet_clear_range = 1.0
 
 [HEGrenade]
 	#HE grenade's damage follow a linear decay function
@@ -88,6 +106,8 @@ damage_non_player_entity = true
 	damage_range = 5.0
 	#Range: 0.0 ~ 100.0
 	head_damage_boost = 1.5
+	#Allowed values: NEVER, NOT_IN_TEAM, ALWAYS
+	causeDamageToOwner = "ALWAYS"
 
 [FireGrenade]
 	#Range: 0 ~ 100
@@ -107,7 +127,49 @@ damage_non_player_entity = true
 	#In what time should fire damage reach its maximum damage (linearly)
 	#Range: 0 ~ 100000
 	damage_increase_time = 2000
+	#Allowed values: NEVER, NOT_IN_TEAM, ALWAYS
+	causeDamageToOwner = "ALWAYS"
 ```
+
+## Commands
+This mod provides server-side commands to configure grenade behavior in-game. You must have operator permissions (level 2) to use them.
+
+### Set Self-Damage Policy
+You can control whether HE grenades and fire grenades (Incendiary/Molotov) can damage their owner.
+
+**Usage:**
+`/csgrenades <grenadeType> causeDamageToOwner <value>`
+
+-   `<grenadeType>`: The type of grenade to configure.
+    -   `hegrenade`
+    -   `firegrenade`
+-   `<value>`: The self-damage policy.
+    -   `always`: Grenades will always damage their owner. (Default)
+    -   `not_in_team`: Grenades will only damage their owner if team-based friendly fire is enabled.
+    -   `never`: Grenades will never damage their owner.
+
+**Example:**
+`/csgrenades hegrenade causeDamageToOwner never`
+
+### Set Global Settings
+You can configure global settings that affect all grenades.
+
+**Usage:**
+`/csgrenades global <setting> <value>`
+
+-   `<setting>`: The global setting to change.
+    -   `ignoreBarrierBlock`: Controls if grenades pass through barrier blocks.
+-   `<value>`: The value for the setting.
+    -   `true`: Grenades will fly through barrier blocks.
+    -   `false`: Grenades will collide with barrier blocks. (Default)
+
+**Example:**
+`/csgrenades global ignoreBarrierBlock true`
+
+## Localization
+The mod currently supports the following languages:
+-   English (en_us)
+-   简体中文 (zh_cn)
 
 ## Acknowledgments
 - [MinecraftForge/MinecraftForge: Modifications to the Minecraft base files to assist in compatibility between mods](https://github.com/MinecraftForge/MinecraftForge)
