@@ -40,7 +40,7 @@ To give yourself a decoy grenade that plays a creeper priming sound:
 ```
 /give @p csgrenades:decoy{DecoySound:"minecraft:entity.creeper.primed"} 1
 ```
-If the `DecoySound` tag is not provided, the decoy will play random footstep and mob sounds by default.
+If the `DecoySound` tag is not provided, the decoy will play mob sounds by default.
 
 ## Config
 In version `1.2.*` or later, you can customize this mod's behavior via [Forge's server side config](https://docs.minecraftforge.net/en/1.20.1/misc/config/#registering-a-configuration).
