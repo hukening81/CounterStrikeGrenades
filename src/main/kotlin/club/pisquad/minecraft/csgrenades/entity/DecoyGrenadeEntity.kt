@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity
 
+import club.pisquad.minecraft.csgrenades.compat.tacz.TaczApiHandler
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registery.ModDamageType
 import club.pisquad.minecraft.csgrenades.registery.ModItems
@@ -17,6 +18,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
+import net.minecraftforge.fml.ModList
 import kotlin.random.Random
 
 class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
@@ -25,6 +27,7 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     // --- State Variables ---
     private var activationTick: Int? = null
     private var nextSoundTick: Int = 0
+    private var lastSoundCounter = 0
 
     companion object {
         private const val TOTAL_DURATION_TICKS = 15 * 20
@@ -36,11 +39,16 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             DecoyGrenadeEntity::class.java,
             EntityDataSerializers.STRING
         )
+        val SOUND_COUNTER_ACCESSOR: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            DecoyGrenadeEntity::class.java,
+            EntityDataSerializers.INT
+        )
     }
 
     override fun defineSynchedData() {
         super.defineSynchedData()
         this.entityData.define(CUSTOM_SOUND_ACCESSOR, "") // Default to empty string
+        this.entityData.define(SOUND_COUNTER_ACCESSOR, 0)
     }
 
     override fun getDefaultItem(): Item {
@@ -49,8 +57,19 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
     override fun tick() {
         super.tick()
-        if (level().isClientSide) return
 
+        if (level().isClientSide) {
+            val currentCounter = this.entityData.get(SOUND_COUNTER_ACCESSOR)
+            if (currentCounter > lastSoundCounter) {
+                if (ModList.get().isLoaded("tacz")) {
+                    TaczApiHandler.playGunSound(this)
+                }
+                lastSoundCounter = currentCounter
+            }
+            return
+        }
+
+        // Server-side logic
         if (activationTick == null) {
             // Check for landing and activation
             if (this.entityData.get(isLandedAccessor) && this.getDeltaMovement().lengthSqr() < 0.01) {
@@ -61,7 +80,12 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             // Logic for when the decoy is active
             val currentActivationTick = tickCount - activationTick!!
             if (tickCount >= nextSoundTick) {
-                playSoundLogic()
+                if (ModList.get().isLoaded("tacz")) {
+                    val currentCounter = this.entityData.get(SOUND_COUNTER_ACCESSOR)
+                    this.entityData.set(SOUND_COUNTER_ACCESSOR, currentCounter + 1)
+                } else {
+                    playSoundLogic()
+                }
                 scheduleNextSound()
             }
             if (currentActivationTick > TOTAL_DURATION_TICKS) {
