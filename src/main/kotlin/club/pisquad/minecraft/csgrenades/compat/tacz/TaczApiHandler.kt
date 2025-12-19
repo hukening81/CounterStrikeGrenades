@@ -7,15 +7,12 @@ import net.minecraft.world.entity.Entity
 import net.minecraftforge.fml.ModList
 
 object TaczApiHandler {
-    fun playGunSound(entity: Entity) {
+    fun playGunSound(entity: Entity, gunId: ResourceLocation) {
         // Ensure this code only runs when Tacz is loaded
         if (!ModList.get().isLoaded("tacz")) {
             return
         }
 
-        // Hardcode a gun to play the sound of for now.
-        // In the future, this could be dynamic.
-        val gunId = ResourceLocation("tacz", "ak47")
         val soundName = "shoot"
         val volume = 0.8f
         val pitch = 0.9f + entity.level().random.nextFloat() * 0.125f
