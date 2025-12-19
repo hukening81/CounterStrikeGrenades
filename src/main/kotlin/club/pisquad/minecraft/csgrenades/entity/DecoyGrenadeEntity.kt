@@ -88,7 +88,8 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 }
                 scheduleNextSound()
             }
-        } else {
+        }
+        else {
             // Logic for when the decoy is active
             val currentActivationTick = tickCount - activationTick!!
             if (tickCount >= nextSoundTick) {
@@ -176,7 +177,7 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
     private fun endOfLifeExplosion() {
         if (!level().isClientSide) {
-            this.level().explode(this, this.x, this.y, this.z, 1.0f, false, Level.ExplosionInteraction.NONE)
+            this.level().explode(this, this.x, this.y, this.z, 0.1f, false, Level.ExplosionInteraction.NONE)
         }
         this.discard()
     }
