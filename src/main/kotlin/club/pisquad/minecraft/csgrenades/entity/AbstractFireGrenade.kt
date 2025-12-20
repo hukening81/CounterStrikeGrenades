@@ -73,17 +73,17 @@ abstract class AbstractFireGrenade(
     }
 
     override fun tick() {
-        // Force-freeze logic for exploded state
-        if (this.entityData.get(isExplodedAccessor)) {
+        val isExploded = this.entityData.get(isExplodedAccessor)
+
+        if (isExploded) {
+            // This grenade has exploded, stop physics and freeze rotation
             if (this.level().isClientSide) {
                 if (!hasSavedFinalRotation) {
-                    // Save the final rotation on the first tick it's exploded
                     finalXRot = this.xRot
                     finalYRot = this.yRot
                     finalZRot = this.zRot
                     hasSavedFinalRotation = true
                 }
-                // On every subsequent tick, force the rotation back to the saved values
                 this.xRot = finalXRot
                 this.yRot = finalYRot
                 this.zRot = finalZRot
@@ -91,28 +91,24 @@ abstract class AbstractFireGrenade(
                 this.yRotO = finalYRot
                 this.zRotO = finalZRot
             }
+        } else {
+            // This grenade has not exploded, run full physics simulation
+            super.tick()
+        }
 
-            // Server-side logic for damage and despawning must still run
-            if (!this.level().isClientSide) {
+        // --- The following logic needs to run regardless of super.tick() ---
+        if (this.level().isClientSide) {
+            if (!this.poppedInAir && isExploded) {
+                FireGrenadeRenderer.renderOne(this)
+            }
+        } else { // Server-side
+            if (isExploded) {
                 this.doDamage()
                 if ((this.tickCount - this.explosionTick) > ModConfig.FireGrenade.LIFETIME.get().millToTick()) {
                     this.kill()
+                    return
                 }
-            }
-            return // Skip the super.tick() and other movement logic
-        }
-
-        // Default tick logic for non-exploded state
-        super.tick()
-
-        if (this.level().isClientSide) {
-            if (!this.poppedInAir && this.entityData.get(isExplodedAccessor)) {
-                FireGrenadeRenderer.renderOne(this)
-            }
-        } else {
-            if (!this.entityData.get(isExplodedAccessor) && this.tickCount > ModConfig.FireGrenade.FUSE_TIME.get()
-                    .div(50)
-            ) {
+            } else if (this.tickCount > ModConfig.FireGrenade.FUSE_TIME.get().div(50)) {
                 this.entityData.set(isExplodedAccessor, true)
                 this.poppedInAir = true
                 CsGrenadePacketHandler.INSTANCE.send(
@@ -122,16 +118,19 @@ abstract class AbstractFireGrenade(
                 this.kill()
             }
         }
-        if (!this.lastInWater && this.deltaMovement.snapToAxis() == Direction.DOWN) {
-            val nextPosition = this.position().add(this.deltaMovement)
-            val nextBlockPos = BlockPos.containing(nextPosition)
-            val isNextBlockPosInWater = !this.level().getBlockState(nextBlockPos).fluidState.isEmpty
-            if (isNextBlockPosInWater) {
-                this.onHitBlock(BlockHitResult(nextPosition, Direction.UP, nextBlockPos, false))
-                this.deltaMovement = Vec3.ZERO
+
+        if (!isExploded) { // This logic should only run when the grenade is still moving
+            if (!this.lastInWater && this.deltaMovement.snapToAxis() == Direction.DOWN) {
+                val nextPosition = this.position().add(this.deltaMovement)
+                val nextBlockPos = BlockPos.containing(nextPosition)
+                val isNextBlockPosInWater = !this.level().getBlockState(nextBlockPos).fluidState.isEmpty
+                if (isNextBlockPosInWater) {
+                    this.onHitBlock(BlockHitResult(nextPosition, Direction.UP, nextBlockPos, false))
+                    this.deltaMovement = Vec3.ZERO
+                }
             }
+            this.lastInWater = this.isCurrentInWater()
         }
-        this.lastInWater = this.isCurrentInWater()
     }
 
     override fun onHitBlock(result: BlockHitResult) {
