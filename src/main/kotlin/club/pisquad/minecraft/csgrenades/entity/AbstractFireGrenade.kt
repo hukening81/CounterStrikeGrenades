@@ -48,6 +48,12 @@ abstract class AbstractFireGrenade(
     private var entitiesLastInRange: MutableMap<UUID, Long> = mutableMapOf()
     private var lastInWater: Boolean = false
 
+    // For freezing rotation after explosion
+    private var hasSavedFinalRotation = false
+    private var finalXRot = 0f
+    private var finalYRot = 0f
+    private var finalZRot = 0f
+
     init {
         hitBlockSound = ModSoundEvents.INCENDIARY_BOUNCE.get()
         throwSound = ModSoundEvents.INCENDIARY_THROW.get()
@@ -67,26 +73,43 @@ abstract class AbstractFireGrenade(
     }
 
     override fun tick() {
+        // Force-freeze logic for exploded state
+        if (this.entityData.get(isExplodedAccessor)) {
+            if (this.level().isClientSide) {
+                if (!hasSavedFinalRotation) {
+                    // Save the final rotation on the first tick it's exploded
+                    finalXRot = this.xRot
+                    finalYRot = this.yRot
+                    finalZRot = this.zRot
+                    hasSavedFinalRotation = true
+                }
+                // On every subsequent tick, force the rotation back to the saved values
+                this.xRot = finalXRot
+                this.yRot = finalYRot
+                this.zRot = finalZRot
+                this.xRotO = finalXRot
+                this.yRotO = finalYRot
+                this.zRotO = finalZRot
+            }
+
+            // Server-side logic for damage and despawning must still run
+            if (!this.level().isClientSide) {
+                this.doDamage()
+                if ((this.tickCount - this.explosionTick) > ModConfig.FireGrenade.LIFETIME.get().millToTick()) {
+                    this.kill()
+                }
+            }
+            return // Skip the super.tick() and other movement logic
+        }
+
+        // Default tick logic for non-exploded state
         super.tick()
+
         if (this.level().isClientSide) {
             if (!this.poppedInAir && this.entityData.get(isExplodedAccessor)) {
                 FireGrenadeRenderer.renderOne(this)
             }
         } else {
-            if (this.entityData.get(isExplodedAccessor)) {
-                // [注释] 燃烧弹/瓶爆炸后，实体必须继续存在，以处理持续伤害(doDamage)并作为火焰粒子效果的锚点。
-                // 它会在其生命周期(LIFETIME)结束后，由下面的逻辑移除。
-                // 注意：这也导致了其实体模型会在火焰中心持续可见。所有常规的隐形方法(isInvisible, setItem)均尝试失败，
-                // 这意味着该实体可能使用了非常规的渲染管线？
-                // Damage players within range
-                this.doDamage()
-
-                if ((this.tickCount - this.explosionTick) > ModConfig.FireGrenade.LIFETIME.get().millToTick()
-                ) {
-                    this.kill()
-                    return
-                }
-            }
             if (!this.entityData.get(isExplodedAccessor) && this.tickCount > ModConfig.FireGrenade.FUSE_TIME.get()
                     .div(50)
             ) {
