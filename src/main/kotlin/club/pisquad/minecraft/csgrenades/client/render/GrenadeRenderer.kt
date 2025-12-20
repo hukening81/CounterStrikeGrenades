@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
+import club.pisquad.minecraft.csgrenades.entity.AbstractFireGrenade
 import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.GrenadeEntityInterface
 import com.mojang.blaze3d.vertex.PoseStack
@@ -29,6 +30,11 @@ class GrenadeRenderer<T>(
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
+        // Hide fire grenade model after it explodes
+        if (entity is AbstractFireGrenade && entity.entityData.get(CounterStrikeGrenadeEntity.isExplodedAccessor)) {
+            return
+        }
+
         poseStack.pushPose()
 
         val itemStack = entity.getItem()
