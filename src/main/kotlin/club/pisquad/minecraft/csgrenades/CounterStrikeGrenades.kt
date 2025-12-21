@@ -3,6 +3,8 @@ package club.pisquad.minecraft.csgrenades
 import club.pisquad.minecraft.csgrenades.command.ModCommands
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.init.*
+import club.pisquad.minecraft.csgrenades.init.ModCreativeTabs
 import club.pisquad.minecraft.csgrenades.registery.*
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
@@ -32,10 +34,13 @@ object CounterStrikeGrenades {
 
         Logger.log(Level.INFO, "Hello Counter Strike Grenades")
 
-        ModEntities.ENTITIES.register(KotlinModLoadingContext.get().getKEventBus())
-        ModItems.ITEMS.register(KotlinModLoadingContext.get().getKEventBus())
-        ModSoundEvents.register(KotlinModLoadingContext.get().getKEventBus())
-        ModParticles.PARTICLE_TYPES.register(KotlinModLoadingContext.get().getKEventBus())
+        val bus = KotlinModLoadingContext.get().getKEventBus()
+
+        ModEntities.ENTITIES.register(bus)
+        ModItems.ITEMS.register(bus)
+        ModSoundEvents.register(bus)
+        ModParticles.PARTICLE_TYPES.register(bus)
+        ModCreativeTabs.TABS.register(bus)
         CsGrenadePacketHandler.registerMessage()
         MinecraftForge.EVENT_BUS.register(ModCommands)
         ModSerializers.register()
@@ -54,7 +59,6 @@ object CounterStrikeGrenades {
 
         val eventBus = KotlinModLoadingContext.get().getKEventBus()
 
-        eventBus.addListener(ModCreativeTabs::onCreativeTabBuildContents)
         eventBus.addListener(ModParticleFactories::onRegisterParticleFactories)
 
     }
