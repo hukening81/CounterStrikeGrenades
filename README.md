@@ -26,7 +26,7 @@ This mod provides utilities in CS2(with smoke falling mechanics) to Minecraft
 - [x] 3D Models
 
 ## Recipes
-<p align="center"><img src="assets/recipes.png" width="500" height="450"></p>
+<p align="center"><img src="assets/recipes-3d.png" width="900" height="650"></p>
 
 ## Advanced Usage
 ### Custom Decoy Sounds
