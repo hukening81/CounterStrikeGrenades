@@ -48,6 +48,10 @@ object ModConfig {
 
     object Flashbang {
         lateinit var EFFECTIVE_RANGE: ForgeConfigSpec.DoubleValue
+        lateinit var FUSE_TIME: ForgeConfigSpec.LongValue
+        lateinit var MAX_DURATION: ForgeConfigSpec.DoubleValue
+        lateinit var MIN_DURATION: ForgeConfigSpec.DoubleValue
+        lateinit var DISTANCE_DECAY_EXPONENT: ForgeConfigSpec.DoubleValue
     }
 
     enum class SelfDamageSetting {
@@ -121,6 +125,14 @@ object ModConfig {
         builder.push("Flashbang")
         builder.comment("The maximum distance at which the flashbang has a significant effect.")
         Flashbang.EFFECTIVE_RANGE = builder.defineInRange("effectiveRange", 64.0, 1.0, 256.0)
+        builder.comment("Fuse time from throw to detonation, in milliseconds.")
+        Flashbang.FUSE_TIME = builder.defineInRange("fuseTime", 1600L, 0L, 10000L)
+        builder.comment("Maximum total blindness duration (at point-blank, direct view), in seconds.")
+        Flashbang.MAX_DURATION = builder.defineInRange("maxDuration", 5.0, 0.0, 30.0)
+        builder.comment("Minimum total blindness duration (when fully facing away), in seconds.")
+        Flashbang.MIN_DURATION = builder.defineInRange("minDuration", 0.25, 0.0, 10.0)
+        builder.comment("Controls the curve of how the effect fades with distance. 1.0 is linear, >1.0 is steeper falloff at range (stronger close up).")
+        Flashbang.DISTANCE_DECAY_EXPONENT = builder.defineInRange("distanceDecayExponent", 2.0, 0.5, 5.0)
         builder.pop()
 
         SPEC = builder.build()
