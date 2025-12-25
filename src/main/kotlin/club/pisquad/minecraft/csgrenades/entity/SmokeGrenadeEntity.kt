@@ -195,7 +195,9 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             searchBB
         ) { arrow -> arrow.deltaMovement.lengthSqr() > 0.01 } // Only consider moving arrows
 
-        val smokeCloudBoundingBox = AABB(BlockPos.containing(this.position())).inflate(ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble())
+        val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
+        val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get().toDouble()
+        val smokeCloudBoundingBox = AABB(this.blockPosition()).inflate(smokeRadius).expandTowards(0.0, -smokeFallingHeight, 0.0)
 
         nearbyArrows.forEach { arrow ->
             // Use a "swept" bounding box to detect fast-moving entities that pass through the cloud in a single tick.
@@ -228,7 +230,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
             val smokeCenter = this.position()
             val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
-            val smokeCloudBoundingBox = AABB(BlockPos.containing(smokeCenter)).inflate(smokeRadius)
+            val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get().toDouble()
+            val smokeCloudBoundingBox = AABB(BlockPos.containing(smokeCenter)).inflate(smokeRadius).expandTowards(0.0, -smokeFallingHeight, 0.0)
 
             allRenderEntities.forEach { entity ->
                 // Use a "swept" bounding box to detect fast-moving entities that pass through the cloud in a single tick.
@@ -346,33 +349,51 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     }
 
     private fun calculateSpreadBlocks(): List<BlockPos> {
-        val initialSmoke = SmokeGrenadeSpreadBlockCalculator(
+        // 1. Calculate the initial "ideal" smoke cloud as before.
+        val initialSmoke: Set<BlockPos> = SmokeGrenadeSpreadBlockCalculator(
             5, 1500, 2, this.blockPosition()
         ).calculate(this.level())
-        val fallDownSmoke = mutableListOf<BlockPos>()
-        initialSmoke.forEach {
-            fallDownSmoke.addAll(
-                getSpaceBelow(it)
-            )
-        }
-        // Optimization: Use a Set to efficiently combine and find distinct blocks.
-        return initialSmoke.union(fallDownSmoke).toList()
-    }
 
-    private fun getSpaceBelow(position: BlockPos): List<BlockPos> {
-        // Temporarily set the maximum fall down height to 10
-        val result = mutableListOf<BlockPos>()
-        var currentPos = position
-        repeat(ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()) {
-            if (!this.level().getBlockState(currentPos.below()).canOcclude()
-            ) {
-                result.add(currentPos)
-                currentPos = currentPos.below()
+        if (initialSmoke.isEmpty()) {
+            return emptyList()
+        }
+
+        // 2. Group smoke blocks by their vertical columns (X, Z coordinates).
+        val smokeColumns = initialSmoke.groupBy { Pair(it.x, it.z) }
+
+        val finalSmoke = mutableSetOf<BlockPos>()
+
+        // 3. Process each column.
+        for ((_, columnBlocks) in smokeColumns) {
+            if (columnBlocks.isEmpty()) continue
+
+            // 4. Find the lowest block in the current column.
+            val lowestBlock = columnBlocks.minByOrNull { it.y } ?: continue
+
+            // 5. Calculate how far this lowest block should fall.
+            var fallDistance = 0
+            var currentPos = lowestBlock
+            for (i in 0 until ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()) {
+                if (!this.level().getBlockState(currentPos.below()).canOcclude()) {
+                    fallDistance++
+                    currentPos = currentPos.below()
+                } else {
+                    break // Stop if we hit a solid block.
+                }
+            }
+
+            // 6. Shift the entire column down by the calculated fall distance.
+            if (fallDistance > 0) {
+                columnBlocks.forEach { block ->
+                    finalSmoke.add(block.below(fallDistance))
+                }
             } else {
-                return result
+                // If there's no fall, just add the original blocks.
+                finalSmoke.addAll(columnBlocks)
             }
         }
-        return result
+
+        return finalSmoke.toList()
     }
 
     override fun getHitDamageSource(hitEntity: LivingEntity): DamageSource {
