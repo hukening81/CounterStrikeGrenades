@@ -32,6 +32,9 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.fml.ModList
 import java.time.Duration
 import java.time.Instant
+import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
@@ -354,42 +357,75 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             5, 1500, 2, this.blockPosition()
         ).calculate(this.level())
 
-        if (initialSmoke.isEmpty()) {
-            return emptyList()
-        }
+        if (initialSmoke.isEmpty()) return emptyList()
 
-        // 2. Group smoke blocks by their vertical columns (X, Z coordinates).
+        val maxFallHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()
         val smokeColumns = initialSmoke.groupBy { Pair(it.x, it.z) }
+        val totalColumnCount = smokeColumns.size.coerceAtLeast(1) // Avoid division by zero
 
-        val finalSmoke = mutableSetOf<BlockPos>()
+        // --- Calculation Pass: Determine raw fall distance and support for each column ---
+        val columnFallInfo = mutableMapOf<Pair<Int, Int>, Int>() // Stores raw fall distance
+        var landingColumnCount = 0
 
-        // 3. Process each column.
-        for ((_, columnBlocks) in smokeColumns) {
+        for ((key, columnBlocks) in smokeColumns) {
             if (columnBlocks.isEmpty()) continue
-
-            // 4. Find the lowest block in the current column.
             val lowestBlock = columnBlocks.minByOrNull { it.y } ?: continue
 
-            // 5. Calculate how far this lowest block should fall.
             var fallDistance = 0
+            var hitGround = false
             var currentPos = lowestBlock
-            for (i in 0 until ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()) {
+            for (i in 0 until maxFallHeight) {
                 if (!this.level().getBlockState(currentPos.below()).canOcclude()) {
                     fallDistance++
                     currentPos = currentPos.below()
                 } else {
-                    break // Stop if we hit a solid block.
+                    hitGround = true
+                    break
                 }
             }
+            columnFallInfo[key] = fallDistance
+            if (hitGround) {
+                landingColumnCount++
+            }
+        }
 
-            // 6. Shift the entire column down by the calculated fall distance.
-            if (fallDistance > 0) {
-                columnBlocks.forEach { block ->
-                    finalSmoke.add(block.below(fallDistance))
-                }
-            } else {
-                // If there's no fall, just add the original blocks.
-                finalSmoke.addAll(columnBlocks)
+        // --- Decision Pass: Decide between spherical and slumping shape ---
+        val supportThreshold = 0.3 // 30%
+        val landingPercentage = landingColumnCount.toDouble() / totalColumnCount
+
+        if (landingPercentage < supportThreshold) {
+            // Not enough support. Stay spherical.
+            return initialSmoke.toList()
+        }
+
+        // --- Smoothing and Application Pass: Apply center-weighted slumping ---
+        val finalSmoke = mutableSetOf<BlockPos>()
+        val grenadePos = this.blockPosition()
+        val centerKey = Pair(grenadePos.x, grenadePos.z)
+        val centerFallDistance = columnFallInfo[centerKey] ?: 0 // Raw fall distance of the center
+
+        // Find max distance from center for normalization
+        var maxDist = 0.0
+        for (key in smokeColumns.keys) {
+            val dist = sqrt((key.first - centerKey.first).toDouble().pow(2.0) + (key.second - centerKey.second).toDouble().pow(2.0))
+            if (dist > maxDist) maxDist = dist
+        }
+        maxDist = maxDist.coerceAtLeast(1.0) // Avoid division by zero
+
+        for ((key, columnBlocks) in smokeColumns) {
+            val rawFallDistance = columnFallInfo[key] ?: 0
+
+            val distFromCenter = sqrt((key.first - centerKey.first).toDouble().pow(2.0) + (key.second - centerKey.second).toDouble().pow(2.0))
+
+            // Weight is high (1.0) at the center, and low (0.0) at the max distance.
+            val weight = (1.0 - (distFromCenter / maxDist)).coerceIn(0.0, 1.0)
+
+            // The final fall distance is interpolated between the column's raw distance and the center's distance.
+            // A higher weight means it adheres more to the center's fall behavior.
+            val finalFallDistance = (rawFallDistance * (1.0 - weight) + centerFallDistance * weight).roundToInt()
+
+            columnBlocks.forEach { block ->
+                finalSmoke.add(block.below(finalFallDistance))
             }
         }
 
