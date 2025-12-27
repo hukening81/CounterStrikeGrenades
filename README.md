@@ -28,6 +28,13 @@ This mod provides utilities in CS2(with smoke falling mechanics) to Minecraft
 ## Recipes
 <p align="center"><img src="assets/recipes-3d.png" width="900" height="650"></p>
 
+## Download Links
+For the latest version:
+
+1. **GitHub Releases** : [https://github.com/ThePiSquad/CounterStrikeGrenades/releases](https://github.com/ThePiSquad/CounterStrikeGrenades/releases)  
+2. **Modrinth** : [https://modrinth.com/mod/counterstrikegrenade](https://modrinth.com/mod/counterstrikegrenade)  
+3. **CurseForge** : [https://www.curseforge.com/minecraft/mc-mods/counter-strike-grenades](https://www.curseforge.com/minecraft/mc-mods/counter-strike-grenades)
+
 ## Advanced Usage
 ### Custom Decoy Sounds
 You can make a Decoy Grenade play a specific sound using NBT tags when giving the item. This is useful for map-making and custom scenarios.
