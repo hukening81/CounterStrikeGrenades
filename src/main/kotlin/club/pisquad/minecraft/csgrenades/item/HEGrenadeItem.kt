@@ -9,5 +9,4 @@ class HEGrenadeItem(properties: Properties) : CounterStrikeGrenadeItem(propertie
         drawSound = ModSoundEvents.HEGRENADE_DRAW.get()
         grenadeType = GrenadeType.HEGRENADE
     }
-
 }

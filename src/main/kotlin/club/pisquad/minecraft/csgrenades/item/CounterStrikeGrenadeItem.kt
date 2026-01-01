@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState
 
 private var drawSoundPlayedSlot: Int = -1
 
-
 open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(1)) {
 
     lateinit var grenadeType: GrenadeType
@@ -31,7 +30,7 @@ open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.st
 
     override fun getAttributeModifiers(
         slot: EquipmentSlot?,
-        stack: ItemStack?
+        stack: ItemStack?,
     ): Multimap<Attribute, AttributeModifier> {
         val modifiers = HashMultimap.create(super.getAttributeModifiers(slot, stack))
         return modifiers
@@ -50,16 +49,9 @@ open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.st
         }
     }
 
+    override fun onEntitySwing(stack: ItemStack?, entity: LivingEntity?): Boolean = true
 
-    override fun onEntitySwing(stack: ItemStack?, entity: LivingEntity?): Boolean {
-        return true
-    }
+    override fun onLeftClickEntity(stack: ItemStack?, player: Player?, entity: Entity?): Boolean = true
 
-    override fun onLeftClickEntity(stack: ItemStack?, player: Player?, entity: Entity?): Boolean {
-        return true
-    }
-
-    override fun canAttackBlock(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player): Boolean {
-        return false
-    }
+    override fun canAttackBlock(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player): Boolean = false
 }

@@ -37,9 +37,7 @@ abstract class AbstractFireGrenade(
     pEntityType: EntityType<out ThrowableItemProjectile>,
     pLevel: Level,
     grenadeType: GrenadeType,
-) :
-
-    CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
+) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
 
     private var explosionTick = 0
     private var extinguished = false
@@ -63,7 +61,7 @@ abstract class AbstractFireGrenade(
     companion object {
         val spreadBlocksAccessor: EntityDataAccessor<List<BlockPos>> = SynchedEntityData.defineId(
             AbstractFireGrenade::class.java,
-            ModSerializers.blockPosListEntityDataSerializer
+            ModSerializers.blockPosListEntityDataSerializer,
         )
     }
 
@@ -113,7 +111,7 @@ abstract class AbstractFireGrenade(
                 this.poppedInAir = true
                 CsGrenadePacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
-                    FireGrenadeMessage(FireGrenadeMessage.MessageType.AirExploded, this.position())
+                    FireGrenadeMessage(FireGrenadeMessage.MessageType.AirExploded, this.position()),
                 )
                 this.kill()
             }
@@ -150,8 +148,9 @@ abstract class AbstractFireGrenade(
                 // Test if any smoke nearby that extinguish this fire
                 val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
                 val bb = AABB(this.blockPosition()).inflate(
-                    smokeRadius, ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get().toDouble(),
-                    smokeRadius
+                    smokeRadius,
+                    ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get().toDouble(),
+                    smokeRadius,
                 )
                 val fireExtinguishRange = ModConfig.FireGrenade.FIRE_EXTINGUISH_RANGE.get().toDouble()
                 if (this.level()
@@ -168,13 +167,14 @@ abstract class AbstractFireGrenade(
 
                     this.entityData.set(
                         spreadBlocksAccessor,
-                        calculateSpreadBlocks(this.level(), this.position())
+                        calculateSpreadBlocks(this.level(), this.position()),
                     )
                     CsGrenadePacketHandler.INSTANCE.send(
                         PacketDistributor.ALL.noArg(),
                         FireGrenadeMessage(
-                            FireGrenadeMessage.MessageType.GroundExploded, this.position(),
-                        )
+                            FireGrenadeMessage.MessageType.GroundExploded,
+                            this.position(),
+                        ),
                     )
                 }
             }
@@ -183,15 +183,13 @@ abstract class AbstractFireGrenade(
         super.onHitBlock(result)
     }
 
-    private fun isCurrentInWater(): Boolean {
-        return !this.level().getBlockState(this.blockPosition()).fluidState.isEmpty
-    }
+    private fun isCurrentInWater(): Boolean = !this.level().getBlockState(this.blockPosition()).fluidState.isEmpty
 
     fun extinguish() {
         this.extinguished = true
         CsGrenadePacketHandler.INSTANCE.send(
             PacketDistributor.ALL.noArg(),
-            FireGrenadeMessage(FireGrenadeMessage.MessageType.ExtinguishedBySmoke, this.position())
+            FireGrenadeMessage(FireGrenadeMessage.MessageType.ExtinguishedBySmoke, this.position()),
         )
         this.kill()
     }
@@ -199,24 +197,24 @@ abstract class AbstractFireGrenade(
     abstract fun getFireDamageType(): ResourceKey<DamageType>
     abstract fun getSelfFireDamageType(): ResourceKey<DamageType>
 
-
     private fun doDamage() {
-        //Should only be run on the server
+        // Should only be run on the server
         val level = this.level() as ServerLevel
         val spreadBlocks = this.entityData.get(spreadBlocksAccessor) ?: return
 
         val entities =
             level.getEntitiesOfClass(
                 if (ModConfig.DAMAGE_NON_PLAYER_ENTITY.get()) LivingEntity::class.java else Player::class.java,
-                AABB(this.blockPosition()).inflate(ModConfig.HEGrenade.DAMAGE_RANGE.get())
+                AABB(this.blockPosition()).inflate(ModConfig.HEGrenade.DAMAGE_RANGE.get()),
             )
         val entitiesInRange = entities.filter { entity ->
             spreadBlocks.any { blockPos ->
                 blockPos.above().center.horizontalDistanceTo(entity.position()) < 1 &&
-                        (entity.y < blockPos.y + 2.8 && entity.y > blockPos.y - 2.8)
-                        && !isPositionInSmoke(
-                    this.level(), entity.position(),
-                )
+                    (entity.y < blockPos.y + 2.8 && entity.y > blockPos.y - 2.8) &&
+                    !isPositionInSmoke(
+                        this.level(),
+                        entity.position(),
+                    )
             }
         }
 
@@ -235,8 +233,12 @@ abstract class AbstractFireGrenade(
 
             val finalDamageSource = if (entity == this.owner) {
                 when (ModConfig.FireGrenade.CAUSE_DAMAGE_TO_OWNER.get()) {
-                    ModConfig.SelfDamageSetting.NEVER -> null // Skip damage
-                    ModConfig.SelfDamageSetting.NOT_IN_TEAM -> DamageSource(damageTypeHolder, this, this.owner) // Vanilla team check
+                    ModConfig.SelfDamageSetting.NEVER -> null
+
+                    // Skip damage
+                    ModConfig.SelfDamageSetting.NOT_IN_TEAM -> DamageSource(damageTypeHolder, this, this.owner)
+
+                    // Vanilla team check
                     ModConfig.SelfDamageSetting.ALWAYS -> DamageSource(selfDamageTypeHolder) // Bypass team check
                 }
             } else {
@@ -259,11 +261,12 @@ abstract class AbstractFireGrenade(
                 damageToApply = min(
                     fullDamage, // Ensure it doesn't exceed full damage
                     linearInterpolate(
-                        minDamage.toDouble(), fullDamage.toDouble(), // Interpolate from minDamage to fullDamage
+                        minDamage.toDouble(),
+                        fullDamage.toDouble(), // Interpolate from minDamage to fullDamage
                         (timeNow - startTime).div(
-                            ModConfig.FireGrenade.DAMAGE_INCREASE_TIME.get().toDouble()
-                        )
-                    ).toFloat()
+                            ModConfig.FireGrenade.DAMAGE_INCREASE_TIME.get().toDouble(),
+                        ),
+                    ).toFloat(),
                 )
             } else {
                 // First time this entity is detected in range. Apply minDamage.
@@ -299,7 +302,7 @@ abstract class AbstractFireGrenade(
 class SpreadPathData(
     val visited: MutableList<BlockPos>,
     private val center: BlockPos,
-    private var currentPos: BlockPos
+    private var currentPos: BlockPos,
 ) {
     private var jumpCount: Int = 0
     private var lastMoveDirection: Direction? = null
@@ -308,7 +311,10 @@ class SpreadPathData(
 
     companion object {
         val directions = listOf(
-            Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
+            Direction.NORTH,
+            Direction.SOUTH,
+            Direction.WEST,
+            Direction.EAST,
         )
 
         private fun getGroundBelow(level: Level, origin: BlockPos): Pair<BlockPos, Int>? {
@@ -317,7 +323,7 @@ class SpreadPathData(
                 origin.offset(0, -ModConfig.FireGrenade.FIRE_MAX_SPREAD_DOWNWARD.get(), 0).center,
                 ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.ANY,
-                null
+                null,
             ).let {
                 val clipResult = level.clip(it)
                 return if (clipResult.type == HitResult.Type.MISS) {
@@ -329,12 +335,10 @@ class SpreadPathData(
         }
     }
 
-    private fun getRandomDirection(): Direction {
-        return if (this.lastMoveDirection != null) {
-            directions.minus(lastMoveDirection).random()!!
-        } else {
-            directions.random()
-        }
+    private fun getRandomDirection(): Direction = if (this.lastMoveDirection != null) {
+        directions.minus(lastMoveDirection).random()!!
+    } else {
+        directions.random()
     }
 
     private fun tryMoveToDirection(level: Level, direction: Direction): Boolean {
@@ -346,7 +350,7 @@ class SpreadPathData(
 
         if (groundCalculateResult.second == 0) {
             if (level.getBlockState(
-                    horizontalShifted.above().above()
+                    horizontalShifted.above().above(),
                 ).isAir && level.getBlockState(this.currentPos.above()).isAir && this.jumpCount < 3
             ) {
                 jumpCount++
@@ -392,4 +396,3 @@ private object FireSpreadCalculator {
         return result.distinct().filter { it.horizontalDistanceTo(origin) < ModConfig.FireGrenade.FIRE_RANGE.get() }
     }
 }
-

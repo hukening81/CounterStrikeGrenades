@@ -21,7 +21,6 @@ data class HEGrenadeExplosionData(
     var position: Vec3,
 )
 
-
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object HEGrenadeRenderManager {
     private val renderers: MutableList<HEGrenadeRenderer> = mutableListOf()
@@ -44,11 +43,10 @@ object HEGrenadeRenderManager {
             renderers.remove(it)
         }
     }
-
 }
 
 class HEGrenadeRenderer(
-    private val data: HEGrenadeExplosionData
+    private val data: HEGrenadeExplosionData,
 ) {
     var done: Boolean = false
     private var soundInstance: SoundInstance? = null
@@ -69,10 +67,9 @@ class HEGrenadeRenderer(
             RandomSource.createNewThreadLocalInstance(),
             data.position.x,
             data.position.y,
-            data.position.z
+            data.position.z,
         )
         Minecraft.getInstance().soundManager.play(this.soundInstance!!)
-
 
         val particleEngine = Minecraft.getInstance().particleEngine
         val randomSource = RandomSource.createNewThreadLocalInstance()
@@ -102,8 +99,5 @@ class HEGrenadeRenderer(
         }
     }
 
-    fun update(): Boolean {
-        return true
-    }
-
+    fun update(): Boolean = true
 }

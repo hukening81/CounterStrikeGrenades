@@ -12,7 +12,6 @@ import net.minecraftforge.fml.common.Mod
 object ModParticleFactories {
     @SubscribeEvent
     fun onRegisterParticleFactories(event: RegisterParticleProvidersEvent) {
-
         event.registerSpriteSet(ModParticles.SMOKE_PARTICLE.get()) { sprite: SpriteSet -> SmokeParticleFactory(sprite) }
     }
 }

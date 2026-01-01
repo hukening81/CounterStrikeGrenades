@@ -20,8 +20,10 @@ object CsGrenadePacketHandler {
         }
 
     val INSTANCE: SimpleChannel = NetworkRegistry.newSimpleChannel(
-        ResourceLocation(CounterStrikeGrenades.ID, "event"), { PROTOCOL_VERSION },
-        PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals
+        ResourceLocation(CounterStrikeGrenades.ID, "event"),
+        { PROTOCOL_VERSION },
+        PROTOCOL_VERSION::equals,
+        PROTOCOL_VERSION::equals,
     )
 
     @Suppress("INACCESSIBLE_TYPE")
@@ -32,7 +34,7 @@ object CsGrenadePacketHandler {
             GrenadeThrownMessage::encoder,
             GrenadeThrownMessage::decoder,
             GrenadeThrownMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_SERVER)
+            Optional.of(NetworkDirection.PLAY_TO_SERVER),
         )
         INSTANCE.registerMessage(
             messageTypeCount,
@@ -40,7 +42,7 @@ object CsGrenadePacketHandler {
             FlashBangExplodedMessage::encoder,
             FlashBangExplodedMessage::decoder,
             FlashBangExplodedMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
         INSTANCE.registerMessage(
             messageTypeCount,

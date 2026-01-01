@@ -68,7 +68,7 @@ class GrenadeThrownMessage(
                 msg.rotation.y,
                 0.0f, // Roll is not used
                 msg.speed.toFloat(),
-                0f
+                0f,
             )
 
             serverLevel.addFreshEntity(grenadeEntity)
@@ -78,8 +78,5 @@ class GrenadeThrownMessage(
                 player.inventory.removeItem(player.getItemInHand(InteractionHand.MAIN_HAND))
             }
         }
-
     }
-
-
 }

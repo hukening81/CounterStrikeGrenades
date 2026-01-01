@@ -18,7 +18,7 @@ object ModEntities {
     val FLASH_BANG_ENTITY: RegistryObject<EntityType<FlashBangEntity>> = ENTITIES.register("flashbang") {
         EntityType.Builder.of(
             { pEntityType: EntityType<FlashBangEntity>, pLevel: Level -> FlashBangEntity(pEntityType, pLevel) },
-            MobCategory.MISC
+            MobCategory.MISC,
         ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "flashbang").toString())
     }
@@ -26,7 +26,7 @@ object ModEntities {
     val SMOKE_GRENADE_ENTITY: RegistryObject<EntityType<SmokeGrenadeEntity>> = ENTITIES.register("smokegrenade") {
         EntityType.Builder.of(
             { pEntityType: EntityType<SmokeGrenadeEntity>, pLevel: Level -> SmokeGrenadeEntity(pEntityType, pLevel) },
-            MobCategory.MISC
+            MobCategory.MISC,
         ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "smokegrenade").toString())
     }
@@ -34,7 +34,7 @@ object ModEntities {
     val HEGRENADE_ENTITY: RegistryObject<EntityType<HEGrenadeEntity>> = ENTITIES.register("hegrenade") {
         EntityType.Builder.of(
             { pEntityType: EntityType<HEGrenadeEntity>, pLevel: Level -> HEGrenadeEntity(pEntityType, pLevel) },
-            MobCategory.MISC
+            MobCategory.MISC,
         ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "hegrenade").toString())
     }
@@ -42,7 +42,7 @@ object ModEntities {
     val INCENDIARY_ENTITY: RegistryObject<EntityType<IncendiaryEntity>> = ENTITIES.register("incendiary") {
         EntityType.Builder.of(
             { pEntityType: EntityType<IncendiaryEntity>, pLevel: Level -> IncendiaryEntity(pEntityType, pLevel) },
-            MobCategory.MISC
+            MobCategory.MISC,
         ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "incendiary").toString())
     }
@@ -50,7 +50,7 @@ object ModEntities {
     val MOLOTOV_ENTITY: RegistryObject<EntityType<MolotovEntity>> = ENTITIES.register("molotov") {
         EntityType.Builder.of(
             { pEntityType: EntityType<MolotovEntity>, pLevel: Level -> MolotovEntity(pEntityType, pLevel) },
-            MobCategory.MISC
+            MobCategory.MISC,
         ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "molotov").toString())
     }
@@ -58,9 +58,8 @@ object ModEntities {
     val DECOY_GRENADE_ENTITY: RegistryObject<EntityType<DecoyGrenadeEntity>> = ENTITIES.register("decoy") {
         EntityType.Builder.of(
             { pEntityType: EntityType<DecoyGrenadeEntity>, pLevel: Level -> DecoyGrenadeEntity(pEntityType, pLevel) },
-            MobCategory.MISC
+            MobCategory.MISC,
         ).sized(GRENADE_ENTITY_SIZE, GRENADE_ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "decoy").toString())
     }
-    
 }

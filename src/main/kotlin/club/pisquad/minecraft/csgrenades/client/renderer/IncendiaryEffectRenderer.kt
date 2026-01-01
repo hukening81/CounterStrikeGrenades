@@ -12,14 +12,11 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
-
-fun getLifetimeFromDistance(distance: Double): Int {
-    return linearInterpolate(
-        INCENDIARY_PARTICLE_LIFETIME.toDouble(),
-        0.0,
-        distance.div(ModConfig.FireGrenade.FIRE_RANGE.get())
-    ).div(50).toInt()
-}
+fun getLifetimeFromDistance(distance: Double): Int = linearInterpolate(
+    INCENDIARY_PARTICLE_LIFETIME.toDouble(),
+    0.0,
+    distance.div(ModConfig.FireGrenade.FIRE_RANGE.get()),
+).div(50).toInt()
 
 @OnlyIn(Dist.CLIENT)
 object FireGrenadeRenderer {
@@ -38,11 +35,10 @@ object FireGrenadeRenderer {
         for (i in 0 until particlePerTick) {
             val position = grenade.position()
 
-
             val pos = getRandomLocationFromBlockSurface(spreadBlocks.random())
             if (isPositionInSmoke(
                     grenade.level(),
-                    pos.add(Vec3(0.0, 0.5, 0.0))
+                    pos.add(Vec3(0.0, 0.5, 0.0)),
                 )
             ) {
                 continue
@@ -50,7 +46,7 @@ object FireGrenadeRenderer {
 
             val distance = Vec2(
                 position.x.minus(pos.x).toFloat(),
-                position.z.minus(pos.z).toFloat()
+                position.z.minus(pos.z).toFloat(),
             ).length().toDouble()
 
             val flameParticleType = when (grenade) {
@@ -70,9 +66,8 @@ object FireGrenadeRenderer {
                 pos.z,
                 0.0,
                 0.1,
-                0.0
+                0.0,
             )?.lifetime = getLifetimeFromDistance(distance)
         }
-
     }
 }
