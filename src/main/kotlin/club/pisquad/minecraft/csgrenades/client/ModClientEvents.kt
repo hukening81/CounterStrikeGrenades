@@ -19,7 +19,7 @@ object ModClientEvents {
             ModItems.SMOKE_GRENADE_ITEM,
             ModItems.INCENDIARY_ITEM,
             ModItems.MOLOTOV_ITEM,
-            ModItems.DECOY_GRENADE_ITEM
+            ModItems.DECOY_GRENADE_ITEM,
         )
 
         grenadeItems.forEach { item ->

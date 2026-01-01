@@ -22,14 +22,9 @@ enum class SoundTypes(val initialVolume: Double, val hearableRange: Double) {
     // Incendiary
     INCENDIARY_EXPLODE(0.15, 50.0),
     INCENDIARY_POP(0.3, 30.0),
-    INCENDIARY_EXPLODE_AIR(0.05, 80.0)
-
-
+    INCENDIARY_EXPLODE_AIR(0.05, 80.0),
 }
 
 object SoundUtils {
-    fun getVolumeFromDistance(distance: Double, soundType: SoundTypes): Double {
-        return max(0.0, soundType.initialVolume.times(1 - distance.div(soundType.hearableRange)))
-    }
+    fun getVolumeFromDistance(distance: Double, soundType: SoundTypes): Double = max(0.0, soundType.initialVolume.times(1 - distance.div(soundType.hearableRange)))
 }
-

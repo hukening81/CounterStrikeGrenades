@@ -33,11 +33,11 @@ object SetConfigCommand {
                                         setGrenadeSpecificConfig(
                                             context,
                                             StringArgumentType.getString(context, "grenadeType"),
-                                            StringArgumentType.getString(context, "value")
+                                            StringArgumentType.getString(context, "value"),
                                         )
-                                    }
-                            )
-                    )
+                                    },
+                            ),
+                    ),
             )
             // Branch for global settings
             .then(
@@ -48,9 +48,9 @@ object SetConfigCommand {
                                 Commands.argument("value", com.mojang.brigadier.arguments.BoolArgumentType.bool())
                                     .executes { context ->
                                         setGlobalIgnoreBarrier(context, com.mojang.brigadier.arguments.BoolArgumentType.getBool(context, "value"))
-                                    }
-                            )
-                    )
+                                    },
+                            ),
+                    ),
             )
         dispatcher.register(command)
     }
@@ -60,7 +60,7 @@ object SetConfigCommand {
         ModConfig.SPEC.save()
         context.source.sendSuccess(
             { Component.literal("Set global ignoreBarrierBlock to $value") },
-            true
+            true,
         )
         return 1
     }
@@ -76,7 +76,9 @@ object SetConfigCommand {
 
         val configToChange = when (grenadeType.lowercase()) {
             "hegrenade" -> ModConfig.HEGrenade.CAUSE_DAMAGE_TO_OWNER
+
             "firegrenade" -> ModConfig.FireGrenade.CAUSE_DAMAGE_TO_OWNER
+
             else -> {
                 source.sendFailure(Component.literal("Invalid grenade type '$grenadeType'. Must be 'hegrenade' or 'firegrenade'."))
                 return 0
@@ -88,7 +90,7 @@ object SetConfigCommand {
 
         source.sendSuccess(
             { Component.literal("Set $grenadeType causeDamageToOwner to $value") },
-            true
+            true,
         )
         return 1
     }

@@ -18,7 +18,7 @@ class SmokeGrenadeParticle(
     z: Double,
     xSpeed: Double,
     ySpeed: Double,
-    zSpeed: Double
+    zSpeed: Double,
 ) : TextureSheetParticle(level, x, y, z, xSpeed, ySpeed, zSpeed) {
     var opacityTime: Int = 0
 
@@ -39,9 +39,7 @@ class SmokeGrenadeParticle(
         }
     }
 
-    override fun getRenderType(): ParticleRenderType {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
-    }
+    override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
 
     override fun render(pBuffer: VertexConsumer, pRenderInfo: Camera, pPartialTicks: Float) {
         super.render(pBuffer, pRenderInfo, pPartialTicks)
@@ -49,7 +47,7 @@ class SmokeGrenadeParticle(
 }
 
 class SmokeParticleFactory(
-    private val spriteSet: SpriteSet
+    private val spriteSet: SpriteSet,
 ) : ParticleProvider<SimpleParticleType> {
     override fun createParticle(
         type: SimpleParticleType,
@@ -59,7 +57,7 @@ class SmokeParticleFactory(
         z: Double,
         xSpeed: Double,
         ySpeed: Double,
-        zSpeed: Double
+        zSpeed: Double,
     ): SmokeGrenadeParticle {
         val particle = SmokeGrenadeParticle(level, x, y, z, 0.0, 0.0, 0.0)
         particle.pickSprite(spriteSet)

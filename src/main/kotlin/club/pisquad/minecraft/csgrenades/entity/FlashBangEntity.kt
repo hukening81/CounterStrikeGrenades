@@ -18,12 +18,9 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.minecraftforge.network.PacketDistributor
 
-class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
-    CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
+class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
 
-    override fun getDefaultItem(): Item {
-        return ModItems.FLASH_BANG_ITEM.get()
-    }
+    override fun getDefaultItem(): Item = ModItems.FLASH_BANG_ITEM.get()
 
     override fun tick() {
         super.tick()
@@ -32,7 +29,7 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             if (!this.level().isClientSide) {
                 CsGrenadePacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
-                    FlashBangExplodedMessage(this.position(), calculateAffectedPlayers())
+                    FlashBangExplodedMessage(this.position(), calculateAffectedPlayers()),
                 )
             }
             this.entityData.set(isExplodedAccessor, true)
@@ -55,6 +52,5 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         return level.getPlayers { it.distanceToSqr(this.position()) < 256 * 256 }.map {
             AffectedPlayerInfo(it.uuid, FlashbangEffectData.create(this.level(), this.position(), it))
         }.filter { it.effectData.effectSustain > 0 }
-
     }
 }

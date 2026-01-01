@@ -22,7 +22,6 @@ import java.time.Instant
 import kotlin.math.max
 import kotlin.math.sqrt
 
-
 private enum class RenderState {
     IDLE,
     AttackStage,
@@ -135,7 +134,10 @@ object FlashbangBlindEffectRenderer {
             gui.guiWidth(),
             gui.guiHeight(),
             FastColor.ABGR32.color(
-                opacity, 255, 255, 255
+                opacity,
+                255,
+                255,
+                255,
             ),
         )
     }
@@ -157,8 +159,8 @@ object FlashbangBlindEffectRenderer {
                 attack = 0,
                 sustain = effectSustain,
                 decay = effectDecay + 300,
-                targetVolume = SoundUtils.getVolumeFromDistance(distance, SoundTypes.FLASHBANG_RING).toFloat()
-            )
+                targetVolume = SoundUtils.getVolumeFromDistance(distance, SoundTypes.FLASHBANG_RING).toFloat(),
+            ),
         )
     }
 }

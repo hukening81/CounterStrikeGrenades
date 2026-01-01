@@ -18,9 +18,7 @@ import kotlin.random.Random
  *Since KFF is not mapping those methods correctly
  */
 
-fun Vec3.toVec3i(): Vec3i {
-    return Vec3i(x.toInt(), y.toInt(), z.toInt())
-}
+fun Vec3.toVec3i(): Vec3i = Vec3i(x.toInt(), y.toInt(), z.toInt())
 
 fun Vec3.snapToAxis(): Direction {
     val absX = abs(x)
@@ -33,17 +31,11 @@ fun Vec3.snapToAxis(): Direction {
     }
 }
 
-fun BlockPos.toVec3(): Vec3 {
-    return Vec3(x.toDouble(), y.toDouble(), z.toDouble())
-}
+fun BlockPos.toVec3(): Vec3 = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
 
-fun Vec3i.toVec3(): Vec3 {
-    return Vec3(x.toDouble(), y.toDouble(), z.toDouble())
-}
+fun Vec3i.toVec3(): Vec3 = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
 
-fun getTimeFromTickCount(tickCount: Double): Double {
-    return tickCount / 20.0
-}
+fun getTimeFromTickCount(tickCount: Double): Double = tickCount / 20.0
 
 fun getRandomLocationFromSphere(center: Vec3, radius: Double): Vec3 {
     val randomSource = RandomSource.createNewThreadLocalInstance()
@@ -51,7 +43,7 @@ fun getRandomLocationFromSphere(center: Vec3, radius: Double): Vec3 {
         val posDelta = Vec3(
             randomSource.nextDouble() * radius * 2 - radius,
             randomSource.nextDouble() * radius * 2 - radius,
-            randomSource.nextDouble() * radius * 2 - radius
+            randomSource.nextDouble() * radius * 2 - radius,
         )
         if (posDelta.length() < radius) {
             return center.add(posDelta)
@@ -64,7 +56,7 @@ fun getRandomLocationFromCircle(center: Vec2, radius: Double): Vec2 {
     while (true) {
         val posDelta = Vec2(
             (randomSource.nextDouble() * radius * 2 - radius).toFloat(),
-            (randomSource.nextDouble() * radius * 2 - radius).toFloat()
+            (randomSource.nextDouble() * radius * 2 - radius).toFloat(),
         )
         if (posDelta.length() < radius) {
             return center.add(posDelta)
@@ -78,7 +70,6 @@ fun getRandomLocationFromBlockSurface(position: BlockPos): Vec3 {
     return Vec3(position.x + x, position.y + 1.0, position.z + z)
 }
 
-
 fun isPositionInSmoke(level: Level, pos: Vec3): Boolean {
     val blockPos = BlockPos.containing(pos)
     return level.getEntitiesOfClass(
@@ -86,8 +77,8 @@ fun isPositionInSmoke(level: Level, pos: Vec3): Boolean {
         AABB(BlockPos(pos.toVec3i())).inflate(
             ModConfig.SmokeGrenade.SMOKE_RADIUS.get() * 2.0,
             ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get() + ModConfig.SmokeGrenade.SMOKE_RADIUS.get() * 2.0,
-            ModConfig.SmokeGrenade.SMOKE_RADIUS.get() * 2.0
-        )
+            ModConfig.SmokeGrenade.SMOKE_RADIUS.get() * 2.0,
+        ),
     ).any {
         it.getSpreadBlocks().any { block -> block == blockPos }
     }
@@ -117,9 +108,9 @@ fun getBlocksAround3D(pos: Vec3, xRange: Int, yRange: Int, zRange: Int): List<Bl
                         begin.offset(
                             xOffset,
                             yOffset,
-                            zOffset
-                        )
-                    )
+                            zOffset,
+                        ),
+                    ),
                 )
             }
         }
@@ -127,26 +118,16 @@ fun getBlocksAround3D(pos: Vec3, xRange: Int, yRange: Int, zRange: Int): List<Bl
     return result
 }
 
-fun linearInterpolate(from: Double, to: Double, t: Double): Double {
-    return from + (to - from) * t
-}
+fun linearInterpolate(from: Double, to: Double, t: Double): Double = from + (to - from) * t
 
-fun Long.millToTick(): Long {
-    return this.div(50)
-}
+fun Long.millToTick(): Long = this.div(50)
 
-fun Vec3.horizontalDistanceTo(other: Vec3): Double {
-    return sqrt(
-        Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble()
-    )
-}
+fun Vec3.horizontalDistanceTo(other: Vec3): Double = sqrt(
+    Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble(),
+)
 
-fun BlockPos.horizontalDistanceToSqr(other: BlockPos): Double {
-    return Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble()
-}
+fun BlockPos.horizontalDistanceToSqr(other: BlockPos): Double = Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble()
 
-fun BlockPos.horizontalDistanceTo(other: BlockPos): Double {
-    return sqrt(
-        this.horizontalDistanceToSqr(other)
-    )
-}
+fun BlockPos.horizontalDistanceTo(other: BlockPos): Double = sqrt(
+    this.horizontalDistanceToSqr(other),
+)

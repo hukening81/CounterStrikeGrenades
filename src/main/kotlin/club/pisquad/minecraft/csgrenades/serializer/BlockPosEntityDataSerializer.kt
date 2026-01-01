@@ -11,11 +11,7 @@ class BlockPosEntityDataSerializer : EntityDataSerializer<BlockPos> {
         pBuffer.writeUtf(Json.encodeToString(IntArraySerializer(), arrayOf(pValue.x, pValue.y, pValue.z).toIntArray()))
     }
 
-    override fun read(pBuffer: FriendlyByteBuf): BlockPos {
-        return Json.decodeFromString<BlockPos>(pBuffer.readUtf())
-    }
+    override fun read(pBuffer: FriendlyByteBuf): BlockPos = Json.decodeFromString<BlockPos>(pBuffer.readUtf())
 
-    override fun copy(pValue: BlockPos): BlockPos {
-        return pValue
-    }
+    override fun copy(pValue: BlockPos): BlockPos = pValue
 }

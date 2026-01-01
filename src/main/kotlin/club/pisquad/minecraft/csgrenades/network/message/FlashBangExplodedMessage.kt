@@ -37,7 +37,7 @@ data class FlashbangEffectData(
     val effectAttack: Int,
     val effectSustain: Int,
     val effectDecay: Int,
-    val effectAmount: Int
+    val effectAmount: Int,
 ) {
     companion object {
         fun create(level: Level, flashbangPos: Vec3, player: Player): FlashbangEffectData {
@@ -66,23 +66,25 @@ data class FlashbangEffectData(
             val fullBlindTimeTier3 = totalTimeTier3 * 0.1 // A small amount of full-blind time to ensure some effect
 
             val fullyBlindedTime = max(
-                0.0, when (angle) {
+                0.0,
+                when (angle) {
                     in 0.0..53.0 -> fullBlindTimeTier0
                     in 53.0..72.0 -> fullBlindTimeTier1
                     in 72.0..101.0 -> fullBlindTimeTier2
                     in 101.0..180.0 -> fullBlindTimeTier3
                     else -> 0.0
-                } * distanceFactor * blockingFactor
+                } * distanceFactor * blockingFactor,
             )
 
             val totalEffectTime = max(
-                0.0, when (angle) {
+                0.0,
+                when (angle) {
                     in 0.0..53.0 -> totalTimeTier0
                     in 53.0..72.0 -> totalTimeTier1
                     in 72.0..101.0 -> totalTimeTier2
                     in 101.0..180.0 -> totalTimeTier3
                     else -> 0.0
-                } * distanceFactor * blockingFactor
+                } * distanceFactor * blockingFactor,
             )
 
             return FlashbangEffectData(
@@ -90,7 +92,7 @@ data class FlashbangEffectData(
                 effectAttack = 20,
                 effectAmount = 50,
                 effectSustain = (fullyBlindedTime * 1000).toInt(),
-                effectDecay = ((totalEffectTime - fullyBlindedTime) * 1000).toInt()
+                effectDecay = ((totalEffectTime - fullyBlindedTime) * 1000).toInt(),
             )
         }
 
@@ -108,18 +110,18 @@ data class FlashbangEffectData(
             return if (result.type.equals(HitResult.Type.MISS)) 1.0 else 0.0
         }
     }
-
 }
 
 @Serializable
 data class AffectedPlayerInfo(
-    @Serializable(with = UUIDSerializer::class) val uuid: UUID, val effectData: FlashbangEffectData
+    @Serializable(with = UUIDSerializer::class) val uuid: UUID,
+    val effectData: FlashbangEffectData,
 )
-
 
 @Serializable
 class FlashBangExplodedMessage(
-    @Serializable(with = Vec3Serializer::class) val position: Vec3, val affectedPlayers: List<AffectedPlayerInfo>
+    @Serializable(with = Vec3Serializer::class) val position: Vec3,
+    val affectedPlayers: List<AffectedPlayerInfo>,
 ) {
     companion object {
 
@@ -159,7 +161,9 @@ class FlashBangExplodedMessage(
                             msg.position.x,
                             msg.position.y,
                             msg.position.z,
-                            speedX.toDouble(), speedY.toDouble(), speedZ.toDouble()
+                            speedX.toDouble(),
+                            speedY.toDouble(),
+                            speedZ.toDouble(),
                         )
                     }
                 }
@@ -187,8 +191,7 @@ private fun playExplosionSound(position: Vec3) {
             RandomSource.createNewThreadLocalInstance(),
             position.x,
             position.y,
-            position.z
-        )
+            position.z,
+        ),
     )
-
 }

@@ -8,7 +8,6 @@ import net.minecraft.util.RandomSource
 import java.time.Duration
 import java.time.Instant
 
-
 class FlashbangRingSound(
     val attack: Int,
     val sustain: Int,

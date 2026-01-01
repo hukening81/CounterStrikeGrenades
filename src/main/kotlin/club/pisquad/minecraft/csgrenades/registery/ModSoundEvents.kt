@@ -39,7 +39,6 @@ object ModSoundEvents {
     val INCENDIARY_BOUNCE = registerSoundEvents("incendiary.bounce")
     val INCENDIARY_POP = registerSoundEvents("incendiary.pop")
 
-
     fun register(eventBus: IEventBus) {
         SOUND_EVENTS.register(eventBus)
     }

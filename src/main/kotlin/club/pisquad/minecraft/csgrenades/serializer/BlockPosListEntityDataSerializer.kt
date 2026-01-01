@@ -16,12 +16,9 @@ class BlockPosListEntityDataSerializer : EntityDataSerializer<List<@Serializable
     }
 
     override fun read(pBuffer: FriendlyByteBuf): List<BlockPos> {
-
         val result = Json.decodeFromString<List<IntArray>>(pBuffer.readUtf())
         return result.map { BlockPos(it[0], it[1], it[2]) }
     }
 
-    override fun copy(pValue: List<BlockPos>): List<BlockPos> {
-        return pValue
-    }
+    override fun copy(pValue: List<BlockPos>): List<BlockPos> = pValue
 }

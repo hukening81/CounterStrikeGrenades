@@ -13,9 +13,9 @@ object RegisterObjectivesCommand {
             Commands.literal("csgrenades").then(
                 Commands.literal("scoreboard").then(
                     Commands.literal("init")
-                        .executes(RegisterObjectivesCommand::scoreboardInit)
-                )
-            )
+                        .executes(RegisterObjectivesCommand::scoreboardInit),
+                ),
+            ),
         )
     }
 

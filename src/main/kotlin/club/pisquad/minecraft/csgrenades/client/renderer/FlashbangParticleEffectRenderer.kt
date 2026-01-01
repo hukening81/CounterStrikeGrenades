@@ -53,7 +53,7 @@ object FlashbangParticleEffectRenderer {
             position.z,
             speed.x,
             speed.y,
-            speed.z
+            speed.z,
         ) ?: return
         particle.lifetime = 1
         particle.scale(3f)

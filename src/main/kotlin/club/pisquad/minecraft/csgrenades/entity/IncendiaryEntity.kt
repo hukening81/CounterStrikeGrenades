@@ -13,19 +13,12 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 
-class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
-    AbstractFireGrenade(pEntityType, pLevel, GrenadeType.INCENDIARY) {
-    override fun getDefaultItem(): Item {
-        return ModItems.INCENDIARY_ITEM.get()
-    }
+class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : AbstractFireGrenade(pEntityType, pLevel, GrenadeType.INCENDIARY) {
+    override fun getDefaultItem(): Item = ModItems.INCENDIARY_ITEM.get()
 
-    override fun getFireDamageType(): ResourceKey<DamageType> {
-        return ModDamageType.INCENDIARY_FIRE
-    }
+    override fun getFireDamageType(): ResourceKey<DamageType> = ModDamageType.INCENDIARY_FIRE
 
-    override fun getSelfFireDamageType(): ResourceKey<DamageType> {
-        return ModDamageType.INCENDIARY_FIRE_SELF
-    }
+    override fun getSelfFireDamageType(): ResourceKey<DamageType> = ModDamageType.INCENDIARY_FIRE_SELF
 
     override fun getHitDamageSource(hitEntity: LivingEntity): DamageSource {
         val registryAccess = this.level().registryAccess()

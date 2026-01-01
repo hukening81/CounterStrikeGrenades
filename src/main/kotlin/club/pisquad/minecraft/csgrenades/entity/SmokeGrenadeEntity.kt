@@ -37,8 +37,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
-    CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
+class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
 
     private var lastPos: Vec3i = Vec3i(0, 0, 0)
     private val particles = mutableMapOf<Vec3i, List<SmokeGrenadeParticle>>()
@@ -51,14 +50,12 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private var finalYRot = 0f
     private var finalZRot = 0f
 
-    override fun getDefaultItem(): Item {
-        return ModItems.SMOKE_GRENADE_ITEM.get()
-    }
+    override fun getDefaultItem(): Item = ModItems.SMOKE_GRENADE_ITEM.get()
 
     companion object {
         val spreadBlocksAccessor: EntityDataAccessor<List<@Serializable BlockPos>> = SynchedEntityData.defineId(
             SmokeGrenadeEntity::class.java,
-            ModSerializers.blockPosListEntityDataSerializer
+            ModSerializers.blockPosListEntityDataSerializer,
         )
     }
 
@@ -114,13 +111,11 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         }
     }
 
-    private fun getRegenerationTime(distance: Double, radius: Double): Int {
-        return ModConfig.SmokeGrenade.TIME_BEFORE_REGENERATE.get().millToTick().toInt() + linearInterpolate(
-            ModConfig.SmokeGrenade.REGENERATION_TIME.get().millToTick().toDouble(),
-            0.0,
-            distance / radius
-        ).toInt()
-    }
+    private fun getRegenerationTime(distance: Double, radius: Double): Int = ModConfig.SmokeGrenade.TIME_BEFORE_REGENERATE.get().millToTick().toInt() + linearInterpolate(
+        ModConfig.SmokeGrenade.REGENERATION_TIME.get().millToTick().toDouble(),
+        0.0,
+        distance / radius,
+    ).toInt()
 
     override fun tick() {
         if (this.entityData.get(isExplodedAccessor)) {
@@ -146,9 +141,9 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             if (this.level() is ServerLevel) {
                 if (this.explosionTime != null && Duration.between(
                         this.explosionTime,
-                        Instant.now()
+                        Instant.now(),
                     ) > Duration.ofMillis(
-                        ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().toLong()
+                        ModConfig.SmokeGrenade.SMOKE_LIFETIME.get().toLong(),
                     )
                 ) {
                     this.kill()
@@ -169,8 +164,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             } else {
                 tickCount = 0
             }
-            if (this.tickCount > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get().millToTick()
-                && this.explosionTime == null
+            if (this.tickCount > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get().millToTick() &&
+                this.explosionTime == null
             ) {
                 if (this.level().isClientSide) {
                     this.clientRenderEffect()
@@ -195,7 +190,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         val searchBB = this.boundingBox.inflate(64.0)
         val nearbyArrows = this.level().getEntitiesOfClass(
             net.minecraft.world.entity.projectile.AbstractArrow::class.java,
-            searchBB
+            searchBB,
         ) { arrow -> arrow.deltaMovement.lengthSqr() > 0.01 } // Only consider moving arrows
 
         val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
@@ -293,12 +288,12 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             val bb = AABB(this.blockPosition()).inflate(
                 smokeRadius.toDouble(),
                 smokeFallingHeight.toDouble(),
-                smokeRadius.toDouble()
+                smokeRadius.toDouble(),
             )
 
             extinguishedFires = this.level().getEntitiesOfClass(
                 AbstractFireGrenade::class.java,
-                bb
+                bb,
             ) {
                 it.entityData.get(isExplodedAccessor) && canDistinguishFire(it.position())
             }
@@ -306,7 +301,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             val bb = AABB(this.blockPosition()).inflate(ModConfig.FireGrenade.FIRE_RANGE.get().toDouble())
             extinguishedFires = this.level().getEntitiesOfClass(
                 AbstractFireGrenade::class.java,
-                bb
+                bb,
             ) {
                 it.entityData.get(isExplodedAccessor) && it.getSpreadBlocks()
                     .any { pos -> pos.above().center.distanceToSqr(this.position()) < 2 }
@@ -325,7 +320,6 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         val player = Minecraft.getInstance().player ?: return
         val distance = this.position().subtract(player.position()).length()
 
-
         // Sounds
         val soundManager = Minecraft.getInstance().soundManager
         val soundEvent =
@@ -339,7 +333,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
             1f,
             this,
-            0
+            0,
         )
         soundManager.play(soundInstance)
 
@@ -358,7 +352,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         // it finds the adjacent air block the grenade is actually "poking" into.
         var validatedOrigin = this.blockPosition()
         val originalBlockState = this.level().getBlockState(validatedOrigin)
-        
+
         if (!originalBlockState.getCollisionShape(this.level(), validatedOrigin).isEmpty) {
             // Grenade is in a solid block. Try to find the "opening" using precise position.
             val precisePos = this.position() // Precise float position of the entity
@@ -369,25 +363,31 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
             // Find the dominant axis of this escape vector to determine the direction of the opening.
             val bestDirection = Direction.getNearest(escapeVector.x, escapeVector.y, escapeVector.z)
-            
+
             val potentialOrigin = validatedOrigin.relative(bestDirection, 1)
             if (this.level().getBlockState(potentialOrigin).getCollisionShape(this.level(), potentialOrigin).isEmpty) {
                 validatedOrigin = potentialOrigin
             } else {
                 // The "smart" direction is also blocked. Fallback: search for first empty neighbor.
                 val firstEmptyNeighbor = listOf(
-                    validatedOrigin.above(), validatedOrigin.below(),
-                    validatedOrigin.north(), validatedOrigin.south(),
-                    validatedOrigin.east(), validatedOrigin.west()
+                    validatedOrigin.above(),
+                    validatedOrigin.below(),
+                    validatedOrigin.north(),
+                    validatedOrigin.south(),
+                    validatedOrigin.east(),
+                    validatedOrigin.west(),
                 ).firstOrNull { pos -> this.level().getBlockState(pos).getCollisionShape(this.level(), pos).isEmpty }
-                
+
                 validatedOrigin = firstEmptyNeighbor ?: validatedOrigin.above(2) // As a last resort, go 2 blocks up.
             }
         }
 
         // 1. Calculate the initial "ideal" smoke cloud as before.
         val initialSmoke: Set<BlockPos> = SmokeGrenadeSpreadBlockCalculator(
-            5, 1500, 2, validatedOrigin // Use the sanitized origin
+            5,
+            1500,
+            2,
+            validatedOrigin, // Use the sanitized origin
         ).calculate(this.level())
 
         if (initialSmoke.isEmpty()) return emptyList()
@@ -482,9 +482,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         return this.spreadBlocksCache
     }
 
-    fun canDistinguishFire(position: Vec3): Boolean {
-        return this.getSpreadBlocks().any { it.center.distanceToSqr(position) < 2.0 }
-    }
+    fun canDistinguishFire(position: Vec3): Boolean = this.getSpreadBlocks().any { it.center.distanceToSqr(position) < 2.0 }
 }
 
 private class SmokeGrenadeSpreadBlockCalculator(
@@ -518,11 +516,18 @@ private class SmokeGrenadeSpreadBlockCalculator(
 
     private fun randomMoveOnce(level: Level, blockPos: BlockPos): BlockPos {
         val newLocation = when (randomDirection()) {
-            Direction.UP -> blockPos.above() // Corrected
-            Direction.DOWN -> blockPos.below() // Corrected
+            Direction.UP -> blockPos.above()
+
+            // Corrected
+            Direction.DOWN -> blockPos.below()
+
+            // Corrected
             Direction.NORTH -> blockPos.north()
+
             Direction.SOUTH -> blockPos.south()
+
             Direction.WEST -> blockPos.west()
+
             Direction.EAST -> blockPos.east()
         }
         // Revert to getCollisionShape().isEmpty, as origin sanitization solves the leak.
@@ -532,15 +537,12 @@ private class SmokeGrenadeSpreadBlockCalculator(
         return blockPos
     }
 
-    private fun randomDirection(): Direction {
-        return when ((Random.nextInt(10))) {
-            0 -> Direction.UP
-            1, 5 -> Direction.DOWN
-            2, 6 -> Direction.NORTH
-            3, 7 -> Direction.SOUTH
-            4, 8 -> Direction.WEST
-            else -> Direction.EAST
-
-        }
+    private fun randomDirection(): Direction = when ((Random.nextInt(10))) {
+        0 -> Direction.UP
+        1, 5 -> Direction.DOWN
+        2, 6 -> Direction.NORTH
+        3, 7 -> Direction.SOUTH
+        4, 8 -> Direction.WEST
+        else -> Direction.EAST
     }
 }

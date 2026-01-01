@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.init
 
-//import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades.Companion.MOD_ID
+// import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades.Companion.MOD_ID
 import club.pisquad.minecraft.csgrenades.registery.ModItems
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
@@ -27,5 +27,4 @@ object ModCreativeTabs {
             }
             .build()
     }
-
 }

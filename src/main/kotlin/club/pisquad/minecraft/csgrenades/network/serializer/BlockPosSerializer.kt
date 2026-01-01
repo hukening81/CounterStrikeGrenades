@@ -8,7 +8,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import net.minecraft.core.BlockPos
 
-
 class BlockPosSerializer : KSerializer<BlockPos> {
     private val delegateSerializer = IntArraySerializer()
 
@@ -24,7 +23,7 @@ class BlockPosSerializer : KSerializer<BlockPos> {
         val data = intArrayOf(
             value.x,
             value.y,
-            value.z
+            value.z,
         )
         encoder.encodeSerializableValue(delegateSerializer, data)
     }

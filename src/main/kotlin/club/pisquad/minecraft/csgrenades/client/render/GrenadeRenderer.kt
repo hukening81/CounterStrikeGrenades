@@ -5,22 +5,22 @@ import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.GrenadeEntityInterface
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import net.minecraft.client.Minecraft // Import Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.renderer.texture.TextureAtlas
+import net.minecraft.client.resources.model.BakedModel // Import BakedModel
+import net.minecraft.client.resources.model.ModelManager // Import ModelManager
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.client.Minecraft // Import Minecraft
-import net.minecraft.client.resources.model.BakedModel // Import BakedModel
-import net.minecraft.client.resources.model.ModelManager // Import ModelManager
 
 class GrenadeRenderer<T>(
-    context: EntityRendererProvider.Context
+    context: EntityRendererProvider.Context,
 ) : EntityRenderer<T>(context) where T : Entity, T : GrenadeEntityInterface {
 
     private val itemRenderer: ItemRenderer = context.itemRenderer
@@ -31,7 +31,7 @@ class GrenadeRenderer<T>(
         partialTicks: Float,
         poseStack: PoseStack,
         buffer: MultiBufferSource,
-        packedLight: Int
+        packedLight: Int,
     ) {
         // Hide fire grenade model after it explodes
         if (entity is AbstractFireGrenade && entity.entityData.get(CounterStrikeGrenadeEntity.isExplodedAccessor)) {
@@ -46,7 +46,6 @@ class GrenadeRenderer<T>(
             val visualYRot = Mth.lerp(partialTicks, entity.yRotO, entity.yRot)
             val visualXRot = Mth.lerp(partialTicks, entity.xRotO, entity.xRot)
             val visualZRot = Mth.lerp(partialTicks, entity.zRotO, entity.zRot)
-
 
             // Translate the model to align its visual center with its physical center
             poseStack.translate(0.0, 0.125, 0.0)
@@ -77,7 +76,7 @@ class GrenadeRenderer<T>(
                     buffer,
                     packedLight,
                     OverlayTexture.NO_OVERLAY,
-                    bakedModel
+                    bakedModel,
                 )
             } else {
                 // Fallback to original rendering if custom model not found or is a custom renderer
@@ -89,7 +88,7 @@ class GrenadeRenderer<T>(
                     poseStack,
                     buffer,
                     entity.level(),
-                    entity.id
+                    entity.id,
                 )
             }
             // --- END MODIFICATION ---
@@ -97,11 +96,8 @@ class GrenadeRenderer<T>(
 
         poseStack.popPose()
         // super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight) // 移除super调用以消除阴影和“扭头”效果
-
     }
 
     // 这个方法必须重写，对于物品模型渲染，通常返回这个默认值
-    override fun getTextureLocation(entity: T): ResourceLocation {
-        return TextureAtlas.LOCATION_BLOCKS
-    }
+    override fun getTextureLocation(entity: T): ResourceLocation = TextureAtlas.LOCATION_BLOCKS
 }
