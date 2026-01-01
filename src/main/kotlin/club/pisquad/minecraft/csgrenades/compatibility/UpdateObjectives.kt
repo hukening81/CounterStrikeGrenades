@@ -22,7 +22,7 @@ object ObjectiveManager {
     fun initAllObjectives(
         scoreboard: Scoreboard,
         dispatcher: CommandDispatcher<CommandSourceStack>,
-        commandSource: CommandSourceStack
+        commandSource: CommandSourceStack,
     ) {
         for (objective in ModObjectives.entries) {
             if (scoreboard.getObjective(objective.objectiveName) != null) {
@@ -35,11 +35,11 @@ object ObjectiveManager {
     private fun removeObjective(
         objective: ModObjectives,
         dispatcher: CommandDispatcher<CommandSourceStack>,
-        commandSource: CommandSourceStack
+        commandSource: CommandSourceStack,
     ) {
         dispatcher.execute(
             "scoreboard objectives remove ${objective.objectiveName}",
-            commandSource.withSuppressedOutput()
+            commandSource.withSuppressedOutput(),
         )
     }
 
@@ -48,26 +48,25 @@ object ObjectiveManager {
         scoreboard: Scoreboard,
         objective: ModObjectives,
         dispatcher: CommandDispatcher<CommandSourceStack>,
-        commandSource: CommandSourceStack
+        commandSource: CommandSourceStack,
     ) {
         if (scoreboard.getObjective(objective.objectiveName) != null) {
             dispatcher.execute(
                 "scoreboard players add $player ${objective.objectiveName} 1",
-                commandSource.withSuppressedOutput()
+                commandSource.withSuppressedOutput(),
             )
         } else {
             dispatcher.execute(
                 "scoreboard objectives add ${objective.objectiveName} dummy",
-                commandSource.withSuppressedOutput()
+                commandSource.withSuppressedOutput(),
             )
             dispatcher.execute(
                 "scoreboard players add $player ${objective.objectiveName} 1",
-                commandSource.withSuppressedOutput()
+                commandSource.withSuppressedOutput(),
             )
         }
     }
 }
-
 
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 object UpdateObjectives {
@@ -80,10 +79,15 @@ object UpdateObjectives {
 
             val objective = when (event.source.entity) {
                 is FlashBangEntity -> ModObjectives.KILLCOUNT_FLASHBANG
+
                 is SmokeGrenadeEntity -> ModObjectives.KILLCOUNT_SMOKEGRENADE
+
                 is HEGrenadeEntity -> ModObjectives.KILLCOUNT_HEGRENADE
+
                 is IncendiaryEntity -> ModObjectives.KILLCOUNT_INCENDIARY
+
                 is MolotovEntity -> ModObjectives.KILLCOUNT_MOLOTOV
+
                 else -> {
                     null
                 }
@@ -94,10 +98,9 @@ object UpdateObjectives {
                     server.scoreboard,
                     objective,
                     server.commands.dispatcher,
-                    commandSource
+                    commandSource,
                 )
             }
-
         }
     }
 }

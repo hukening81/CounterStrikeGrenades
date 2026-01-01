@@ -5,9 +5,9 @@ import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeRenderManager
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.getTimeFromTickCount
-import club.pisquad.minecraft.csgrenades.registery.ModDamageType
-import club.pisquad.minecraft.csgrenades.registery.ModItems
-import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.ModDamageType
+import club.pisquad.minecraft.csgrenades.registry.ModItems
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.core.registries.Registries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
@@ -23,16 +23,13 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import kotlin.math.max
 
-class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
-    CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.HEGRENADE) {
+class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.HEGRENADE) {
 
     init {
         this.hitBlockSound = ModSoundEvents.HEGRENADE_BOUNCE.get()
     }
 
-    override fun getDefaultItem(): Item {
-        return ModItems.HEGRENADE_ITEM.get()
-    }
+    override fun getDefaultItem(): Item = ModItems.HEGRENADE_ITEM.get()
 
     override fun tick() {
         if (this.entityData.get(isExplodedAccessor)) {
@@ -62,15 +59,15 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         val damageRange = ModConfig.HEGrenade.DAMAGE_RANGE.get()
         val baseDamageSource = DamageSource(
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION),
-            this.owner
+            this.owner,
         )
         val selfDamageSource = DamageSource(
-            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION_SELF)
+            registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION_SELF),
         )
         val entities =
             level.getEntitiesOfClass(
                 if (ModConfig.DAMAGE_NON_PLAYER_ENTITY.get()) LivingEntity::class.java else Player::class.java,
-                AABB(this.blockPosition()).inflate(ModConfig.HEGrenade.DAMAGE_RANGE.get())
+                AABB(this.blockPosition()).inflate(ModConfig.HEGrenade.DAMAGE_RANGE.get()),
             )
         for (entity in entities) {
             val distance = entity.distanceTo(this).toDouble()
@@ -104,7 +101,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             entity.eyePosition,
             ClipContext.Block.COLLIDER,
             ClipContext.Fluid.ANY,
-            null
+            null,
         ).let {
             val clipResult = this.level().clip(it)
             return@let if (clipResult.type == HitResult.Type.MISS) {
@@ -124,7 +121,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
             entity.position(),
             ClipContext.Block.COLLIDER,
             ClipContext.Fluid.ANY,
-            null
+            null,
         ).let {
             val clipResult = this.level().clip(it)
             return@let if (clipResult.type == HitResult.Type.MISS) {
@@ -154,7 +151,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         this.level().getEntitiesOfClass(
             SmokeGrenadeEntity::class.java,
             this.boundingBox.inflate(heDamageRange + smokeRadius)
-                .inflate(0.0, smokeFallingHeight.toDouble(), 0.0)
+                .inflate(0.0, smokeFallingHeight.toDouble(), 0.0),
         ).forEach {
             it.clearSmokeWithinRange(this.position(), heDamageRange + 2.5, true)
         }
@@ -164,7 +161,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
 private fun calculateHEGrenadeDamage(
     distance: Double,
     armorReduction: Double,
-    headDamageBoost: Boolean = false
+    headDamageBoost: Boolean = false,
 ): Double {
     val baseDamage =
         if (headDamageBoost) ModConfig.HEGrenade.BASE_DAMAGE.get() * ModConfig.HEGrenade.HEAD_DAMAGE_BOOST.get() else ModConfig.HEGrenade.BASE_DAMAGE.get()

@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.registery
+package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import net.minecraft.resources.ResourceLocation
@@ -38,7 +38,6 @@ object ModSoundEvents {
     val INCENDIARY_EXPLODE_AIR = registerSoundEvents("incendiary.explode_air")
     val INCENDIARY_BOUNCE = registerSoundEvents("incendiary.bounce")
     val INCENDIARY_POP = registerSoundEvents("incendiary.pop")
-
 
     fun register(eventBus: IEventBus) {
         SOUND_EVENTS.register(eventBus)

@@ -68,11 +68,10 @@ object ThrowActionHandler {
         val player = Minecraft.getInstance().player ?: return
         val selectedSlot = player.inventory.selected
 
-
         val itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND)
 
-        if (itemInHand.item is CounterStrikeGrenadeItem
-            && previousSlot == selectedSlot
+        if (itemInHand.item is CounterStrikeGrenadeItem &&
+            previousSlot == selectedSlot
         ) {
             if (Duration.between(this.grenadeLastThrow, Instant.now())
                     .toMillis() > ModConfig.GRENADE_THROW_COOLDOWN.get()
@@ -83,21 +82,21 @@ object ThrowActionHandler {
                             Pair(true, true) -> {
                                 this.setNewTransientTarget(
                                     ModConfig.THROW_SPEED_MODERATE.get(),
-                                    ModConfig.THROW_SPEED_MODERATE.get()
+                                    ModConfig.THROW_SPEED_MODERATE.get(),
                                 )
                             }
 
                             Pair(true, false) -> {
                                 this.setNewTransientTarget(
                                     ModConfig.THROW_SPEED_STRONG.get(),
-                                    ModConfig.THROW_SPEED_STRONG.get()
+                                    ModConfig.THROW_SPEED_STRONG.get(),
                                 )
                             }
 
                             Pair(false, true) -> {
                                 this.setNewTransientTarget(
                                     ModConfig.THROW_SPEED_WEAK.get(),
-                                    ModConfig.THROW_SPEED_WEAK.get()
+                                    ModConfig.THROW_SPEED_WEAK.get(),
                                 )
                             }
                         }
@@ -182,18 +181,19 @@ object ThrowActionHandler {
             min(
                 1.0,
                 Duration.between(this.transientBeginTime, Instant.now()).toMillis()
-                    .toDouble() / ModConfig.THROW_TYPE_TRANSIENT_TIME.get()
-            )
+                    .toDouble() / ModConfig.THROW_TYPE_TRANSIENT_TIME.get(),
+            ),
         )
     }
-
 
     private fun getButtonState(): Pair<Boolean, Boolean> {
         val window = Minecraft.getInstance().window.window
         return Pair(
             GLFW.glfwGetMouseButton(
-                window, GLFW.GLFW_MOUSE_BUTTON_LEFT
-            ) == 1, GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == 1
+                window,
+                GLFW.GLFW_MOUSE_BUTTON_LEFT,
+            ) == 1,
+            GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == 1,
         )
     }
 }
@@ -215,7 +215,7 @@ fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
         linearInterpolate(
             ModConfig.PLAYER_SPEED_FACTOR_WEAK.get(),
             ModConfig.PLAYER_SPEED_FACTOR_STRONG.get(),
-            speedFactor
+            speedFactor,
         )
 
     val speed = player.deltaMovement.scale(playerSpeedFactor)
@@ -225,9 +225,9 @@ fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
                     linearInterpolate(
                         ModConfig.THROW_SPEED_WEAK.get(),
                         ModConfig.THROW_SPEED_STRONG.get(),
-                        speedFactor
-                    )
-                )
+                        speedFactor,
+                    ),
+                ),
         )
         .length()
 
@@ -250,8 +250,8 @@ fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
             grenadeType,
             player.eyePosition,
             Rotations(player.xRot, player.yRot, 0.0f),
-            customSound
-        )
+            customSound,
+        ),
     )
 }
 
@@ -261,5 +261,4 @@ fun setItemCoolDown(player: Player) {
             player.cooldowns.addCooldown(it.item, ModConfig.GRENADE_THROW_COOLDOWN.get() / 1000 * 20)
         }
     }
-
 }

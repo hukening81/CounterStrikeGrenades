@@ -4,7 +4,7 @@ import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import club.pisquad.minecraft.csgrenades.snapToAxis
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
@@ -29,10 +29,9 @@ import java.util.*
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out ThrowableItemProjectile>,
     pLevel: Level,
-    val grenadeType: GrenadeType
-) :
-    ThrowableItemProjectile(pEntityType, pLevel), GrenadeEntityInterface {
-
+    val grenadeType: GrenadeType,
+) : ThrowableItemProjectile(pEntityType, pLevel),
+    GrenadeEntityInterface {
 
     var hitBlockSound = ModSoundEvents.GRENADE_HIT.get()
     var throwSound = ModSoundEvents.GRENADE_THROW.get()
@@ -44,7 +43,6 @@ abstract class CounterStrikeGrenadeEntity(
     private var zRotSpeed: Float = 0f
     var zRot: Float = 0f
     var zRotO: Float = 0f
-
 
     companion object {
         val speedAccessor: EntityDataAccessor<Float> =
@@ -77,7 +75,6 @@ abstract class CounterStrikeGrenadeEntity(
         if (result.entity is EndCrystal) {
             result.entity.hurt(result.entity.damageSources().generic(), 1f)
         }
-
 
         if (result.entity is LivingEntity) {
             val entity = result.entity as LivingEntity
@@ -167,7 +164,7 @@ abstract class CounterStrikeGrenadeEntity(
         // So I just make a test here
         // (In integrated server, haven't tested on other configurations yet)
         if (this.level().isClientSide && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(
-                isLandedAccessor
+                isLandedAccessor,
             )
         ) {
             val player = Minecraft.getInstance().player!!
@@ -177,11 +174,11 @@ abstract class CounterStrikeGrenadeEntity(
                 SoundSource.AMBIENT,
                 SoundUtils.getVolumeFromDistance(
                     distance,
-                    SoundTypes.GRENADE_HIT // unify volume for all grenades hit sounds
+                    SoundTypes.GRENADE_HIT, // unify volume for all grenades hit sounds
                 ).toFloat(),
                 1f,
                 this,
-                0
+                0,
             )
             Minecraft.getInstance().soundManager.play(soundInstance)
         }
@@ -189,12 +186,11 @@ abstract class CounterStrikeGrenadeEntity(
         // Calculate the movement of the entity
         if (this.entityData.get(isLandedAccessor) || this.entityData.get(isExplodedAccessor)) {
             return
-
         } else {
             this.bounce(
                 result.direction,
                 speedCoefficient = 0.7f,
-                frictionFactor = 0.9f
+                frictionFactor = 0.9f,
             )
             this.setPos(this.xOld, this.yOld, this.zOld)
 
@@ -220,33 +216,28 @@ abstract class CounterStrikeGrenadeEntity(
                 Vec3(
                     deltaMovement.x * frictionFactor,
                     -deltaMovement.y * speedCoefficient,
-                    deltaMovement.z * frictionFactor
+                    deltaMovement.z * frictionFactor,
                 )
 
             Direction.WEST, Direction.EAST ->
                 Vec3(
                     -deltaMovement.x * speedCoefficient,
                     deltaMovement.y * frictionFactor,
-                    deltaMovement.z * frictionFactor
+                    deltaMovement.z * frictionFactor,
                 )
 
             Direction.NORTH, Direction.SOUTH ->
                 Vec3(
                     deltaMovement.x * frictionFactor,
                     deltaMovement.y * frictionFactor,
-                    -deltaMovement.z * speedCoefficient
+                    -deltaMovement.z * speedCoefficient,
                 )
         }
     }
 
-    override fun isOnFire(): Boolean {
-        return false
-    }
+    override fun isOnFire(): Boolean = false
 
-    override fun shouldBeSaved(): Boolean {
-        return false
-    }
+    override fun shouldBeSaved(): Boolean = false
 
     abstract fun getHitDamageSource(hitEntity: LivingEntity): DamageSource
-
 }

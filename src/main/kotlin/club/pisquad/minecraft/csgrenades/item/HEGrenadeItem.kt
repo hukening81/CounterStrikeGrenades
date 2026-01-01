@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.item
 
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 
 class HEGrenadeItem(properties: Properties) : CounterStrikeGrenadeItem(properties) {
 
@@ -9,5 +9,4 @@ class HEGrenadeItem(properties: Properties) : CounterStrikeGrenadeItem(propertie
         drawSound = ModSoundEvents.HEGRENADE_DRAW.get()
         grenadeType = GrenadeType.HEGRENADE
     }
-
 }

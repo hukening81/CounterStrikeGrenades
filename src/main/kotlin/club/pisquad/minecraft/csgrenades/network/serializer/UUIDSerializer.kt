@@ -23,5 +23,4 @@ class UUIDSerializer : KSerializer<UUID> {
     override fun serialize(encoder: Encoder, value: UUID) {
         encoder.encodeSerializableValue(delegateSerializer, UUIDUtil.uuidToIntArray(value))
     }
-
 }

@@ -4,7 +4,7 @@ import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.getRandomLocationFromSphere
-import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
@@ -20,7 +20,6 @@ import net.minecraftforge.fml.common.Mod
 data class HEGrenadeExplosionData(
     var position: Vec3,
 )
-
 
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object HEGrenadeRenderManager {
@@ -44,11 +43,10 @@ object HEGrenadeRenderManager {
             renderers.remove(it)
         }
     }
-
 }
 
 class HEGrenadeRenderer(
-    private val data: HEGrenadeExplosionData
+    private val data: HEGrenadeExplosionData,
 ) {
     var done: Boolean = false
     private var soundInstance: SoundInstance? = null
@@ -69,10 +67,9 @@ class HEGrenadeRenderer(
             RandomSource.createNewThreadLocalInstance(),
             data.position.x,
             data.position.y,
-            data.position.z
+            data.position.z,
         )
         Minecraft.getInstance().soundManager.play(this.soundInstance!!)
-
 
         val particleEngine = Minecraft.getInstance().particleEngine
         val randomSource = RandomSource.createNewThreadLocalInstance()
@@ -102,8 +99,5 @@ class HEGrenadeRenderer(
         }
     }
 
-    fun update(): Boolean {
-        return true
-    }
-
+    fun update(): Boolean = true
 }

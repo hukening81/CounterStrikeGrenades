@@ -23,7 +23,7 @@ class RotationSerializer : KSerializer<Rotations> {
         val data = floatArrayOf(
             value.x,
             value.y,
-            value.z
+            value.z,
         )
         encoder.encodeSerializableValue(delegateSerializer, data)
     }

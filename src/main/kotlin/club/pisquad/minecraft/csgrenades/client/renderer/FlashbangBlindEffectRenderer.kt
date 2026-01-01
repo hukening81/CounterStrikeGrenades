@@ -4,7 +4,7 @@ import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.network.message.FlashbangEffectData
-import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import club.pisquad.minecraft.csgrenades.sound.FlashbangRingSound
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -21,7 +21,6 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.math.max
 import kotlin.math.sqrt
-
 
 private enum class RenderState {
     IDLE,
@@ -135,7 +134,10 @@ object FlashbangBlindEffectRenderer {
             gui.guiWidth(),
             gui.guiHeight(),
             FastColor.ABGR32.color(
-                opacity, 255, 255, 255
+                opacity,
+                255,
+                255,
+                255,
             ),
         )
     }
@@ -157,8 +159,8 @@ object FlashbangBlindEffectRenderer {
                 attack = 0,
                 sustain = effectSustain,
                 decay = effectDecay + 300,
-                targetVolume = SoundUtils.getVolumeFromDistance(distance, SoundTypes.FLASHBANG_RING).toFloat()
-            )
+                targetVolume = SoundUtils.getVolumeFromDistance(distance, SoundTypes.FLASHBANG_RING).toFloat(),
+            ),
         )
     }
 }

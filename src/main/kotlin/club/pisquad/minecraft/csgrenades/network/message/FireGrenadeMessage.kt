@@ -3,7 +3,7 @@ package club.pisquad.minecraft.csgrenades.network.message
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
-import club.pisquad.minecraft.csgrenades.registery.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -57,7 +57,6 @@ class FireGrenadeMessage(
                 }
             }
         }
-
     }
 }
 
@@ -72,7 +71,7 @@ private fun playGroundExplodedSound(position: Vec3) {
         randomSource,
         position.x,
         position.y,
-        position.z
+        position.z,
     )
     Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
 }
@@ -88,7 +87,7 @@ private fun playAirExplodedSound(position: Vec3) {
         randomSource,
         position.x,
         position.y,
-        position.z
+        position.z,
     )
     Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
 }
@@ -104,7 +103,7 @@ private fun playExtinguishSound(position: Vec3) {
         randomSource,
         position.x,
         position.y,
-        position.z
+        position.z,
     )
     Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
 }

@@ -2,8 +2,8 @@ package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.compat.tacz.TaczApiHandler
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.registery.ModDamageType
-import club.pisquad.minecraft.csgrenades.registery.ModItems
+import club.pisquad.minecraft.csgrenades.registry.ModDamageType
+import club.pisquad.minecraft.csgrenades.registry.ModItems
 import com.tacz.guns.api.item.IGun
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -23,8 +23,7 @@ import net.minecraft.world.level.Level
 import net.minecraftforge.fml.ModList
 import kotlin.random.Random
 
-class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
-    CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.DECOY_GRENADE) {
+class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.DECOY_GRENADE) {
 
     // --- State Variables ---
     private var activationTick: Int? = null
@@ -44,15 +43,15 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
         val CUSTOM_SOUND_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(
             DecoyGrenadeEntity::class.java,
-            EntityDataSerializers.STRING
+            EntityDataSerializers.STRING,
         )
         val SOUND_COUNTER_ACCESSOR: EntityDataAccessor<Int> = SynchedEntityData.defineId(
             DecoyGrenadeEntity::class.java,
-            EntityDataSerializers.INT
+            EntityDataSerializers.INT,
         )
         val GUN_ID_TO_PLAY_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(
             DecoyGrenadeEntity::class.java,
-            EntityDataSerializers.STRING
+            EntityDataSerializers.STRING,
         )
     }
 
@@ -63,9 +62,7 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         this.entityData.define(GUN_ID_TO_PLAY_ACCESSOR, "")
     }
 
-    override fun getDefaultItem(): Item {
-        return ModItems.DECOY_GRENADE_ITEM.get()
-    }
+    override fun getDefaultItem(): Item = ModItems.DECOY_GRENADE_ITEM.get()
 
     override fun tick() {
         val isLanded = this.entityData.get(isLandedAccessor)
@@ -146,7 +143,6 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         }
     }
 
-
     override fun getHitDamageSource(hitEntity: LivingEntity): DamageSource {
         val registryAccess = this.level().registryAccess()
         val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.DECOY_GRENADE_HIT)
@@ -191,7 +187,7 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             SoundEvents.CREEPER_PRIMED,
 //            SoundEvents.FIREWORK_ROCKET_BLAST,
             SoundEvents.CHICKEN_HURT,
-            SoundEvents.CHICKEN_AMBIENT
+            SoundEvents.CHICKEN_AMBIENT,
         )
         val randomSoundHolder = footstepSounds[Random.nextInt(footstepSounds.size)]
         level().playSound(null, this.blockPosition(), randomSoundHolder, SoundSource.PLAYERS, 1.0f, 1.0f)

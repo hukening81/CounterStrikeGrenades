@@ -3,7 +3,7 @@ package club.pisquad.minecraft.csgrenades
 import club.pisquad.minecraft.csgrenades.command.ModCommands
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.registery.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.world.item.CreativeModeTabs
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent
@@ -48,7 +48,6 @@ object CounterStrikeGrenades {
         ModSerializers.register()
         net.minecraftforge.fml.ModLoadingContext.get()
             .registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC)
-
     }
 
     private fun removeFromCreativeTabs(event: BuildCreativeModeTabContentsEvent) {
@@ -59,11 +58,11 @@ object CounterStrikeGrenades {
                 ModItems.FLASH_BANG_ITEM.get(),
                 ModItems.DECOY_GRENADE_ITEM.get(),
                 ModItems.MOLOTOV_ITEM.get(),
-                ModItems.INCENDIARY_ITEM.get()
+                ModItems.INCENDIARY_ITEM.get(),
             )
 
             // Correct way: Use an iterator on the entry set to safely remove.
-            val iterator = event.getEntries().iterator()
+            val iterator = event.entries.iterator()
             while (iterator.hasNext()) {
                 val entry = iterator.next()
                 if (entry.key.item in itemsToRemove) {
@@ -84,7 +83,6 @@ object CounterStrikeGrenades {
         val eventBus = KotlinModLoadingContext.get().getKEventBus()
 
         eventBus.addListener(ModParticleFactories::onRegisterParticleFactories)
-
     }
 
     /**

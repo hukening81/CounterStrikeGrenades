@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package club.pisquad.minecraft.csgrenades.config
 
 import net.minecraftforge.common.ForgeConfigSpec
@@ -55,7 +57,9 @@ object ModConfig {
     }
 
     enum class SelfDamageSetting {
-        NEVER, NOT_IN_TEAM, ALWAYS
+        NEVER,
+        NOT_IN_TEAM,
+        ALWAYS,
     }
 
     init {

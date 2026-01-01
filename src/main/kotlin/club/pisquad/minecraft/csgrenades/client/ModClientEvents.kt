@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.registery.ModItems
+import club.pisquad.minecraft.csgrenades.registry.ModItems
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.event.ModelEvent
@@ -19,7 +19,7 @@ object ModClientEvents {
             ModItems.SMOKE_GRENADE_ITEM,
             ModItems.INCENDIARY_ITEM,
             ModItems.MOLOTOV_ITEM,
-            ModItems.DECOY_GRENADE_ITEM
+            ModItems.DECOY_GRENADE_ITEM,
         )
 
         grenadeItems.forEach { item ->

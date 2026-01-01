@@ -4,7 +4,7 @@ import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.serializer.RotationSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
-import club.pisquad.minecraft.csgrenades.registery.ModEntities
+import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -68,7 +68,7 @@ class GrenadeThrownMessage(
                 msg.rotation.y,
                 0.0f, // Roll is not used
                 msg.speed.toFloat(),
-                0f
+                0f,
             )
 
             serverLevel.addFreshEntity(grenadeEntity)
@@ -78,8 +78,5 @@ class GrenadeThrownMessage(
                 player.inventory.removeItem(player.getItemInHand(InteractionHand.MAIN_HAND))
             }
         }
-
     }
-
-
 }

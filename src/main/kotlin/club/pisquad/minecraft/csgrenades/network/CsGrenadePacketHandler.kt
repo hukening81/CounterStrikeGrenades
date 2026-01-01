@@ -7,6 +7,7 @@ import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.network.NetworkRegistry
+import net.minecraftforge.network.simple.IndexedMessageCodec.MessageHandler
 import net.minecraftforge.network.simple.SimpleChannel
 import java.util.*
 
@@ -20,8 +21,10 @@ object CsGrenadePacketHandler {
         }
 
     val INSTANCE: SimpleChannel = NetworkRegistry.newSimpleChannel(
-        ResourceLocation(CounterStrikeGrenades.ID, "event"), { PROTOCOL_VERSION },
-        PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals
+        ResourceLocation(CounterStrikeGrenades.ID, "event"),
+        { PROTOCOL_VERSION },
+        PROTOCOL_VERSION::equals,
+        PROTOCOL_VERSION::equals,
     )
 
     @Suppress("INACCESSIBLE_TYPE")
@@ -32,7 +35,7 @@ object CsGrenadePacketHandler {
             GrenadeThrownMessage::encoder,
             GrenadeThrownMessage::decoder,
             GrenadeThrownMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_SERVER)
+            Optional.of(NetworkDirection.PLAY_TO_SERVER),
         )
         INSTANCE.registerMessage(
             messageTypeCount,
@@ -40,7 +43,7 @@ object CsGrenadePacketHandler {
             FlashBangExplodedMessage::encoder,
             FlashBangExplodedMessage::decoder,
             FlashBangExplodedMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
         INSTANCE.registerMessage(
             messageTypeCount,

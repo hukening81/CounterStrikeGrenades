@@ -5,7 +5,7 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.millToTick
 import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
-import club.pisquad.minecraft.csgrenades.registery.ModParticles
+import club.pisquad.minecraft.csgrenades.registry.ModParticles
 import club.pisquad.minecraft.csgrenades.toVec3
 import club.pisquad.minecraft.csgrenades.toVec3i
 import net.minecraft.client.particle.ParticleEngine
@@ -17,7 +17,6 @@ import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 
-
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object SmokeRenderManager {
     private var renderers: MutableList<SmokeRenderer> = mutableListOf()
@@ -27,7 +26,6 @@ object SmokeRenderManager {
         if (event.phase == TickEvent.Phase.END) return
         renderers.forEach {
             it.update()
-
         }
         val shouldRemove: MutableList<SmokeRenderer> = mutableListOf()
         renderers.forEach {
@@ -50,7 +48,7 @@ object SmokeRenderManager {
                 particleEngine,
                 position,
                 smokeEntity,
-            )
+            ),
         )
     }
 }
@@ -112,7 +110,7 @@ class SmokeRenderer(
                     shuffledPosition.z,
                     0.0,
                     0.0,
-                    0.0
+                    0.0,
                 )
                 if (particle != null) {
                     this.smokeEntity.registerParticle(particle as SmokeGrenadeParticle)
@@ -120,6 +118,5 @@ class SmokeRenderer(
             }
             this.renderBlockPos.removeAt(0)
         }
-
     }
 }

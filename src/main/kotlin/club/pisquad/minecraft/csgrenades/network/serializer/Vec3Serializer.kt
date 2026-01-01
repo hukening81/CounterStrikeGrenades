@@ -23,9 +23,8 @@ class Vec3Serializer : KSerializer<Vec3> {
         val data = doubleArrayOf(
             value.x,
             value.y,
-            value.z
+            value.z,
         )
         encoder.encodeSerializableValue(delegateSerializer, data)
     }
-
 }
