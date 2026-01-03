@@ -12,5 +12,5 @@ import net.minecraftforge.eventbus.api.Cancelable
 @Cancelable
 class GrenadeThrowEvent(
     player: Player,
-    val itemStack: ItemStack
+    val itemStack: ItemStack,
 ) : PlayerEvent(player)

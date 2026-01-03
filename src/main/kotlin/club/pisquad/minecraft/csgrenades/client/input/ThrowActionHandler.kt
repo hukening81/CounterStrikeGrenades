@@ -1,8 +1,12 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
+import java.time.Duration
+import java.time.Instant
+import kotlin.math.min
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.event.GrenadeThrowEvent
 import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.linearInterpolate
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
@@ -13,16 +17,12 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.event.TickEvent.ClientTickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import org.lwjgl.glfw.GLFW
-import java.time.Duration
-import java.time.Instant
-import kotlin.math.min
-import net.minecraftforge.common.MinecraftForge // Moved from below
-import club.pisquad.minecraft.csgrenades.event.GrenadeThrowEvent // Moved from below
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])

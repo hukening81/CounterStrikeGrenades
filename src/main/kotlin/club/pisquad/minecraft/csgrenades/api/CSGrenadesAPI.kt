@@ -18,9 +18,7 @@ object CSGrenadesAPI {
      * @return 如果玩家被致盲，则返回 true；否则返回 false。
      */
     @JvmStatic
-    fun isPlayerFlashed(player: Player): Boolean {
-        return flashedPlayers.containsKey(player.uuid) && (flashedPlayers[player.uuid] ?: 0) > 0
-    }
+    fun isPlayerFlashed(player: Player): Boolean = flashedPlayers.containsKey(player.uuid) && (flashedPlayers[player.uuid] ?: 0) > 0
 
     /**
      * 内部方法：设置玩家的闪光弹致盲状态和持续时间。

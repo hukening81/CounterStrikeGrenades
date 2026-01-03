@@ -1,8 +1,15 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
-import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI // New import
+import java.util.*
+import java.util.function.Supplier
+import kotlin.math.PI
+import kotlin.math.acos
+import kotlin.math.max
+import kotlin.math.pow
+import kotlin.math.sqrt
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
+import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangBlindEffectRenderer
 import club.pisquad.minecraft.csgrenades.client.renderer.FlashbangParticleEffectRenderer
 import club.pisquad.minecraft.csgrenades.config.ModConfig
@@ -23,13 +30,6 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
-import java.util.*
-import java.util.function.Supplier
-import kotlin.math.PI
-import kotlin.math.acos
-import kotlin.math.max
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 @Serializable
 data class FlashbangEffectData(
