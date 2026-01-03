@@ -1,12 +1,5 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
-import java.util.*
-import java.util.function.Supplier
-import kotlin.math.PI
-import kotlin.math.acos
-import kotlin.math.max
-import kotlin.math.pow
-import kotlin.math.sqrt
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
@@ -30,6 +23,13 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
+import java.util.*
+import java.util.function.Supplier
+import kotlin.math.PI
+import kotlin.math.acos
+import kotlin.math.max
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 @Serializable
 data class FlashbangEffectData(
@@ -157,23 +157,20 @@ class FlashBangExplodedMessage(
                 playExplosionSound(msg.position)
 
                 // Add particle spawning
-                val level = Minecraft.getInstance().level
                 val random = RandomSource.createNewThreadLocalInstance()
                 for (i in 0 until 20) { // Spawn 20 particles
                     val speedX = random.nextGaussian().toFloat() * 0.02f
                     val speedY = random.nextGaussian().toFloat() * 0.02f
                     val speedZ = random.nextGaussian().toFloat() * 0.02f
-                    if (level != null) {
-                        level.addParticle(
-                            net.minecraft.core.particles.ParticleTypes.FLASH, // The FLASH particle type
-                            msg.position.x,
-                            msg.position.y,
-                            msg.position.z,
-                            speedX.toDouble(),
-                            speedY.toDouble(),
-                            speedZ.toDouble(),
-                        )
-                    }
+                    Minecraft.getInstance().level?.addParticle(
+                        net.minecraft.core.particles.ParticleTypes.FLASH, // The FLASH particle type
+                        msg.position.x,
+                        msg.position.y,
+                        msg.position.z,
+                        speedX.toDouble(),
+                        speedY.toDouble(),
+                        speedZ.toDouble(),
+                    )
                 }
             }
         }

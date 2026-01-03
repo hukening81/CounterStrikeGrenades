@@ -1,8 +1,5 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
-import java.time.Duration
-import java.time.Instant
-import kotlin.math.min
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
@@ -23,6 +20,9 @@ import net.minecraftforge.event.TickEvent.ClientTickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import org.lwjgl.glfw.GLFW
+import java.time.Duration
+import java.time.Instant
+import kotlin.math.min
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
