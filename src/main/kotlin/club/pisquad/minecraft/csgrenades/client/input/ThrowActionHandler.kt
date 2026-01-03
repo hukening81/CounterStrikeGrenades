@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades.client.input
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.event.GrenadeThrowEvent
 import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.linearInterpolate
 import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
@@ -13,6 +14,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.event.TickEvent.ClientTickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -198,6 +200,15 @@ object ThrowActionHandler {
 
 fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
     val player: Player = Minecraft.getInstance().player ?: return
+    val itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND) // Moved up for event
+
+    // NEW: Fire the GrenadeThrowEvent
+    val event = GrenadeThrowEvent(player, itemInHand)
+    if (MinecraftForge.EVENT_BUS.post(event)) {
+        // Event was canceled, stop the throw action
+        return
+    }
+
     val speedFactor =
         (throwSpeed - ModConfig.THROW_SPEED_WEAK.get()) / (ModConfig.THROW_SPEED_STRONG.get() - ModConfig.THROW_SPEED_WEAK.get())
     val playerSpeedFactor =
