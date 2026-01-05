@@ -70,12 +70,11 @@ jobs:
       - name: Publish to CurseForge
         uses: itsmeow/curseforge-upload@v3.1.2
         with:
-          api-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          project-id: '1413459'
-          release-type: 'beta'
-          game-versions: '1.20.1'
-          loaders: 'forge'
-          files: ${{ steps.prepare_artifact.outputs.artifact_path }}
+          token: ${{ secrets.CURSEFORGE_TOKEN }}
+          project_id: '1413459'
+          release_type: 'beta'
+          game_endpoint: 'minecraft'
+          game_versions: 'Minecraft 1.20.1,Forge'
+          file_path: ${{ steps.prepare_artifact.outputs.artifact_path }}
           changelog: ${{ steps.changelog.outputs.changes }}
-          dependencies: |
-            kotlin-for-forge(required)
+          relations: 'kotlin-for-forge:requiredDependency'
