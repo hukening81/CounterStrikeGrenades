@@ -105,6 +105,13 @@ abstract class CounterStrikeGrenadeEntity(
             this.isNoGravity = true
         }
 
+        // New, more robust landing detection
+        if (!this.entityData.get(isLandedAccessor) && !this.entityData.get(isExplodedAccessor)) {
+            if (this.onGround() && this.deltaMovement.lengthSqr() < 0.01 * 0.01) {
+                this.entityData.set(isLandedAccessor, true)
+            }
+        }
+
         // Client-side rotation logic
         if (this.level().isClientSide) {
             val isLanded = this.entityData.get(isLandedAccessor)

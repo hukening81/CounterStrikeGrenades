@@ -42,9 +42,11 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private val particles = mutableMapOf<Vec3i, List<SmokeGrenadeParticle>>()
     private var explosionTime: Instant? = null
     private val spreadBlocksCache: MutableList<@Serializable BlockPos> = mutableListOf()
+    private var stationaryTicks = 0
 
     // For freezing rotation after explosion
     private var hasSavedFinalRotation = false
+
     private var finalXRot = 0f
     private var finalYRot = 0f
     private var finalZRot = 0f
@@ -159,11 +161,11 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
         if (this.entityData.get(isLandedAccessor)) {
             if (this.position() == Vec3(this.xOld, this.yOld, this.zOld)) {
-                this.tickCount++
+                stationaryTicks++
             } else {
-                tickCount = 0
+                stationaryTicks = 0
             }
-            if (this.tickCount > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get().millToTick() &&
+            if (stationaryTicks > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get().millToTick() &&
                 this.explosionTime == null
             ) {
                 if (this.level().isClientSide) {
