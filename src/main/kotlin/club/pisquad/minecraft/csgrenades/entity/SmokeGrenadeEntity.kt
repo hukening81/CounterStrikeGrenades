@@ -122,18 +122,18 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             if (this.level().isClientSide) {
                 if (!hasSavedFinalRotation) {
                     // Save the final rotation the first tick it's exploded
-                    finalXRot = this.xRot
-                    finalYRot = this.yRot
-                    finalZRot = this.zRot
+                    finalXRot = this.customXRot
+                    finalYRot = this.customYRot
+                    finalZRot = this.customZRot
                     hasSavedFinalRotation = true
                 }
                 // On every subsequent tick, force the rotation back to the saved values
-                this.xRot = finalXRot
-                this.yRot = finalYRot
-                this.zRot = finalZRot
-                this.xRotO = finalXRot
-                this.yRotO = finalYRot
-                this.zRotO = finalZRot
+                this.customXRot = finalXRot
+                this.customYRot = finalYRot
+                this.customZRot = finalZRot
+                this.customXRotO = finalXRot
+                this.customYRotO = finalYRot
+                this.customZRotO = finalZRot
             }
 
             // Smoke-specific logic still needs to run
