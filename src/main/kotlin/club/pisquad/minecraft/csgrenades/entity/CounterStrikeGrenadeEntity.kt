@@ -44,6 +44,12 @@ abstract class CounterStrikeGrenadeEntity(
     var zRot: Float = 0f
     var zRotO: Float = 0f
 
+    init {
+        if (pLevel.isClientSide) {
+            randomizeRotation()
+        }
+    }
+
     companion object {
         val speedAccessor: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.FLOAT)
@@ -58,13 +64,6 @@ abstract class CounterStrikeGrenadeEntity(
         this.entityData.define(speedAccessor, 0f)
         this.entityData.define(isLandedAccessor, false)
         this.entityData.define(isExplodedAccessor, false)
-    }
-
-    override fun shoot(x: Double, y: Double, z: Double, pVelocity: Float, pInaccuracy: Float) {
-        super.shoot(x, y, z, pVelocity, pInaccuracy)
-        if (level().isClientSide) {
-            randomizeRotation()
-        }
     }
 
     override fun onHitEntity(result: EntityHitResult) {
