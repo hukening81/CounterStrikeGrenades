@@ -63,7 +63,6 @@ class GrenadeThrownMessage(
                 }
             }
 
-
             grenadeEntity.setPos(msg.position)
             grenadeEntity.shootFromRotation(
                 player,
