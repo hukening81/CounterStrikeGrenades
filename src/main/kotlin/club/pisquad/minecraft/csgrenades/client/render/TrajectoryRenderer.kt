@@ -76,14 +76,31 @@ object TrajectoryRenderer {
         val camera = mc.gameRenderer.mainCamera
         val cameraPos = camera.position
 
+        // --- FINAL ACCURACY FIX: Replicate the EXACT speed calculation from ThrowActionHandler ---
         val speedFactor =
             (throwSpeed - ModConfig.THROW_SPEED_WEAK.get()) / (ModConfig.THROW_SPEED_STRONG.get() - ModConfig.THROW_SPEED_WEAK.get())
-        val launchSpeed = linearInterpolate(
+
+        val playerSpeedFactor =
+            linearInterpolate(
+                ModConfig.PLAYER_SPEED_FACTOR_WEAK.get(),
+                ModConfig.PLAYER_SPEED_FACTOR_STRONG.get(),
+                speedFactor,
+            )
+
+        val interpolatedThrowSpeed = linearInterpolate(
             ModConfig.THROW_SPEED_WEAK.get(),
             ModConfig.THROW_SPEED_STRONG.get(),
             speedFactor,
         )
 
+        // This is the magnitude of the initial velocity vector, exactly as calculated in `throwAction` before being sent to the server.
+        val launchSpeed = player.deltaMovement.scale(playerSpeedFactor)
+            .add(
+                player.lookAngle.normalize().scale(interpolatedThrowSpeed),
+            )
+            .length()
+
+        // The server only gets the look direction and the final speed magnitude, so we simulate that.
         var velocity = player.lookAngle.normalize().scale(launchSpeed)
         var position = player.eyePosition
 
@@ -99,14 +116,9 @@ object TrajectoryRenderer {
             ) as? BlockHitResult
 
             if (clipResult?.type != net.minecraft.world.phys.HitResult.Type.MISS) {
-                // On hit, path visually ends at the wall.
                 clipResult?.let { pathPoints.add(it.location) }
-
-                // The entity's position is reset to the pre-collision position for the next tick's calculation.
-                // Our `position` variable already holds this, so we don't update it to `clipResult.location`.
                 position = tickStartPosition
 
-                // Calculate bounce velocity
                 var bounceVelocity = clipResult?.let { bounce(velocity, it.direction) }
                 if (bounceVelocity != null) {
                     bounceVelocity = bounceVelocity.scale(0.5)
@@ -115,20 +127,16 @@ object TrajectoryRenderer {
                     velocity = bounceVelocity
                 }
 
-                // Check if the grenade should come to rest on the ground
                 if (clipResult != null) {
                     if (clipResult.direction == Direction.UP && velocity.lengthSqr() < REST_THRESHOLD_SQR) {
-                        // Snap final point to the ground and stop.
-                        pathPoints.removeLast() // remove the impact point
-                        pathPoints.add(Vec3(clipResult.location.x, clipResult.location.y + 0.01, clipResult.location.z)) // Snap to ground
+                        pathPoints.removeLast()
+                        pathPoints.add(Vec3(clipResult.location.x, clipResult.location.y + 0.01, clipResult.location.z))
                         break
                     }
                 }
-                // Gravity is not applied on a bounce tick, and we loop with the new velocity from the old position.
                 continue
             }
 
-            // No hit, full movement
             position = nextPosition
             velocity = velocity.add(0.0, -GRAVITY.toDouble(), 0.0)
             pathPoints.add(position)
