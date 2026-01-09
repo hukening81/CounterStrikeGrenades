@@ -7,7 +7,7 @@
 <p align="center"><img src="assets/CounterStrikeGrenadesBanner.png" width="500" height="250"></p>
 
 <div align="center">
-    
+
 
 
 | ![HE Grenade](assets/he.png) | ![Flash Bang](assets/flashbang.png) | ![Decoy](assets/decoy.png) | ![Incendiary Grenade](assets/incendiary.png) | ![Smoke Grenade](assets/smokegrenade.png) | ![Molotov](assets/molotov.png)
@@ -62,7 +62,7 @@ This mod provides an optional integration with the [Tacz gun mod](https://www.cu
 If the Tacz mod is installed, decoy grenades will prioritize playing realistic gun sounds from the Tacz mod instead of default mob sounds.
 
 **How it works:**
-1.  When a decoy grenade lands and activates, it scans the throwing player's inventory *once*.
+1.  When the decoy flare is launched, it scans the throwing player's inventory *once*.
 2.  It identifies the first Tacz gun (e.g., AK-47, M4A1) in the inventory.
 3.  For its entire duration, the decoy grenade will repeatedly play the "shoot" sound of that specific Tacz gun.
 
