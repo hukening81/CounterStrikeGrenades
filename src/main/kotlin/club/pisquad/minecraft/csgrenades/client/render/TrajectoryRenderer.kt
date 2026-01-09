@@ -171,9 +171,19 @@ object TrajectoryRenderer {
         }
 
         val matrix = poseStack.last().pose()
-        for (point in pathPoints) {
+        val totalPoints = pathPoints.size
+        val startAlpha = 0.9f
+        val endAlpha = 0.2f
+
+        if (totalPoints < 2) return // Not enough points to draw a line
+
+        for ((i, point) in pathPoints.withIndex()) {
+            // Linearly interpolate alpha from startAlpha to endAlpha
+            val progress = i.toFloat() / (totalPoints - 1)
+            val currentAlpha = startAlpha + (endAlpha - startAlpha) * progress
+
             vertexConsumer.vertex(matrix, point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
-                .color(r, g, b, 0.8f)
+                .color(r, g, b, currentAlpha)
                 .normal(0.0f, 1.0f, 0.0f)
                 .endVertex()
         }
