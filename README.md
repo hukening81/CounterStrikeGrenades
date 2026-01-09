@@ -149,6 +149,8 @@ throw_type_transient_time = 1000
 fov_effect_amount = 0.12
 #Damage living entities other than player
 damage_non_player_entity = true
+#The color of the grenade trajectory preview line, in #RRGGBB hex format.
+trajectory_preview_color = "#FFFFFF"
 
 [SmokeGrenade]
 	#Smoke radius, in block
