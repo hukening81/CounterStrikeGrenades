@@ -355,31 +355,37 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         val originalBlockState = this.level().getBlockState(validatedOrigin)
 
         if (!originalBlockState.getCollisionShape(this.level(), validatedOrigin).isEmpty) {
-            // Grenade is in a solid block. Try to find the "opening" using precise position.
-            val precisePos = this.position() // Precise float position of the entity
-            val blockCenter = Vec3.atCenterOf(validatedOrigin) // Center of the solid block
+            // Grenade is in a "solid" block. Find the best adjacent empty block to move to.
+            val precisePos = this.position()
 
-            // Vector from block center to precise entity position. This points towards the "opening".
-            val escapeVector = precisePos.subtract(blockCenter)
+            // Get all 6 neighbors.
+            val neighbors = listOf(
+                validatedOrigin.above(),
+                validatedOrigin.below(),
+                validatedOrigin.north(),
+                validatedOrigin.south(),
+                validatedOrigin.east(),
+                validatedOrigin.west()
+            )
 
-            // Find the dominant axis of this escape vector to determine the direction of the opening.
-            val bestDirection = Direction.getNearest(escapeVector.x, escapeVector.y, escapeVector.z)
+            // Filter for empty blocks and find the one whose center is closest to the grenade's actual position.
+            val bestNeighbor = neighbors
+                .filter { pos -> this.level().getBlockState(pos).getCollisionShape(this.level(), pos).isEmpty }
+                .minByOrNull { pos -> precisePos.distanceToSqr(Vec3.atCenterOf(pos)) }
 
-            val potentialOrigin = validatedOrigin.relative(bestDirection, 1)
-            if (this.level().getBlockState(potentialOrigin).getCollisionShape(this.level(), potentialOrigin).isEmpty) {
-                validatedOrigin = potentialOrigin
-            } else {
-                // The "smart" direction is also blocked. Fallback: search for first empty neighbor.
-                val firstEmptyNeighbor = listOf(
-                    validatedOrigin.above(),
-                    validatedOrigin.below(),
-                    validatedOrigin.north(),
-                    validatedOrigin.south(),
-                    validatedOrigin.east(),
-                    validatedOrigin.west(),
-                ).firstOrNull { pos -> this.level().getBlockState(pos).getCollisionShape(this.level(), pos).isEmpty }
+            validatedOrigin = bestNeighbor ?: run {
+                // Fallback if no direct neighbor is empty (e.g., stuck in a corner).
+                // The original "escape vector" logic can be a fallback.
+                val blockCenter = Vec3.atCenterOf(validatedOrigin)
+                val escapeVector = precisePos.subtract(blockCenter)
+                val bestDirection = Direction.getNearest(escapeVector.x, escapeVector.y, escapeVector.z)
+                val potentialOrigin = validatedOrigin.relative(bestDirection, 1)
 
-                validatedOrigin = firstEmptyNeighbor ?: validatedOrigin.above(2) // As a last resort, go 2 blocks up.
+                if (this.level().getBlockState(potentialOrigin).getCollisionShape(this.level(), potentialOrigin).isEmpty) {
+                    potentialOrigin
+                } else {
+                    validatedOrigin.above(2) // Last resort
+                }
             }
         }
 
