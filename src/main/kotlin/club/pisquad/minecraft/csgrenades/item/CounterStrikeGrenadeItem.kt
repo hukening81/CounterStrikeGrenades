@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState
 
 private var drawSoundPlayedSlot: Int = -1
 
-open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(1)) {
+open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(2)) {
 
     lateinit var grenadeType: GrenadeType
     val defaultModifiers: ImmutableMultimap<Attribute, AttributeModifier>
