@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.command
 
-import club.pisquad.minecraft.csgrenades.compatibility.ObjectiveManager
+import club.pisquad.minecraft.csgrenades.compat.ObjectiveManager
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.context.CommandContext
