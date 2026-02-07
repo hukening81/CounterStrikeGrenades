@@ -31,11 +31,14 @@ minecraft {
 
         client {
             workingDirectory project.file('run')
-
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', mod_id
 
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
+//            jvmArg("-Dorg.lwjgl.glfw.libname=/usr/lib/libglfw.so")
             mods {
                 "$mod_id" {
                     source sourceSets.main
@@ -49,6 +52,10 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', mod_id
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
 
             mods {
                 "$mod_id" {
@@ -97,6 +104,25 @@ repositories {
         url = 'https://thedarkcolour.github.io/KotlinForForge/'
         content { includeGroup "thedarkcolour" }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven {
+        name = "Curse Maven"
+        url = "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+
     flatDir {
         dirs 'libs'
     }
@@ -107,11 +133,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
 
     implementation "thedarkcolour:kotlinforforge:$kff_version"
-
+    implementation fg.deobf("curse.maven:timeless-and-classics-zero-1028108:7401617")
+//    implementation "maven.modrinth:timeless-and-classics-zero:$tacz_version"
     runtimeOnly "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.1"
-
-    // Tacz Mod soft dependency
-    compileOnly fg.deobf(files("libs/tacz-1.20.1-1.1.7.jar"))
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
