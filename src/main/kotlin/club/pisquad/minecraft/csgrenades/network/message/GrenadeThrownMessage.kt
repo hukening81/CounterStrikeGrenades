@@ -77,7 +77,7 @@ class GrenadeThrownMessage(
 
             context.packetHandled = true
             if (!player.isCreative) {
-                player.inventory.removeItem(player.getItemInHand(InteractionHand.MAIN_HAND))
+                player.getItemInHand(InteractionHand.MAIN_HAND).count-=1
             }
         }
     }

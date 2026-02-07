@@ -1,10 +1,10 @@
 {
   "itemGroup.csgrenades": "Counter-Strike Grenades",
-  "item.csgrenades.decoy": "Decoy Grenade",
+  "item.csgrenades.decoy": "Decoy",
   "item.csgrenades.flashbang": "Flashbang",
   "item.csgrenades.hegrenade": "HE Grenade",
-  "item.csgrenades.incendiary": "Incendiary Grenade",
-  "item.csgrenades.molotov": "Molotov Cocktail",
+  "item.csgrenades.incendiary": "Incendiary",
+  "item.csgrenades.molotov": "Molotov",
   "item.csgrenades.smokegrenade": "Smoke Grenade",
   "death.attack.csgrenades.decoy_hit": "%1$s was bonked by %2$'s decoy grenade",
   "death.attack.csgrenades.flashbang_hit": "%1$s was hit by %2$'s flashbang",

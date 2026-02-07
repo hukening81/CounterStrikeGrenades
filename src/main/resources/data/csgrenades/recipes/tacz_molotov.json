@@ -1,0 +1,25 @@
+{
+  "materials": [
+    {
+      "item": {
+        "item": "minecraft:glass"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "minecraft:gunpowder"
+      },
+      "count": 3
+    }
+  ],
+  "result": {
+    "type": "custom",
+    "group": "tacz:misc",
+    "item": {
+      "item": "csgrenades:molotov",
+      "count": 2
+    }
+  },
+  "type": "tacz:gun_smith_table_crafting"
+}
