@@ -1,0 +1,31 @@
+{
+  "materials": [
+    {
+      "item": {
+        "item": "minecraft:iron_ingot"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "minecraft:gunpowder"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "minecraft:bone_meal"
+      },
+      "count": 2
+    }
+  ],
+  "result": {
+    "type": "custom",
+    "group": "tacz:misc",
+    "item": {
+      "item": "csgrenades:flashbang",
+      "count": 2
+    }
+  },
+  "type": "tacz:gun_smith_table_crafting"
+}
