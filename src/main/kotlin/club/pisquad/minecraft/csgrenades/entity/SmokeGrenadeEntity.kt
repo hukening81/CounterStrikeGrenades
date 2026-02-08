@@ -9,6 +9,7 @@ import club.pisquad.minecraft.csgrenades.registry.ModDamageType
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModSerializers
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import com.electronwill.nightconfig.core.conversion.InvalidValueException
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
@@ -28,11 +29,13 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.AirBlock
 import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.TrapDoorBlock
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.Half
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraftforge.common.Tags
 import net.minecraftforge.fml.ModList
 import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
 import java.time.Duration
@@ -359,14 +362,19 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         )
     }
 
-    private fun calculateSpreadBlocks(): List<BlockPos> {
-        //
+    private fun getSurroundingAirBlocks(): List<BlockPos> {
         val blockAt = BlockPos.containing(this.center)
         val blockAtState = this.level().getBlockState(blockAt)
-        val surroundingAirBlock = mutableListOf<BlockPos>()
+
+        // Will not generate smoke when inside a waterlogged block
+        val waterlogged = blockAtState.getOptionalValue(BlockStateProperties.WATERLOGGED)
+        if (waterlogged.isPresent && waterlogged.get()) {
+            return emptyList()
+        }
+
         when (blockAtState.block) {
             is AirBlock -> {
-                surroundingAirBlock.add(blockAt)
+                return listOf(blockAt)
             }
 
             is StairBlock -> {
@@ -408,14 +416,77 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                     Direction.EAST -> {
                         listOf(blockAt.north(), blockAt.south(), blockAt.west())
                     }
-                }.filter { this.level().getBlockState(it).isAir }.let { result.addAll(it) }
+                }.filterAir(this.level()).let { result.addAll(it) }
 
-                surroundingAirBlock.addAll(result)
+                return result
+            }
+
+            is TrapDoorBlock -> {
+                val result = blockAt.adjacent().toMutableList()
+                when (blockAtState.getValue(BlockStateProperties.OPEN)) {
+                    true -> {
+                        when (blockAtState.getValue(BlockStateProperties.HORIZONTAL_FACING)) {
+                            Direction.UP -> {
+                                throw Exception("Trapdoors should never face up")
+                            }
+
+                            Direction.DOWN -> {
+                                throw Exception("Trapdoors should never face down")
+                            }
+
+                            Direction.NORTH -> {
+                                result.remove(blockAt.south())
+                            }
+
+                            Direction.SOUTH -> {
+                                result.remove(blockAt.north())
+                            }
+
+                            Direction.WEST -> {
+                                result.remove(blockAt.east())
+                            }
+
+                            Direction.EAST -> {
+                                result.remove(blockAt.west())
+                            }
+                        }
+                    }
+
+                    false -> {
+                        when (blockAtState.getValue(BlockStateProperties.HALF)) {
+                            Half.TOP -> {
+                                result.remove(blockAt.above())
+                            }
+
+                            Half.BOTTOM -> {
+                                result.remove(blockAt.below())
+                            }
+                        }
+                    }
+                }
+                return result.filterAir(this.level())
             }
 
             else -> {
+                if (blockAtState.`is`(Tags.Blocks.GLASS_PANES)) {
+                    val south = blockAtState.getValue(BlockStateProperties.SOUTH)
+                    val north = blockAtState.getValue(BlockStateProperties.NORTH)
+                    val east = blockAtState.getValue(BlockStateProperties.EAST)
+                    val west = blockAtState.getValue(BlockStateProperties.WEST)
+
+                    val corner = getCurrentGlassPaneCorner(blockAt, this.center)
+                    return GlassPaneState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(this.level())
+                } else {
+                    // Unhandled situation, default to emptyList
+                    return listOf()
+                }
             }
         }
+//        throw Exception("All cases should be handled")
+    }
+
+    private fun calculateSpreadBlocks(): List<BlockPos> {
+        val surroundingAirBlock = this.getSurroundingAirBlocks()
 
         // use the air block that can generate the most initial smoke
         val initialSmoke: Set<BlockPos> = surroundingAirBlock.map {
@@ -582,3 +653,70 @@ private class SmokeGrenadeSpreadBlockCalculator(
         else -> Direction.EAST
     }
 }
+
+fun List<BlockPos>.filterAir(level: Level): List<BlockPos> = this.filter { level.getBlockState(it).isAir }
+
+enum class Corner(val main: Direction, val secondary: Direction) {
+    SOUTHWEST(Direction.SOUTH, Direction.WEST),
+    SOUTHEAST(Direction.SOUTH, Direction.EAST),
+    NORTHWEST(Direction.NORTH, Direction.WEST),
+    NORTHEAST(Direction.NORTH, Direction.EAST),
+}
+
+private class GlassPaneState(val north: Boolean, val south: Boolean, val west: Boolean, val east: Boolean) {
+    fun get(direction: Direction): Boolean = when (direction) {
+        Direction.DOWN -> throw Exception("No down property for glass pane")
+        Direction.UP -> throw Exception("No up property for glass pane")
+        Direction.NORTH -> this.north
+        Direction.SOUTH -> this.south
+        Direction.WEST -> this.west
+        Direction.EAST -> this.east
+    }
+
+    fun nonBlockingAdjacentForCorner(blockPos: BlockPos, corner: Corner): Set<BlockPos> {
+        val result = mutableSetOf<BlockPos>(blockPos.relative(corner.main), blockPos.relative(corner.secondary))
+        if ((this.get(corner.secondary) && this.get(corner.main)) ||
+            (this.get(corner.secondary) && this.get(corner.secondary.opposite))
+        ) {
+            // EMPTY
+        } else {
+            result.add(blockPos.relative(corner.main.opposite))
+        }
+
+        if ((this.get(corner.main) && this.get(corner.secondary)) ||
+            (this.get(corner.main) && this.get(corner.main.opposite))
+        ) {
+            // EMPTY
+        } else {
+            result.add(blockPos.relative(corner.secondary.opposite))
+        }
+
+        return result
+    }
+}
+
+fun getCurrentGlassPaneCorner(blockPos: BlockPos, position: Vec3): Corner {
+    val relativePos = position - blockPos.center
+    return if (relativePos.z > 0) {
+        if (relativePos.x > 0) {
+            Corner.SOUTHEAST
+        } else {
+            Corner.SOUTHWEST
+        }
+    } else {
+        if (relativePos.x > 0) {
+            Corner.NORTHEAST
+        } else {
+            Corner.NORTHWEST
+        }
+    }
+}
+
+fun BlockPos.adjacent(): Set<BlockPos> = setOf(
+    this.above(),
+    this.below(),
+    this.north(),
+    this.south(),
+    this.west(),
+    this.east(),
+)
