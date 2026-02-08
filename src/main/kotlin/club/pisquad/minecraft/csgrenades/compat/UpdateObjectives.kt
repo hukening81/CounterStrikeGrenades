@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.compatibility
+package club.pisquad.minecraft.csgrenades.compat
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.*
