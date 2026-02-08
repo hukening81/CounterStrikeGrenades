@@ -27,11 +27,15 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.AirBlock
+import net.minecraft.world.level.block.FenceBlock
+import net.minecraft.world.level.block.FenceGateBlock
+import net.minecraft.world.level.block.SlabBlock
 import net.minecraft.world.level.block.StairBlock
 import net.minecraft.world.level.block.TrapDoorBlock
 import net.minecraft.world.level.block.WallBlock
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.SlabType
 import net.minecraft.world.level.block.state.properties.WallSide
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
@@ -378,6 +382,10 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 return listOf(blockAt)
             }
 
+            is FenceBlock, is FenceGateBlock -> {
+                return blockAt.adjacent().toMutableList().filterAir(this.level())
+            }
+
             is StairBlock -> {
                 val result = mutableListOf<BlockPos>()
 
@@ -469,7 +477,6 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             }
 
             is WallBlock -> {
-                val result = blockAt.adjacent().toMutableList()
                 val corner = getGrenadeCornerType(blockAt, this.center)
 
                 // Tall or low type will be treated as obstracting
@@ -481,6 +488,26 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 return ExtendableBlockState(north, south, west, east)
                     .nonBlockingAdjacentForCorner(blockAt, corner)
                     .toMutableList().filterAir(this.level())
+            }
+
+            is SlabBlock -> {
+                val adjacent = blockAt.adjacent().toMutableList()
+                when (blockAtState.getValue(BlockStateProperties.SLAB_TYPE)) {
+                    SlabType.TOP -> {
+                        adjacent.remove(blockAt.above())
+                        return adjacent.filterAir(this.level())
+                    }
+
+                    SlabType.BOTTOM -> {
+                        adjacent.remove(blockAt.below())
+                        return adjacent.filterAir(this.level())
+                    }
+
+                    SlabType.DOUBLE -> {
+//                        Although
+                        return emptyList()
+                    }
+                }
             }
 
             else -> {
