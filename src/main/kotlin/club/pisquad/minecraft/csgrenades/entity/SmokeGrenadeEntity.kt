@@ -365,7 +365,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 validatedOrigin.north(),
                 validatedOrigin.south(),
                 validatedOrigin.east(),
-                validatedOrigin.west()
+                validatedOrigin.west(),
             )
 
             // Filter for empty blocks and find the one whose center is closest to the grenade's actual position.
