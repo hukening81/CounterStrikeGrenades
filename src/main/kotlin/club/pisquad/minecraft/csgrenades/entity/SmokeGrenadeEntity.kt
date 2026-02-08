@@ -9,7 +9,6 @@ import club.pisquad.minecraft.csgrenades.registry.ModDamageType
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModSerializers
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
-import com.electronwill.nightconfig.core.conversion.InvalidValueException
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
@@ -30,8 +29,10 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.AirBlock
 import net.minecraft.world.level.block.StairBlock
 import net.minecraft.world.level.block.TrapDoorBlock
+import net.minecraft.world.level.block.WallBlock
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.WallSide
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
@@ -467,6 +468,21 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 return result.filterAir(this.level())
             }
 
+            is WallBlock -> {
+                val result = blockAt.adjacent().toMutableList()
+                val corner = getGrenadeCornerType(blockAt, this.center)
+
+                // Tall or low type will be treated as obstracting
+                val west = blockAtState.getValue(BlockStateProperties.WEST_WALL) != WallSide.NONE
+                val east = blockAtState.getValue(BlockStateProperties.EAST_WALL) != WallSide.NONE
+                val north = blockAtState.getValue(BlockStateProperties.NORTH_WALL) != WallSide.NONE
+                val south = blockAtState.getValue(BlockStateProperties.SOUTH_WALL) != WallSide.NONE
+
+                return ExtendableBlockState(north, south, west, east)
+                    .nonBlockingAdjacentForCorner(blockAt, corner)
+                    .toMutableList().filterAir(this.level())
+            }
+
             else -> {
                 if (blockAtState.`is`(Tags.Blocks.GLASS_PANES)) {
                     val south = blockAtState.getValue(BlockStateProperties.SOUTH)
@@ -474,8 +490,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                     val east = blockAtState.getValue(BlockStateProperties.EAST)
                     val west = blockAtState.getValue(BlockStateProperties.WEST)
 
-                    val corner = getCurrentGlassPaneCorner(blockAt, this.center)
-                    return GlassPaneState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(this.level())
+                    val corner = getGrenadeCornerType(blockAt, this.center)
+                    return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(this.level())
                 } else {
                     // Unhandled situation, default to emptyList
                     return listOf()
@@ -663,7 +679,7 @@ enum class Corner(val main: Direction, val secondary: Direction) {
     NORTHEAST(Direction.NORTH, Direction.EAST),
 }
 
-private class GlassPaneState(val north: Boolean, val south: Boolean, val west: Boolean, val east: Boolean) {
+private class ExtendableBlockState(val north: Boolean, val south: Boolean, val west: Boolean, val east: Boolean) {
     fun get(direction: Direction): Boolean = when (direction) {
         Direction.DOWN -> throw Exception("No down property for glass pane")
         Direction.UP -> throw Exception("No up property for glass pane")
@@ -695,7 +711,7 @@ private class GlassPaneState(val north: Boolean, val south: Boolean, val west: B
     }
 }
 
-fun getCurrentGlassPaneCorner(blockPos: BlockPos, position: Vec3): Corner {
+fun getGrenadeCornerType(blockPos: BlockPos, position: Vec3): Corner {
     val relativePos = position - blockPos.center
     return if (relativePos.z > 0) {
         if (relativePos.x > 0) {
