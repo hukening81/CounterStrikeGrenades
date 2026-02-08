@@ -26,10 +26,15 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.AirBlock
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.Half
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.fml.ModList
+import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.pow
@@ -50,6 +55,14 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private var finalXRot = 0f
     private var finalYRot = 0f
     private var finalZRot = 0f
+
+    var center: Vec3
+        get() {
+            return this.position().add(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0))
+        }
+        set(pos: Vec3) {
+            this.setPos(pos.minus(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0)))
+        }
 
     override fun getDefaultItem(): Item = ModItems.SMOKE_GRENADE_ITEM.get()
 
@@ -206,7 +219,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             val sweptBB = currentBB.minmax(oldBB)
 
             if (smokeCloudBoundingBox.intersects(sweptBB)) {
-                println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Arrow.")
+//                println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Arrow.")
                 // Interpolate position to prevent tunneling
                 val posNow = arrow.position()
                 val posOld = posNow.subtract(delta)
@@ -245,7 +258,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 // Check if the swept path intersects the smoke cloud
                 if (smokeCloudBoundingBox.intersects(sweptBB)) {
                     if (entity::class.java.name == "com.tacz.guns.entity.EntityKineticBullet") {
-                        println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Kinetic Bullet.")
+//                        println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Kinetic Bullet.")
 
                         val posNow = entity.position()
                         val finalClearRange = ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get()
@@ -347,55 +360,72 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     }
 
     private fun calculateSpreadBlocks(): List<BlockPos> {
-        // --- Smart Origin Sanitization ---
-        // Determines the actual starting point for smoke generation.
-        // If the grenade's block position is inside a solid block (e.g., stair crevice),
-        // it finds the adjacent air block the grenade is actually "poking" into.
-        var validatedOrigin = this.blockPosition()
-        val originalBlockState = this.level().getBlockState(validatedOrigin)
+        //
+        val blockAt = BlockPos.containing(this.center)
+        val blockAtState = this.level().getBlockState(blockAt)
+        val surroundingAirBlock = mutableListOf<BlockPos>()
+        when (blockAtState.block) {
+            is AirBlock -> {
+                surroundingAirBlock.add(blockAt)
+            }
 
-        if (!originalBlockState.getCollisionShape(this.level(), validatedOrigin).isEmpty) {
-            // Grenade is in a "solid" block. Find the best adjacent empty block to move to.
-            val precisePos = this.position()
+            is StairBlock -> {
+                val result = mutableListOf<BlockPos>()
 
-            // Get all 6 neighbors.
-            val neighbors = listOf(
-                validatedOrigin.above(),
-                validatedOrigin.below(),
-                validatedOrigin.north(),
-                validatedOrigin.south(),
-                validatedOrigin.east(),
-                validatedOrigin.west(),
-            )
+                // Add blockPos above or below
+                when (blockAtState.getValue(BlockStateProperties.HALF)) {
+                    Half.TOP -> {
+                        blockAt.below()
+                    }
 
-            // Filter for empty blocks and find the one whose center is closest to the grenade's actual position.
-            val bestNeighbor = neighbors
-                .filter { pos -> this.level().getBlockState(pos).getCollisionShape(this.level(), pos).isEmpty }
-                .minByOrNull { pos -> precisePos.distanceToSqr(Vec3.atCenterOf(pos)) }
+                    Half.BOTTOM -> {
+                        blockAt.above()
+                    }
+                }.takeIf { this.level().getBlockState(it).isAir }?.let { result.add(it) }
 
-            validatedOrigin = bestNeighbor ?: run {
-                // Fallback if no direct neighbor is empty (e.g., stuck in a corner).
-                // The original "escape vector" logic can be a fallback.
-                val blockCenter = Vec3.atCenterOf(validatedOrigin)
-                val escapeVector = precisePos.subtract(blockCenter)
-                val bestDirection = Direction.getNearest(escapeVector.x, escapeVector.y, escapeVector.z)
-                val potentialOrigin = validatedOrigin.relative(bestDirection, 1)
+                // Add horizontal surrounding blockPoses
+                when (blockAtState.getValue(BlockStateProperties.HORIZONTAL_FACING)) {
+                    Direction.UP -> {
+                        listOf() // Stairs can never face up
+                    }
 
-                if (this.level().getBlockState(potentialOrigin).getCollisionShape(this.level(), potentialOrigin).isEmpty) {
-                    potentialOrigin
-                } else {
-                    validatedOrigin.above(2) // Last resort
-                }
+                    Direction.DOWN -> {
+                        listOf() // Stairs can never face down
+                    }
+
+                    Direction.NORTH -> {
+                        listOf(blockAt.south(), blockAt.west(), blockAt.east())
+                    }
+
+                    Direction.SOUTH -> {
+                        listOf(blockAt.north(), blockAt.west(), blockAt.east())
+                    }
+
+                    Direction.WEST -> {
+                        listOf(blockAt.north(), blockAt.south(), blockAt.east())
+                    }
+
+                    Direction.EAST -> {
+                        listOf(blockAt.north(), blockAt.south(), blockAt.west())
+                    }
+                }.filter { this.level().getBlockState(it).isAir }.let { result.addAll(it) }
+
+                surroundingAirBlock.addAll(result)
+            }
+
+            else -> {
             }
         }
 
-        // 1. Calculate the initial "ideal" smoke cloud as before.
-        val initialSmoke: Set<BlockPos> = SmokeGrenadeSpreadBlockCalculator(
-            5,
-            1500,
-            2,
-            validatedOrigin, // Use the sanitized origin
-        ).calculate(this.level())
+        // use the air block that can generate the most initial smoke
+        val initialSmoke: Set<BlockPos> = surroundingAirBlock.map {
+            SmokeGrenadeSpreadBlockCalculator(
+                5,
+                1500,
+                2,
+                it, // Use the sanitized origin
+            ).calculate(this.level())
+        }.sortedBy { it.size }.ifEmpty { listOf(emptySet()) }[0]
 
         if (initialSmoke.isEmpty()) return emptyList()
 
@@ -537,7 +567,6 @@ private class SmokeGrenadeSpreadBlockCalculator(
 
             Direction.EAST -> blockPos.east()
         }
-        // Revert to getCollisionShape().isEmpty, as origin sanitization solves the leak.
         if (level.getBlockState(newLocation).getCollisionShape(level, newLocation).isEmpty) {
             return newLocation
         }

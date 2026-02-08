@@ -209,7 +209,7 @@ abstract class CounterStrikeGrenadeEntity(
         }
         // fix: the entity will keep bouncing on the ground
         if (result.direction == Direction.UP && this.deltaMovement.length() < 0.05) {
-            this.setPos(this.x, result.blockPos.y.toDouble() + 1, this.z)
+//            this.setPos(this.x, result.blockPos.y.toDouble() + 1, this.z)
             this.deltaMovement = Vec3.ZERO
             this.entityData.set(isLandedAccessor, true)
         }
