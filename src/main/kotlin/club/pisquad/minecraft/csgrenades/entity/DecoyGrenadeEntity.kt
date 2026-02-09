@@ -86,87 +86,101 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     override fun getDefaultItem(): Item = ModItems.DECOY_GRENADE_ITEM.get()
 
     override fun tick() {
-        val isLanded = this.entityData.get(isLandedAccessor)
-
-        if (isLanded) {
-            // Decoy is on the ground, freeze rotation and handle sound/explosion logic
+        if (this.entityData.get(isLandedAccessor)) {
             if (level().isClientSide) {
-                // Force-freeze rotation
-                if (!hasSavedFinalRotation) {
-                    finalXRot = this.customXRot
-                    finalYRot = this.customYRot
-                    finalZRot = this.customZRot
-                    hasSavedFinalRotation = true
-                }
-                this.customXRot = finalXRot
-                this.customYRot = finalYRot
-                this.customZRot = finalZRot
-                this.customXRotO = finalXRot
-                this.customYRotO = finalYRot
-                this.customZRotO = finalZRot
-
-                // Client-side sound playing
-                val currentCounter = this.entityData.get(SOUND_COUNTER_ACCESSOR)
-                if (currentCounter > lastSoundCounter) {
-                    if (ModList.get().isLoaded("tacz")) {
-                        val gunIdString = this.entityData.get(GUN_ID_TO_PLAY_ACCESSOR)
-                        if (gunIdString.isNotBlank()) {
-                            TaczApiHandler.playGunSound(this, ResourceLocation(gunIdString))
-                        }
-                    }
-                    lastSoundCounter = currentCounter
-                }
+                handleClientSideTick()
             } else { // Server-side
                 if (activationTick == null) {
-                    // First tick on the ground, activate the decoy
-                    activationTick = this.tickCount
-                    scheduleNextSound(true) // Schedule the very first sound
+                    handleServerSideInitialActivation()
                 } else {
-                    // Logic for when the decoy is active
-                    val currentActivationTick = tickCount - activationTick!!
-                    if (tickCount >= nextSoundTick) {
-                        // Time to make a sound
-                        val fireMode = this.entityData.get(GUN_FIRE_MODE_ACCESSOR)
-                        val rpm = this.entityData.get(GUN_RPM_ACCESSOR)
-
-                        if (ModList.get().isLoaded("tacz") && this.entityData.get(GUN_ID_TO_PLAY_ACCESSOR).isNotBlank() && rpm > 0 && fireMode == FireMode.AUTO.name) {
-                            // Auto-fire logic
-                            if (shotsInBurstRemaining > 0) {
-                                fireShot()
-                                shotsInBurstRemaining--
-                                if (shotsInBurstRemaining > 0) {
-                                    val shootIntervalMs = this.entityData.get(GUN_SHOOT_INTERVAL_MS_ACCESSOR)
-                                    val delay = (shootIntervalMs / 50).coerceAtLeast(1)
-                                    nextSoundTick = tickCount + delay
-                                } else {
-                                    // Last shot of the burst, schedule next burst
-                                    scheduleNextSound(true)
-                                }
-                            } else {
-                                // Start a new burst
-                                shotsInBurstRemaining = Random.nextInt(3, 6) // 3-5 shots per burst
-                                fireShot()
-                                shotsInBurstRemaining--
-                                val shootIntervalMs = this.entityData.get(GUN_SHOOT_INTERVAL_MS_ACCESSOR)
-                                val delay = (shootIntervalMs / 50).coerceAtLeast(1)
-                                nextSoundTick = tickCount + delay
-                            }
-                        } else {
-                            // Semi-auto logic (or fallback)
-                            fireShot()
-                            scheduleNextSound(false)
-                        }
-                    }
-
-                    if (currentActivationTick > TOTAL_DURATION_TICKS) {
-                        endOfLifeExplosion()
-                    }
+                    handleServerSideActiveTick()
                 }
             }
         } else {
-            // Decoy is in the air/not yet active, run full physics
             super.tick()
         }
+    }
+
+    private fun handleClientSideTick() {
+        // Force-freeze rotation
+        if (!hasSavedFinalRotation) {
+            finalXRot = this.customXRot
+            finalYRot = this.customYRot
+            finalZRot = this.customZRot
+            hasSavedFinalRotation = true
+        }
+        this.customXRot = finalXRot
+        this.customYRot = finalYRot
+        this.customZRot = finalZRot
+        this.customXRotO = finalXRot
+        this.customYRotO = finalYRot
+        this.customZRotO = finalZRot
+
+        // Client-side sound playing
+        val currentCounter = this.entityData.get(SOUND_COUNTER_ACCESSOR)
+        if (currentCounter > lastSoundCounter) {
+            if (ModList.get().isLoaded("tacz")) {
+                val gunIdString = this.entityData.get(GUN_ID_TO_PLAY_ACCESSOR)
+                if (gunIdString.isNotBlank()) {
+                    TaczApiHandler.playGunSound(this, ResourceLocation(gunIdString))
+                }
+            }
+            lastSoundCounter = currentCounter
+        }
+    }
+
+    private fun handleServerSideInitialActivation() {
+        activationTick = this.tickCount
+        scheduleNextSound(true) // Schedule the very first sound
+    }
+
+    private fun handleServerSideActiveTick() {
+        val currentActivationTick = tickCount - activationTick!!
+        if (tickCount >= nextSoundTick) {
+            tryPlayDecoySound()
+        }
+        if (currentActivationTick > TOTAL_DURATION_TICKS) {
+            endOfLifeExplosion()
+        }
+    }
+
+    private fun tryPlayDecoySound() {
+        val fireMode = this.entityData.get(GUN_FIRE_MODE_ACCESSOR)
+        val rpm = this.entityData.get(GUN_RPM_ACCESSOR)
+
+        if (ModList.get().isLoaded("tacz") && this.entityData.get(GUN_ID_TO_PLAY_ACCESSOR).isNotBlank() && rpm > 0 && fireMode == FireMode.AUTO.name) {
+            handleAutoFireSound()
+        } else {
+            handleSemiAutoFireSound()
+        }
+    }
+
+    private fun handleAutoFireSound() {
+        if (shotsInBurstRemaining > 0) {
+            fireShot()
+            shotsInBurstRemaining--
+            if (shotsInBurstRemaining > 0) {
+                val shootIntervalMs = this.entityData.get(GUN_SHOOT_INTERVAL_MS_ACCESSOR)
+                val delay = (shootIntervalMs / 50).coerceAtLeast(1)
+                nextSoundTick = tickCount + delay
+            } else {
+                // Last shot of the burst, schedule next burst
+                scheduleNextSound(true)
+            }
+        } else {
+            // Start a new burst
+            shotsInBurstRemaining = Random.nextInt(3, 6) // 3-5 shots per burst
+            fireShot()
+            shotsInBurstRemaining--
+            val shootIntervalMs = this.entityData.get(GUN_SHOOT_INTERVAL_MS_ACCESSOR)
+            val delay = (shootIntervalMs / 50).coerceAtLeast(1)
+            nextSoundTick = tickCount + delay
+        }
+    }
+
+    private fun handleSemiAutoFireSound() {
+        fireShot()
+        scheduleNextSound(false)
     }
 
     fun findAndSetTaczGunIdOnThrow() {
