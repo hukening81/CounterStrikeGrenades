@@ -6,7 +6,6 @@ import club.pisquad.minecraft.csgrenades.registry.ModDamageType
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import com.tacz.guns.api.TimelessAPI
 import com.tacz.guns.api.item.IGun
-
 import com.tacz.guns.api.item.gun.FireMode
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -44,8 +43,6 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         private const val TOTAL_DURATION_TICKS = 15 * 20
         private const val SOUND_INTERVAL_BASE_TICKS = 1 * 20
         private const val SOUND_INTERVAL_RANDOM_TICKS = 2 * 20
-
-
 
         val CUSTOM_SOUND_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(
             DecoyGrenadeEntity::class.java,
