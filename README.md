@@ -42,6 +42,9 @@ For the latest version:
 2. **Modrinth** : [https://modrinth.com/mod/counterstrikegrenade](https://modrinth.com/mod/counterstrikegrenade)  
 3. **CurseForge** : [https://www.curseforge.com/minecraft/mc-mods/counter-strike-grenades](https://www.curseforge.com/minecraft/mc-mods/counter-strike-grenades)
 
+## Documentation
+Checkout this repo's [wiki](https://github.com/thepisquad/counterstrikegrenades/wiki)
+
 ## Localization
 The mod currently supports the following languages:
 -   English (en_us)
