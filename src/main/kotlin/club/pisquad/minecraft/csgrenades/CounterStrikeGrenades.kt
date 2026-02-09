@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import thedarkcolour.kotlinforforge.KotlinModLoadingContext
+import thedarkcolour.kotlinforforge.forge.registerConfig
 
 /**
  * Main mod class. Should be an `object` declaration annotated with `@Mod`.
@@ -25,6 +26,7 @@ import thedarkcolour.kotlinforforge.KotlinModLoadingContext
 
 @Mod(CounterStrikeGrenades.ID)
 object CounterStrikeGrenades {
+
     const val ID = "csgrenades"
 
     // the logger for our mod
@@ -46,8 +48,7 @@ object CounterStrikeGrenades {
         CsGrenadePacketHandler.registerMessage()
         MinecraftForge.EVENT_BUS.register(ModCommands)
         ModSerializers.register()
-        net.minecraftforge.fml.ModLoadingContext.get()
-            .registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC)
+        registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC)
     }
 
     private fun removeFromCreativeTabs(event: BuildCreativeModeTabContentsEvent) {
