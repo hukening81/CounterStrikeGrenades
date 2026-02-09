@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.sound
+package club.pisquad.minecraft.csgrenades.client.sound
 
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance
