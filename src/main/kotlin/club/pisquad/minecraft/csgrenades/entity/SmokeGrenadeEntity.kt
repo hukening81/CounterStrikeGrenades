@@ -26,10 +26,26 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.AirBlock
+import net.minecraft.world.level.block.ChainBlock
+import net.minecraft.world.level.block.FenceBlock
+import net.minecraft.world.level.block.FenceGateBlock
+import net.minecraft.world.level.block.IronBarsBlock
+import net.minecraft.world.level.block.SignBlock
+import net.minecraft.world.level.block.SlabBlock
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.TrapDoorBlock
+import net.minecraft.world.level.block.WallBlock
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.SlabType
+import net.minecraft.world.level.block.state.properties.WallSide
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraftforge.common.Tags
 import net.minecraftforge.fml.ModList
+import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.pow
@@ -50,6 +66,14 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private var finalXRot = 0f
     private var finalYRot = 0f
     private var finalZRot = 0f
+
+    var center: Vec3
+        get() {
+            return this.position().add(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0))
+        }
+        set(pos: Vec3) {
+            this.setPos(pos.minus(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0)))
+        }
 
     override fun getDefaultItem(): Item = ModItems.SMOKE_GRENADE_ITEM.get()
 
@@ -206,7 +230,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             val sweptBB = currentBB.minmax(oldBB)
 
             if (smokeCloudBoundingBox.intersects(sweptBB)) {
-                println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Arrow.")
+//                println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Arrow.")
                 // Interpolate position to prevent tunneling
                 val posNow = arrow.position()
                 val posOld = posNow.subtract(delta)
@@ -245,7 +269,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 // Check if the swept path intersects the smoke cloud
                 if (smokeCloudBoundingBox.intersects(sweptBB)) {
                     if (entity::class.java.name == "com.tacz.guns.entity.EntityKineticBullet") {
-                        println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Kinetic Bullet.")
+//                        println("CS-GRENADES DEBUG: Swept BB intersection SUCCESS for Kinetic Bullet.")
 
                         val posNow = entity.position()
                         val finalClearRange = ModConfig.SmokeGrenade.BULLET_CLEAR_RANGE.get()
@@ -346,50 +370,197 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         )
     }
 
-    private fun calculateSpreadBlocks(): List<BlockPos> {
-        // --- Smart Origin Sanitization ---
-        // Determines the actual starting point for smoke generation.
-        // If the grenade's block position is inside a solid block (e.g., stair crevice),
-        // it finds the adjacent air block the grenade is actually "poking" into.
-        var validatedOrigin = this.blockPosition()
-        val originalBlockState = this.level().getBlockState(validatedOrigin)
+    private fun getSurroundingAirBlocks(): List<BlockPos> {
+        val blockAt = BlockPos.containing(this.center)
+        val blockAtState = this.level().getBlockState(blockAt)
 
-        if (!originalBlockState.getCollisionShape(this.level(), validatedOrigin).isEmpty) {
-            // Grenade is in a solid block. Try to find the "opening" using precise position.
-            val precisePos = this.position() // Precise float position of the entity
-            val blockCenter = Vec3.atCenterOf(validatedOrigin) // Center of the solid block
-
-            // Vector from block center to precise entity position. This points towards the "opening".
-            val escapeVector = precisePos.subtract(blockCenter)
-
-            // Find the dominant axis of this escape vector to determine the direction of the opening.
-            val bestDirection = Direction.getNearest(escapeVector.x, escapeVector.y, escapeVector.z)
-
-            val potentialOrigin = validatedOrigin.relative(bestDirection, 1)
-            if (this.level().getBlockState(potentialOrigin).getCollisionShape(this.level(), potentialOrigin).isEmpty) {
-                validatedOrigin = potentialOrigin
-            } else {
-                // The "smart" direction is also blocked. Fallback: search for first empty neighbor.
-                val firstEmptyNeighbor = listOf(
-                    validatedOrigin.above(),
-                    validatedOrigin.below(),
-                    validatedOrigin.north(),
-                    validatedOrigin.south(),
-                    validatedOrigin.east(),
-                    validatedOrigin.west(),
-                ).firstOrNull { pos -> this.level().getBlockState(pos).getCollisionShape(this.level(), pos).isEmpty }
-
-                validatedOrigin = firstEmptyNeighbor ?: validatedOrigin.above(2) // As a last resort, go 2 blocks up.
-            }
+        // Will not generate smoke when inside a waterlogged block
+        val waterlogged = blockAtState.getOptionalValue(BlockStateProperties.WATERLOGGED)
+        if (waterlogged.isPresent && waterlogged.get()) {
+            return emptyList()
         }
 
-        // 1. Calculate the initial "ideal" smoke cloud as before.
-        val initialSmoke: Set<BlockPos> = SmokeGrenadeSpreadBlockCalculator(
-            5,
-            1500,
-            2,
-            validatedOrigin, // Use the sanitized origin
-        ).calculate(this.level())
+        when (blockAtState.block) {
+            is AirBlock -> {
+                return listOf(blockAt)
+            }
+
+            is FenceBlock, is FenceGateBlock -> {
+                return blockAt.adjacent().toMutableList().filterAir(this.level())
+            }
+
+            is StairBlock -> {
+                val result = mutableListOf<BlockPos>()
+
+                // Add blockPos above or below
+                when (blockAtState.getValue(BlockStateProperties.HALF)) {
+                    Half.TOP -> {
+                        blockAt.below()
+                    }
+
+                    Half.BOTTOM -> {
+                        blockAt.above()
+                    }
+                }.takeIf { this.level().getBlockState(it).isAir }?.let { result.add(it) }
+
+                // Add horizontal surrounding blockPoses
+                when (blockAtState.getValue(BlockStateProperties.HORIZONTAL_FACING)) {
+                    Direction.UP -> {
+                        listOf() // Stairs can never face up
+                    }
+
+                    Direction.DOWN -> {
+                        listOf() // Stairs can never face down
+                    }
+
+                    Direction.NORTH -> {
+                        listOf(blockAt.south(), blockAt.west(), blockAt.east())
+                    }
+
+                    Direction.SOUTH -> {
+                        listOf(blockAt.north(), blockAt.west(), blockAt.east())
+                    }
+
+                    Direction.WEST -> {
+                        listOf(blockAt.north(), blockAt.south(), blockAt.east())
+                    }
+
+                    Direction.EAST -> {
+                        listOf(blockAt.north(), blockAt.south(), blockAt.west())
+                    }
+                }.filterAir(this.level()).let { result.addAll(it) }
+
+                return result
+            }
+
+            is IronBarsBlock -> {
+                val south = blockAtState.getValue(BlockStateProperties.SOUTH)
+                val north = blockAtState.getValue(BlockStateProperties.NORTH)
+                val east = blockAtState.getValue(BlockStateProperties.EAST)
+                val west = blockAtState.getValue(BlockStateProperties.WEST)
+
+                val corner = getGrenadeCornerType(blockAt, this.center)
+                return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(this.level())
+            }
+
+            is ChainBlock -> {
+                return blockAt.adjacent().toMutableList().filterAir(this.level())
+            }
+
+            is SignBlock -> {
+                return blockAt.adjacent().toMutableList().filterAir(this.level())
+            }
+
+            is TrapDoorBlock -> {
+                val result = blockAt.adjacent().toMutableList()
+                when (blockAtState.getValue(BlockStateProperties.OPEN)) {
+                    true -> {
+                        when (blockAtState.getValue(BlockStateProperties.HORIZONTAL_FACING)) {
+                            Direction.UP -> {
+                                throw Exception("Trapdoors should never face up")
+                            }
+
+                            Direction.DOWN -> {
+                                throw Exception("Trapdoors should never face down")
+                            }
+
+                            Direction.NORTH -> {
+                                result.remove(blockAt.south())
+                            }
+
+                            Direction.SOUTH -> {
+                                result.remove(blockAt.north())
+                            }
+
+                            Direction.WEST -> {
+                                result.remove(blockAt.east())
+                            }
+
+                            Direction.EAST -> {
+                                result.remove(blockAt.west())
+                            }
+                        }
+                    }
+
+                    false -> {
+                        when (blockAtState.getValue(BlockStateProperties.HALF)) {
+                            Half.TOP -> {
+                                result.remove(blockAt.above())
+                            }
+
+                            Half.BOTTOM -> {
+                                result.remove(blockAt.below())
+                            }
+                        }
+                    }
+                }
+                return result.filterAir(this.level())
+            }
+
+            is WallBlock -> {
+                val corner = getGrenadeCornerType(blockAt, this.center)
+
+                // Tall or low type will be treated as obstracting
+                val west = blockAtState.getValue(BlockStateProperties.WEST_WALL) != WallSide.NONE
+                val east = blockAtState.getValue(BlockStateProperties.EAST_WALL) != WallSide.NONE
+                val north = blockAtState.getValue(BlockStateProperties.NORTH_WALL) != WallSide.NONE
+                val south = blockAtState.getValue(BlockStateProperties.SOUTH_WALL) != WallSide.NONE
+
+                return ExtendableBlockState(north, south, west, east)
+                    .nonBlockingAdjacentForCorner(blockAt, corner)
+                    .toMutableList().filterAir(this.level())
+            }
+
+            is SlabBlock -> {
+                val adjacent = blockAt.adjacent().toMutableList()
+                when (blockAtState.getValue(BlockStateProperties.SLAB_TYPE)) {
+                    SlabType.TOP -> {
+                        adjacent.remove(blockAt.above())
+                        return adjacent.filterAir(this.level())
+                    }
+
+                    SlabType.BOTTOM -> {
+                        adjacent.remove(blockAt.below())
+                        return adjacent.filterAir(this.level())
+                    }
+
+                    SlabType.DOUBLE -> {
+//                        Although
+                        return emptyList()
+                    }
+                }
+            }
+
+            else -> {
+                if (blockAtState.`is`(Tags.Blocks.GLASS_PANES)) {
+                    val south = blockAtState.getValue(BlockStateProperties.SOUTH)
+                    val north = blockAtState.getValue(BlockStateProperties.NORTH)
+                    val east = blockAtState.getValue(BlockStateProperties.EAST)
+                    val west = blockAtState.getValue(BlockStateProperties.WEST)
+
+                    val corner = getGrenadeCornerType(blockAt, this.center)
+                    return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(this.level())
+                } else {
+                    // Unhandled situation, default to emptyList
+                    return listOf()
+                }
+            }
+        }
+//        throw Exception("All cases should be handled")
+    }
+
+    private fun calculateSpreadBlocks(): List<BlockPos> {
+        val surroundingAirBlock = this.getSurroundingAirBlocks()
+
+        // use the air block that can generate the most initial smoke
+        val initialSmoke: Set<BlockPos> = surroundingAirBlock.map {
+            SmokeGrenadeSpreadBlockCalculator(
+                5,
+                1500,
+                2,
+                it, // Use the sanitized origin
+            ).calculate(this.level())
+        }.sortedBy { it.size }.ifEmpty { listOf(emptySet()) }[0]
 
         if (initialSmoke.isEmpty()) return emptyList()
 
@@ -531,7 +702,6 @@ private class SmokeGrenadeSpreadBlockCalculator(
 
             Direction.EAST -> blockPos.east()
         }
-        // Revert to getCollisionShape().isEmpty, as origin sanitization solves the leak.
         if (level.getBlockState(newLocation).getCollisionShape(level, newLocation).isEmpty) {
             return newLocation
         }
@@ -547,3 +717,70 @@ private class SmokeGrenadeSpreadBlockCalculator(
         else -> Direction.EAST
     }
 }
+
+fun List<BlockPos>.filterAir(level: Level): List<BlockPos> = this.filter { level.getBlockState(it).isAir }
+
+enum class Corner(val main: Direction, val secondary: Direction) {
+    SOUTHWEST(Direction.SOUTH, Direction.WEST),
+    SOUTHEAST(Direction.SOUTH, Direction.EAST),
+    NORTHWEST(Direction.NORTH, Direction.WEST),
+    NORTHEAST(Direction.NORTH, Direction.EAST),
+}
+
+private class ExtendableBlockState(val north: Boolean, val south: Boolean, val west: Boolean, val east: Boolean) {
+    fun get(direction: Direction): Boolean = when (direction) {
+        Direction.DOWN -> throw Exception("No down property for glass pane")
+        Direction.UP -> throw Exception("No up property for glass pane")
+        Direction.NORTH -> this.north
+        Direction.SOUTH -> this.south
+        Direction.WEST -> this.west
+        Direction.EAST -> this.east
+    }
+
+    fun nonBlockingAdjacentForCorner(blockPos: BlockPos, corner: Corner): Set<BlockPos> {
+        val result = mutableSetOf<BlockPos>(blockPos.relative(corner.main), blockPos.relative(corner.secondary))
+        if ((this.get(corner.secondary) && this.get(corner.main)) ||
+            (this.get(corner.secondary) && this.get(corner.secondary.opposite))
+        ) {
+            // EMPTY
+        } else {
+            result.add(blockPos.relative(corner.main.opposite))
+        }
+
+        if ((this.get(corner.main) && this.get(corner.secondary)) ||
+            (this.get(corner.main) && this.get(corner.main.opposite))
+        ) {
+            // EMPTY
+        } else {
+            result.add(blockPos.relative(corner.secondary.opposite))
+        }
+
+        return result
+    }
+}
+
+fun getGrenadeCornerType(blockPos: BlockPos, position: Vec3): Corner {
+    val relativePos = position - blockPos.center
+    return if (relativePos.z > 0) {
+        if (relativePos.x > 0) {
+            Corner.SOUTHEAST
+        } else {
+            Corner.SOUTHWEST
+        }
+    } else {
+        if (relativePos.x > 0) {
+            Corner.NORTHEAST
+        } else {
+            Corner.NORTHWEST
+        }
+    }
+}
+
+fun BlockPos.adjacent(): Set<BlockPos> = setOf(
+    this.above(),
+    this.below(),
+    this.north(),
+    this.south(),
+    this.west(),
+    this.east(),
+)
