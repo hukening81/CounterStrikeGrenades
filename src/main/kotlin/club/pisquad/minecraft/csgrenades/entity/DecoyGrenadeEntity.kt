@@ -4,7 +4,9 @@ import club.pisquad.minecraft.csgrenades.compat.tacz.TaczApiHandler
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.ModDamageType
 import club.pisquad.minecraft.csgrenades.registry.ModItems
+import com.tacz.guns.api.TimelessAPI
 import com.tacz.guns.api.item.IGun
+
 import com.tacz.guns.api.item.gun.FireMode
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -43,6 +45,8 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         private const val SOUND_INTERVAL_BASE_TICKS = 1 * 20
         private const val SOUND_INTERVAL_RANDOM_TICKS = 2 * 20
 
+
+
         val CUSTOM_SOUND_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(
             DecoyGrenadeEntity::class.java,
             EntityDataSerializers.STRING,
@@ -63,6 +67,10 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             DecoyGrenadeEntity::class.java,
             EntityDataSerializers.INT,
         )
+        val GUN_SHOOT_INTERVAL_MS_ACCESSOR: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            DecoyGrenadeEntity::class.java,
+            EntityDataSerializers.INT,
+        )
     }
 
     override fun defineSynchedData() {
@@ -72,6 +80,7 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         this.entityData.define(GUN_ID_TO_PLAY_ACCESSOR, "")
         this.entityData.define(GUN_FIRE_MODE_ACCESSOR, "")
         this.entityData.define(GUN_RPM_ACCESSOR, 0)
+        this.entityData.define(GUN_SHOOT_INTERVAL_MS_ACCESSOR, 0)
     }
 
     override fun getDefaultItem(): Item = ModItems.DECOY_GRENADE_ITEM.get()
@@ -126,7 +135,8 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                                 fireShot()
                                 shotsInBurstRemaining--
                                 if (shotsInBurstRemaining > 0) {
-                                    val delay = (60 * 20 / rpm).coerceAtLeast(1)
+                                    val shootIntervalMs = this.entityData.get(GUN_SHOOT_INTERVAL_MS_ACCESSOR)
+                                    val delay = (shootIntervalMs / 50).coerceAtLeast(1)
                                     nextSoundTick = tickCount + delay
                                 } else {
                                     // Last shot of the burst, schedule next burst
@@ -137,7 +147,8 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                                 shotsInBurstRemaining = Random.nextInt(3, 6) // 3-5 shots per burst
                                 fireShot()
                                 shotsInBurstRemaining--
-                                val delay = (60 * 20 / rpm).coerceAtLeast(1)
+                                val shootIntervalMs = this.entityData.get(GUN_SHOOT_INTERVAL_MS_ACCESSOR)
+                                val delay = (shootIntervalMs / 50).coerceAtLeast(1)
                                 nextSoundTick = tickCount + delay
                             }
                         } else {
@@ -169,10 +180,17 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 if (item is IGun) {
                     val gunId = item.getGunId(itemStack)
                     val fireMode = item.getFireMode(itemStack)
-                    val rpm = item.getRPM(itemStack)
-                    this.entityData.set(GUN_ID_TO_PLAY_ACCESSOR, gunId.toString())
-                    this.entityData.set(GUN_FIRE_MODE_ACCESSOR, fireMode.name)
-                    this.entityData.set(GUN_RPM_ACCESSOR, rpm)
+                    val rpm = item.getRPM(itemStack) // Keep RPM for potential fallback or display
+
+                    TimelessAPI.getCommonGunIndex(gunId).ifPresent { commonGunIndex ->
+                        val gunData = commonGunIndex.gunData
+                        val shootIntervalMs = gunData.getShootInterval(owner as LivingEntity, fireMode, itemStack).toInt()
+
+                        this.entityData.set(GUN_ID_TO_PLAY_ACCESSOR, gunId.toString())
+                        this.entityData.set(GUN_FIRE_MODE_ACCESSOR, fireMode.name)
+                        this.entityData.set(GUN_RPM_ACCESSOR, rpm)
+                        this.entityData.set(GUN_SHOOT_INTERVAL_MS_ACCESSOR, shootIntervalMs)
+                    }
                     return // Found a gun, exit
                 }
             }
