@@ -27,8 +27,11 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.AirBlock
+import net.minecraft.world.level.block.ChainBlock
 import net.minecraft.world.level.block.FenceBlock
 import net.minecraft.world.level.block.FenceGateBlock
+import net.minecraft.world.level.block.IronBarsBlock
+import net.minecraft.world.level.block.SignBlock
 import net.minecraft.world.level.block.SlabBlock
 import net.minecraft.world.level.block.StairBlock
 import net.minecraft.world.level.block.TrapDoorBlock
@@ -428,6 +431,24 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 }.filterAir(this.level()).let { result.addAll(it) }
 
                 return result
+            }
+
+            is IronBarsBlock -> {
+                val south = blockAtState.getValue(BlockStateProperties.SOUTH)
+                val north = blockAtState.getValue(BlockStateProperties.NORTH)
+                val east = blockAtState.getValue(BlockStateProperties.EAST)
+                val west = blockAtState.getValue(BlockStateProperties.WEST)
+
+                val corner = getGrenadeCornerType(blockAt, this.center)
+                return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(this.level())
+            }
+
+            is ChainBlock -> {
+                return blockAt.adjacent().toMutableList().filterAir(this.level())
+            }
+
+            is SignBlock -> {
+                return blockAt.adjacent().toMutableList().filterAir(this.level())
             }
 
             is TrapDoorBlock -> {
