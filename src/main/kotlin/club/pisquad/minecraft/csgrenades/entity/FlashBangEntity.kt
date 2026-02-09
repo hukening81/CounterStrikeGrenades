@@ -25,14 +25,14 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     override fun tick() {
         super.tick()
 
-        if (this.tickCount > ModConfig.Flashbang.FUSE_TIME.get() / 50.0 && !this.entityData.get(isExplodedAccessor)) {
+        if (this.tickCount > ModConfig.Flashbang.FUSE_TIME.get() / 50.0 && !this.entityData.get(isActivatedAccessor)) {
             if (!this.level().isClientSide) {
                 CsGrenadePacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
                     FlashBangExplodedMessage(this.position(), calculateAffectedPlayers()),
                 )
             }
-            this.entityData.set(isExplodedAccessor, true)
+            this.entityData.set(isActivatedAccessor, true)
             this.discard()
         }
     }

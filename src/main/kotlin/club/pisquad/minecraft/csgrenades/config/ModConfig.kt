@@ -17,7 +17,7 @@ object ModConfig {
     var THROW_TYPE_TRANSIENT_TIME: ForgeConfigSpec.IntValue
     var FOV_EFFECT_AMOUNT: ForgeConfigSpec.DoubleValue
     var DAMAGE_NON_PLAYER_ENTITY: ForgeConfigSpec.BooleanValue
-    lateinit var TRAJECTORY_PREVIEW_COLOR: ForgeConfigSpec.ConfigValue<String>
+    var TRAJECTORY_PREVIEW_COLOR: ForgeConfigSpec.ConfigValue<String>
 
     object SmokeGrenade {
         lateinit var SMOKE_RADIUS: ForgeConfigSpec.IntValue
@@ -55,6 +55,10 @@ object ModConfig {
         lateinit var MAX_DURATION: ForgeConfigSpec.DoubleValue
         lateinit var MIN_DURATION: ForgeConfigSpec.DoubleValue
         lateinit var DISTANCE_DECAY_EXPONENT: ForgeConfigSpec.DoubleValue
+    }
+
+    object Decoy {
+        lateinit var LIFETIME: ForgeConfigSpec.DoubleValue
     }
 
     enum class SelfDamageSetting {
@@ -140,6 +144,11 @@ object ModConfig {
         Flashbang.MIN_DURATION = builder.defineInRange("minDuration", 0.25, 0.0, 10.0)
         builder.comment("Controls the curve of how the effect fades with distance. 1.0 is linear, >1.0 is steeper falloff at range (stronger close up).")
         Flashbang.DISTANCE_DECAY_EXPONENT = builder.defineInRange("distanceDecayExponent", 2.0, 0.5, 5.0)
+        builder.pop()
+
+        builder.push("Decoy")
+        builder.comment("How long should the decoy makes fake sound, in second?")
+        Decoy.LIFETIME = builder.defineInRange("soundDuration", 15.0, 5.0, 60.0)
         builder.pop()
 
         SPEC = builder.build()

@@ -33,7 +33,7 @@ class GrenadeRenderer<T>(
         packedLight: Int,
     ) {
         // Hide fire grenade model after it explodes
-        if (entity is AbstractFireGrenade && entity.entityData.get(CounterStrikeGrenadeEntity.isExplodedAccessor)) {
+        if (entity is AbstractFireGrenade && entity.entityData.get(CounterStrikeGrenadeEntity.isActivatedAccessor)) {
             return
         }
 

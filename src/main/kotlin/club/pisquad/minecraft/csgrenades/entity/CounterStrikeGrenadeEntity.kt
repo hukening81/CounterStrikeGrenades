@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity
 
+import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.config.ModConfig
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.BarrierBlock
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
+import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
 import java.util.*
 
 abstract class CounterStrikeGrenadeEntity(
@@ -49,6 +51,14 @@ abstract class CounterStrikeGrenadeEntity(
     var customYRotO: Float = 0f
     var customZRotO: Float = 0f
 
+    var center: Vec3
+        get() {
+            return this.position().add(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0))
+        }
+        set(pos: Vec3) {
+            this.setPos(pos.minus(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0)))
+        }
+
     init {
         if (pLevel.isClientSide) {
             randomizeRotation()
@@ -60,7 +70,7 @@ abstract class CounterStrikeGrenadeEntity(
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.FLOAT)
         val isLandedAccessor: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
-        val isExplodedAccessor: EntityDataAccessor<Boolean> =
+        val isActivatedAccessor: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
     }
 
@@ -68,7 +78,7 @@ abstract class CounterStrikeGrenadeEntity(
         super.defineSynchedData()
         this.entityData.define(speedAccessor, 0f)
         this.entityData.define(isLandedAccessor, false)
-        this.entityData.define(isExplodedAccessor, false)
+        this.entityData.define(isActivatedAccessor, false)
     }
 
     override fun onHitEntity(result: EntityHitResult) {
@@ -100,13 +110,13 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun tick() {
         super.tick()
-        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isExplodedAccessor)) {
+        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isActivatedAccessor)) {
             this.deltaMovement = Vec3.ZERO
             this.isNoGravity = true
         }
 
         // New, more robust landing detection
-        if (!this.entityData.get(isLandedAccessor) && !this.entityData.get(isExplodedAccessor)) {
+        if (!this.entityData.get(isLandedAccessor) && !this.entityData.get(isActivatedAccessor)) {
             if (this.onGround() && this.deltaMovement.lengthSqr() < 0.01 * 0.01) {
                 this.entityData.set(isLandedAccessor, true)
             }
@@ -115,7 +125,7 @@ abstract class CounterStrikeGrenadeEntity(
         // Client-side rotation logic
         if (this.level().isClientSide) {
             val isLanded = this.entityData.get(isLandedAccessor)
-            if (!isLanded && !this.entityData.get(isExplodedAccessor)) {
+            if (!isLanded && !this.entityData.get(isActivatedAccessor)) {
                 // In air: keep rotating
                 this.customXRotO = this.customXRot
                 this.customYRotO = this.customYRot
@@ -174,7 +184,7 @@ abstract class CounterStrikeGrenadeEntity(
         // This function seems to be work fine when calling from server and client side?
         // So I just make a test here
         // (In integrated server, haven't tested on other configurations yet)
-        if (this.level().isClientSide && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(
+        if (this.level().isClientSide && !this.entityData.get(isActivatedAccessor) && !this.entityData.get(
                 isLandedAccessor,
             )
         ) {
@@ -195,7 +205,7 @@ abstract class CounterStrikeGrenadeEntity(
         }
 
         // Calculate the movement of the entity
-        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isExplodedAccessor)) {
+        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isActivatedAccessor)) {
             return
         } else {
             this.bounce(
@@ -251,4 +261,15 @@ abstract class CounterStrikeGrenadeEntity(
     override fun shouldBeSaved(): Boolean = false
 
     abstract fun getHitDamageSource(hitEntity: LivingEntity): DamageSource
+
+    /**
+     * Ideally called when the grenade activates
+     * - HE explodes
+     * - Smoke emits
+     * - Decoy starts to make fake sound
+     * - etc
+     *
+     * Factor in progress
+     * */
+    open fun activate() {}
 }
