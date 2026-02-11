@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeExplosionData
-import club.pisquad.minecraft.csgrenades.client.renderer.HEGrenadeRenderManager
+import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeExplosionData
+import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeRenderManager
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.getTimeFromTickCount

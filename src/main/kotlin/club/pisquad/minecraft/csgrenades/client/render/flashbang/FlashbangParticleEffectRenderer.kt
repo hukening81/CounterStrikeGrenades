@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.client.renderer
+package club.pisquad.minecraft.csgrenades.client.render.flashbang
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.network.message.AffectedPlayerInfo
@@ -7,11 +7,10 @@ import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.player.Player
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.event.TickEvent
-import net.minecraftforge.event.TickEvent.ClientTickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object FlashbangParticleEffectRenderer {
@@ -30,7 +29,7 @@ object FlashbangParticleEffectRenderer {
     }
 
     @SubscribeEvent
-    fun render(event: ClientTickEvent) {
+    fun render(event: TickEvent.ClientTickEvent) {
         if (event.phase == TickEvent.Phase.END) {
             val timeNowEpoch = Instant.now().toEpochMilli()
             val level = Minecraft.getInstance().level ?: return
