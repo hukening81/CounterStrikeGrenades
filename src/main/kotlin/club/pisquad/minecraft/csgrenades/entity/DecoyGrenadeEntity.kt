@@ -26,6 +26,12 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out DecoyGrenadeEntity>, pLevel
     private var nextFireTimestampIndex: Int = 0
     private var activationTick: Int? = null
 
+    // For freezing rotation after landing
+    private var hasSavedFinalRotation = false
+    private var finalXRot = 0f
+    private var finalYRot = 0f
+    private var finalZRot = 0f
+
     companion object {
         private const val TOTAL_DURATION_TICKS = 15 * 20
 
@@ -51,14 +57,36 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out DecoyGrenadeEntity>, pLevel
     override fun getDefaultItem(): Item = ModItems.DECOY_GRENADE_ITEM.get()
 
     override fun tick() {
-        super.tick() // This handles physics and rotation stopping on land
-
-        if (level().isClientSide) {
+        // If not landed, run normal physics and rotation
+        if (!entityData.get(isLandedAccessor)) {
+            super.tick()
             return
         }
 
-        // Server-side logic
-        if (entityData.get(isLandedAccessor) && activationTick == null) {
+        // --- Grenade has landed ---
+
+        // On client, forcefully freeze rotation to prevent twitching
+        if (level().isClientSide) {
+            if (!hasSavedFinalRotation) {
+                // Save the final rotation the first tick it's landed
+                finalXRot = this.customXRot
+                finalYRot = this.customYRot
+                finalZRot = this.customZRot
+                hasSavedFinalRotation = true
+            }
+            // On every subsequent tick, force the rotation back to the saved values
+            this.customXRot = finalXRot
+            this.customYRot = finalYRot
+            this.customZRot = finalZRot
+            this.customXRotO = finalXRot
+            this.customYRotO = finalYRot
+            this.customZRotO = finalZRot
+            // Do not call super.tick() here to prevent physics/rotation interference
+            return // No other client logic needed
+        }
+
+        // On server, handle activation and sound scheduling
+        if (activationTick == null) {
             activate()
         }
 
