@@ -97,7 +97,7 @@ data class FlashbangEffectData(
             return FlashbangEffectData(
                 position = flashbangPos,
                 effectAttack = 20,
-                effectAmount = 50,
+                effectAmount = 255,
                 effectSustain = (fullyBlindedTime * 1000).toInt(),
                 effectDecay = ((totalEffectTime - fullyBlindedTime) * 1000).toInt(),
             )
