@@ -19,7 +19,11 @@ object DecoyFirePatternGenerator {
         }
 
         val fireModeName = entity.entityData.get(DecoyGrenadeEntity.GUN_FIRE_MODE_ACCESSOR)
-        val fireMode = try { FireMode.valueOf(fireModeName) } catch (e: Exception) { FireMode.SEMI }
+        val fireMode = try {
+            FireMode.valueOf(fireModeName)
+        } catch (e: Exception) {
+            FireMode.SEMI
+        }
         val rpm = entity.entityData.get(DecoyGrenadeEntity.GUN_RPM_ACCESSOR)
         val shootIntervalMs = entity.entityData.get(DecoyGrenadeEntity.GUN_SHOOT_INTERVAL_MS_ACCESSOR)
 

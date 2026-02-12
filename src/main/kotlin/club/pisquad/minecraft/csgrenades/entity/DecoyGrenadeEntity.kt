@@ -1,13 +1,11 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.compat.tacz.TaczApiHandler
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.ModDamageType
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.simulation.DecoyFirePatternGenerator
 import com.tacz.guns.api.TimelessAPI
 import com.tacz.guns.api.item.IGun
-import com.tacz.guns.api.item.gun.FireMode
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
