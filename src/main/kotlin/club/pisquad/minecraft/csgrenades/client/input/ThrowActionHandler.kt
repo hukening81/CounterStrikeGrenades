@@ -208,7 +208,7 @@ fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
     val itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND) // Moved up for event
 
     // NEW: Fire the GrenadeThrowEvent
-    val event = GrenadeThrowEvent(player, itemInHand)
+    val event = GrenadeThrowEvent(player, itemInHand, grenadeType)
     if (MinecraftForge.EVENT_BUS.post(event)) {
         // Event was canceled, stop the throw action
         return
