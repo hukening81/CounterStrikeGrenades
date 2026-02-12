@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.client.sound.DecoySoundController
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeThrowEvent
@@ -42,6 +43,8 @@ object ThrowActionHandler {
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent) {
         if (event.phase == TickEvent.Phase.START) return
+
+        DecoySoundController.onClientTick()
 
         val (primaryButtonPressed, secondaryButtonPressed) = getButtonState()
 
