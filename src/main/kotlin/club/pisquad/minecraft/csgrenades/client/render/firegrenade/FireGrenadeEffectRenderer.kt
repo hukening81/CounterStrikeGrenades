@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.client.renderer
+package club.pisquad.minecraft.csgrenades.client.render.firegrenade
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.config.ModConfig

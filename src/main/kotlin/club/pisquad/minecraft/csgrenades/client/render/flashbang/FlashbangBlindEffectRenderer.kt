@@ -1,5 +1,18 @@
-package club.pisquad.minecraft.csgrenades.client.renderer
+package club.pisquad.minecraft.csgrenades.client.render.flashbang
 
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.network.message.*
+import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.sound.*
+import com.mojang.blaze3d.platform.GlStateManager
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.BufferBuilder
+import com.mojang.blaze3d.vertex.BufferUploader
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.Tesselator
+import com.mojang.blaze3d.vertex.VertexFormat
+import net.minecraft.client.Camera
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
@@ -8,11 +21,13 @@ import club.pisquad.minecraft.csgrenades.network.message.FlashbangEffectData
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.GameRenderer
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.sounds.SoundEvents
-import net.minecraft.util.FastColor
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.client.event.RenderGuiOverlayEvent
+import net.minecraftforge.client.event.RenderLevelStageEvent
+import net.minecraftforge.client.event.ScreenEvent
 import net.minecraftforge.client.event.sound.PlaySoundEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -101,7 +116,9 @@ object FlashbangBlindEffectRenderer {
     }
 
     @SubscribeEvent
-    fun eventHandler(event: RenderGuiOverlayEvent.Post) {
+    fun eventHandler(event: RenderLevelStageEvent) {
+        if (event.stage != RenderLevelStageEvent.Stage.AFTER_LEVEL) return
+
         val player = Minecraft.getInstance().player ?: return
         if (player.isSpectator) return
 
@@ -109,37 +126,56 @@ object FlashbangBlindEffectRenderer {
         // Converting type to double for precise calculation
         val timeDelta = Duration.between(renderStartTime, currentTime).toMillis().toDouble()
 
+        val camera = event.camera
+        val poseStack = event.poseStack
+
         if (timeDelta < effectAttack) {
             val opacity = (timeDelta / effectAttack * effectAmount).toInt()
-            drawOverlay(event.guiGraphics, opacity)
+            drawOverlay(camera, poseStack, opacity)
             renderState = RenderState.AttackStage
         } else if (timeDelta < effectSustain + effectAttack) {
             val opacity = (effectAmount)
-            drawOverlay(event.guiGraphics, opacity)
+            drawOverlay(camera, poseStack, opacity)
             renderState = RenderState.SustainStage
         } else if (timeDelta < effectDecay + effectSustain + effectAttack) {
             val opacity =
                 effectAmount - ((timeDelta - effectAttack - effectSustain) / effectDecay * effectAmount).toInt()
-            drawOverlay(event.guiGraphics, opacity)
+            drawOverlay(camera, poseStack, opacity)
             renderState = RenderState.DecayStage
         } else {
             clean()
         }
+        event.levelRenderer
     }
 
-    private fun drawOverlay(gui: GuiGraphics, opacity: Int) {
-        gui.fill(
-            0,
-            0,
-            gui.guiWidth(),
-            gui.guiHeight(),
-            FastColor.ABGR32.color(
-                opacity,
-                255,
-                255,
-                255,
-            ),
-        )
+    private fun drawOverlay(camera: Camera, poseStack: PoseStack, opacity: Int) {
+        poseStack.pushPose()
+        poseStack.setIdentity()
+
+        RenderSystem.disableDepthTest()
+        RenderSystem.enableBlend()
+        RenderSystem.defaultBlendFunc()
+        RenderSystem.setShader { GameRenderer.getPositionColorShader() }
+
+        val color = 0xFFFFFFFF.toInt()
+
+        val matrix = poseStack.last().pose()
+
+        val tesselator = Tesselator.getInstance()
+        val buffer = tesselator.builder
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR)
+
+        buffer.vertex(matrix, -1.0f, -1.0f, -0.1f).color(255, 255, 255, opacity).endVertex()
+        buffer.vertex(matrix, 1.0f, -1.0f, -0.1f).color(255, 255, 255, opacity).endVertex()
+        buffer.vertex(matrix, 1.0f, 1.0f, -0.1f).color(255, 255, 255, opacity).endVertex()
+        buffer.vertex(matrix, -1.0f, 1.0f, -0.1f).color(255, 255, 255, opacity).endVertex()
+
+        BufferUploader.drawWithShader(buffer.end())
+
+        RenderSystem.disableBlend()
+        RenderSystem.enableDepthTest()
+
+        poseStack.popPose()
     }
 
     private fun clean() {
