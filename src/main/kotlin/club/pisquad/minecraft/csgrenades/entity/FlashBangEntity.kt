@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.AffectedPlayerInfo
 import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessage
 import club.pisquad.minecraft.csgrenades.network.message.FlashbangEffectData
@@ -25,14 +25,14 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     override fun tick() {
         super.tick()
 
-        if (this.tickCount > ModConfig.Flashbang.FUSE_TIME.get() / 50.0 && !this.entityData.get(isExplodedAccessor)) {
+        if (this.tickCount > ModConfig.Flashbang.FUSE_TIME.get() / 50.0 && !this.entityData.get(isActivatedAccessor)) {
             if (!this.level().isClientSide) {
-                CsGrenadePacketHandler.INSTANCE.send(
+                ModPacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
                     FlashBangExplodedMessage(this.position(), calculateAffectedPlayers()),
                 )
             }
-            this.entityData.set(isExplodedAccessor, true)
+            this.activate()
             this.discard()
         }
     }

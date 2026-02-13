@@ -4,4 +4,5 @@ import net.minecraft.world.item.ItemStack
 
 interface GrenadeEntityInterface {
     fun getItem(): ItemStack
+    fun activate()
 }

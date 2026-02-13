@@ -6,7 +6,7 @@ import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeThrowEvent
 import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.linearInterpolate
-import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Rotations
@@ -248,7 +248,7 @@ fun throwAction(throwSpeed: Double, grenadeType: GrenadeType) {
     }
     // --- End NBT Reading ---
 
-    CsGrenadePacketHandler.INSTANCE.sendToServer(
+    ModPacketHandler.INSTANCE.sendToServer(
         GrenadeThrownMessage(
             player.uuid,
             speed,

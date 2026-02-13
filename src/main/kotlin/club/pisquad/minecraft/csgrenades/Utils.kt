@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
@@ -131,3 +131,5 @@ fun BlockPos.horizontalDistanceToSqr(other: BlockPos): Double = Vec2(this.x.toFl
 fun BlockPos.horizontalDistanceTo(other: BlockPos): Double = sqrt(
     this.horizontalDistanceToSqr(other),
 )
+
+fun Double.toTick(): Long = this.times(20).toLong()

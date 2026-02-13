@@ -1,11 +1,13 @@
-package club.pisquad.minecraft.csgrenades.entity
+package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.client.render.firegrenade.FireGrenadeRenderer
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.entity.SetTimeActivateGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadeActivatedMessage
 import club.pisquad.minecraft.csgrenades.registry.ModSerializers
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
@@ -33,11 +35,11 @@ import java.time.Instant
 import java.util.*
 import kotlin.math.min
 
-abstract class AbstractFireGrenade(
+abstract class AbstractFireGrenadeEntity(
     pEntityType: EntityType<out ThrowableItemProjectile>,
     pLevel: Level,
     grenadeType: GrenadeType,
-) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
+) : SetTimeActivateGrenadeEntity(pEntityType, pLevel, grenadeType, ModConfig.FireGrenade.FUSE_TIME.get().toTick().toInt()) {
 
     private var explosionTick = 0
     private var extinguished = false
@@ -60,7 +62,7 @@ abstract class AbstractFireGrenade(
 
     companion object {
         val spreadBlocksAccessor: EntityDataAccessor<List<BlockPos>> = SynchedEntityData.defineId(
-            AbstractFireGrenade::class.java,
+            AbstractFireGrenadeEntity::class.java,
             ModSerializers.blockPosListEntityDataSerializer,
         )
     }
@@ -71,9 +73,9 @@ abstract class AbstractFireGrenade(
     }
 
     override fun tick() {
-        val isExploded = this.entityData.get(isExplodedAccessor)
+        val isActivated = this.entityData.get(isActivatedAccessor)
 
-        if (isExploded) {
+        if (isActivated) {
             // This grenade has exploded, stop physics and freeze rotation
             if (this.level().isClientSide) {
                 if (!hasSavedFinalRotation) {
@@ -96,28 +98,28 @@ abstract class AbstractFireGrenade(
 
         // --- The following logic needs to run regardless of super.tick() ---
         if (this.level().isClientSide) {
-            if (!this.poppedInAir && isExploded) {
+            if (!this.poppedInAir && isActivated) {
                 FireGrenadeRenderer.renderOne(this)
             }
         } else { // Server-side
-            if (isExploded) {
+            if (isActivated) {
                 this.doDamage()
                 if ((this.tickCount - this.explosionTick) > ModConfig.FireGrenade.LIFETIME.get().millToTick()) {
                     this.kill()
                     return
                 }
-            } else if (this.tickCount > ModConfig.FireGrenade.FUSE_TIME.get().div(50)) {
-                this.entityData.set(isExplodedAccessor, true)
+            } else if (this.tickCount > ModConfig.FireGrenade.FUSE_TIME.get().toTick()) {
+                this.activate()
                 this.poppedInAir = true
-                CsGrenadePacketHandler.INSTANCE.send(
+                ModPacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
-                    FireGrenadeMessage(FireGrenadeMessage.MessageType.AirExploded, this.position()),
+                    FireGrenadeActivatedMessage(FireGrenadeActivatedMessage.ActivateType.AirExploded, this.position()),
                 )
                 this.kill()
             }
         }
 
-        if (!isExploded) { // This logic should only run when the grenade is still moving
+        if (!isActivated) { // This logic should only run when the grenade is still moving
             if (!this.lastInWater && this.deltaMovement.snapToAxis() == Direction.DOWN) {
                 val nextPosition = this.position().add(this.deltaMovement)
                 val nextBlockPos = BlockPos.containing(nextPosition)
@@ -136,15 +138,14 @@ abstract class AbstractFireGrenade(
         // But in MC, all grounds are flat and horizontal
         // we only want the server to handle this logic
 
-        if (this.entityData.get(isExplodedAccessor) || this.entityData.get(isLandedAccessor)) return
+        if (this.entityData.get(isActivatedAccessor)) return
         if (this.extinguished) return
         if (result.direction == Direction.UP) {
             this.deltaMovement = Vec3.ZERO
             this.explosionTick = this.tickCount
             this.isNoGravity = true
             if (!this.level().isClientSide) {
-                this.entityData.set(isExplodedAccessor, true)
-                this.entityData.set(isLandedAccessor, true)
+                this.activate()
                 // Test if any smoke nearby that extinguish this fire
                 val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
                 val bb = AABB(this.blockPosition()).inflate(
@@ -169,10 +170,10 @@ abstract class AbstractFireGrenade(
                         spreadBlocksAccessor,
                         calculateSpreadBlocks(this.level(), this.position()),
                     )
-                    CsGrenadePacketHandler.INSTANCE.send(
+                    ModPacketHandler.INSTANCE.send(
                         PacketDistributor.ALL.noArg(),
-                        FireGrenadeMessage(
-                            FireGrenadeMessage.MessageType.GroundExploded,
+                        FireGrenadeActivatedMessage(
+                            FireGrenadeActivatedMessage.ActivateType.GroundExploded,
                             this.position(),
                         ),
                     )
@@ -187,11 +188,12 @@ abstract class AbstractFireGrenade(
 
     fun extinguish() {
         this.extinguished = true
-        CsGrenadePacketHandler.INSTANCE.send(
-            PacketDistributor.ALL.noArg(),
-            FireGrenadeMessage(FireGrenadeMessage.MessageType.ExtinguishedBySmoke, this.position()),
-        )
-        this.kill()
+        if (this.level().isClientSide) {
+            // EMPTY
+        } else {
+            FireGrenadeHelper.playExtinguishSound(this)
+            this.discard()
+        }
     }
 
     abstract fun getFireDamageType(): ResourceKey<DamageType>
@@ -205,7 +207,7 @@ abstract class AbstractFireGrenade(
         val entities =
             level.getEntitiesOfClass(
                 if (ModConfig.DAMAGE_NON_PLAYER_ENTITY.get()) LivingEntity::class.java else Player::class.java,
-                AABB(this.blockPosition()).inflate(ModConfig.HEGrenade.DAMAGE_RANGE.get()),
+                AABB(this.blockPosition()).inflate(ModConfig.HEGrenade.DAMAGE_RADIUS.get()),
             )
         val entitiesInRange = entities.filter { entity ->
             spreadBlocks.any { blockPos ->

@@ -17,11 +17,11 @@ object ModConfig {
     var THROW_TYPE_TRANSIENT_TIME: ForgeConfigSpec.IntValue
     var FOV_EFFECT_AMOUNT: ForgeConfigSpec.DoubleValue
     var DAMAGE_NON_PLAYER_ENTITY: ForgeConfigSpec.BooleanValue
-    lateinit var TRAJECTORY_PREVIEW_COLOR: ForgeConfigSpec.ConfigValue<String>
+    var TRAJECTORY_PREVIEW_COLOR: ForgeConfigSpec.ConfigValue<String>
 
     object SmokeGrenade {
         lateinit var SMOKE_RADIUS: ForgeConfigSpec.IntValue
-        lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.LongValue
+        lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.DoubleValue
         lateinit var SMOKE_LIFETIME: ForgeConfigSpec.LongValue
         lateinit var TIME_BEFORE_REGENERATE: ForgeConfigSpec.LongValue
         lateinit var REGENERATION_TIME: ForgeConfigSpec.LongValue
@@ -31,9 +31,9 @@ object ModConfig {
     }
 
     object HEGrenade {
-        var FUSE_TIME: ForgeConfigSpec.LongValue? = null
+        lateinit var FUSE_TIME: ForgeConfigSpec.DoubleValue
         lateinit var BASE_DAMAGE: ForgeConfigSpec.DoubleValue
-        lateinit var DAMAGE_RANGE: ForgeConfigSpec.DoubleValue
+        lateinit var DAMAGE_RADIUS: ForgeConfigSpec.DoubleValue
         lateinit var HEAD_DAMAGE_BOOST: ForgeConfigSpec.DoubleValue
         lateinit var CAUSE_DAMAGE_TO_OWNER: ForgeConfigSpec.EnumValue<SelfDamageSetting>
     }
@@ -41,7 +41,7 @@ object ModConfig {
     object FireGrenade {
         lateinit var FIRE_RANGE: ForgeConfigSpec.IntValue
         lateinit var LIFETIME: ForgeConfigSpec.LongValue
-        lateinit var FUSE_TIME: ForgeConfigSpec.LongValue
+        lateinit var FUSE_TIME: ForgeConfigSpec.DoubleValue
         lateinit var FIRE_EXTINGUISH_RANGE: ForgeConfigSpec.IntValue
         lateinit var FIRE_MAX_SPREAD_DOWNWARD: ForgeConfigSpec.IntValue
         lateinit var DAMAGE: ForgeConfigSpec.DoubleValue
@@ -93,8 +93,7 @@ object ModConfig {
         builder.push("SmokeGrenade")
         builder.comment("Smoke radius, in block")
         SmokeGrenade.SMOKE_RADIUS = builder.defineInRange("smoke_radius", 6, 2, 10)
-        SmokeGrenade.FUSE_TIME_AFTER_LANDING =
-            builder.defineInRange("fuse_time_after_landing", 500, 0, 10 * 1000.toLong())
+        SmokeGrenade.FUSE_TIME_AFTER_LANDING = builder.defineInRange("fuse_time_after_landing", 0.5, 0.0, 10.0)
         SmokeGrenade.SMOKE_LIFETIME = builder.defineInRange("smoke_lifetime", 20000, 0, 60 * 1000.toLong())
         SmokeGrenade.TIME_BEFORE_REGENERATE = builder.defineInRange("time_before_regenerate", 1000, 0, 10000.toLong())
         SmokeGrenade.REGENERATION_TIME = builder.defineInRange("regeneration_time", 3000, 0, 10000.toLong())
@@ -108,10 +107,10 @@ object ModConfig {
         builder.push("HEGrenade")
         builder.comment("HE grenade's damage follow a linear decay function")
         HEGrenade.BASE_DAMAGE = builder.defineInRange("base_damage", 30.0, 0.0, 100.0)
-        HEGrenade.DAMAGE_RANGE = builder.defineInRange("damage_range", 5.0, 0.0, 100.0)
+        HEGrenade.DAMAGE_RADIUS = builder.defineInRange("damage_range", 5.0, 0.0, 100.0)
         HEGrenade.HEAD_DAMAGE_BOOST = builder.defineInRange("head_damage_boost", 1.5, 0.0, 100.0)
         builder.comment("Fuse time before explosion, in milliseconds")
-        HEGrenade.FUSE_TIME = builder.defineInRange("fuseTime", 2000L, 0L, 10000L)
+        HEGrenade.FUSE_TIME = builder.defineInRange("fuseTime", 2.0, 0.5, 60.0)
         HEGrenade.CAUSE_DAMAGE_TO_OWNER = builder.defineEnum("causeDamageToOwner", SelfDamageSetting.ALWAYS, SelfDamageSetting.entries)
         builder.pop()
 
@@ -120,7 +119,7 @@ object ModConfig {
         builder.comment("Lifetime of the fire, in milliseconds")
         FireGrenade.LIFETIME = builder.defineInRange("lifetime", 7000, 0, 100 * 1000.toLong())
         builder.comment("Fuse time before air explode, in milliseconds")
-        FireGrenade.FUSE_TIME = builder.defineInRange("fuse_time", 2000.toLong(), 0, 100 * 1000.toLong())
+        FireGrenade.FUSE_TIME = builder.defineInRange("fuse_time", 2.0, 0.5, 60.0)
         FireGrenade.FIRE_EXTINGUISH_RANGE = builder.defineInRange("fire_extinguish_range", 6, 0, 100)
         FireGrenade.FIRE_MAX_SPREAD_DOWNWARD = builder.defineInRange("fire_max_spread_downward", 10, 0, 100)
         FireGrenade.DAMAGE = builder.defineInRange("damage", 3.0, 0.0, 100.0)

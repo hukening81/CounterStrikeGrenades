@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.entity
+package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.ModDamageType
@@ -13,7 +13,7 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 
-class MolotovEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : AbstractFireGrenade(pEntityType, pLevel, GrenadeType.MOLOTOV) {
+class MolotovEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : AbstractFireGrenadeEntity(pEntityType, pLevel, GrenadeType.MOLOTOV) {
     override fun getDefaultItem(): Item = ModItems.MOLOTOV_ITEM.get()
 
     override fun getFireDamageType(): ResourceKey<DamageType> = ModDamageType.MOLOTOV_FIRE

@@ -1,13 +1,20 @@
 package club.pisquad.minecraft.csgrenades.entity
 
+import club.pisquad.minecraft.csgrenades.BOUNCE_FRICTION
+import club.pisquad.minecraft.csgrenades.BOUNCE_RESTORATION_RATE
+import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE
+import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.entity.grenade.HEGrenadeEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import club.pisquad.minecraft.csgrenades.snapToAxis
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -24,7 +31,15 @@ import net.minecraft.world.level.block.BarrierBlock
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent
+import net.minecraftforge.eventbus.EventBus
+import net.minecraftforge.eventbus.api.IEventBus
+import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
+import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.times
 import java.util.*
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out ThrowableItemProjectile>,
@@ -49,6 +64,15 @@ abstract class CounterStrikeGrenadeEntity(
     var customYRotO: Float = 0f
     var customZRotO: Float = 0f
 
+    var center: Vec3
+        get() {
+            return this.position().add(GRENADE_ENTITY_SIZE.div(2.0), GRENADE_ENTITY_SIZE.div(2.0), GRENADE_ENTITY_SIZE.div(2.0))
+        }
+        set(newCenter: Vec3) {
+            val position = newCenter.minus(Vec3(GRENADE_ENTITY_SIZE.div(2.0), GRENADE_ENTITY_SIZE.div(2.0), GRENADE_ENTITY_SIZE.div(2.0)))
+            this.setPos(position)
+        }
+
     init {
         if (pLevel.isClientSide) {
             randomizeRotation()
@@ -58,17 +82,20 @@ abstract class CounterStrikeGrenadeEntity(
     companion object {
         val speedAccessor: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.FLOAT)
-        val isLandedAccessor: EntityDataAccessor<Boolean> =
+        val isActivatedAccessor: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
-        val isExplodedAccessor: EntityDataAccessor<Boolean> =
-            SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
+
+        fun registerGrenadeEntityEventHandler(bus: IEventBus) {
+            HEGrenadeEntity.registerEventHandler(bus)
+        }
     }
 
     override fun defineSynchedData() {
         super.defineSynchedData()
         this.entityData.define(speedAccessor, 0f)
-        this.entityData.define(isLandedAccessor, false)
-        this.entityData.define(isExplodedAccessor, false)
+//        this.entityData.define(isLandedAccessor, false)
+//        this.entityData.define(isExplodedAccessor, false)
+        this.entityData.define(isActivatedAccessor, false)
     }
 
     override fun onHitEntity(result: EntityHitResult) {
@@ -100,22 +127,18 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun tick() {
         super.tick()
-        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isExplodedAccessor)) {
-            this.deltaMovement = Vec3.ZERO
-            this.isNoGravity = true
-        }
 
         // New, more robust landing detection
-        if (!this.entityData.get(isLandedAccessor) && !this.entityData.get(isExplodedAccessor)) {
+        if (!this.entityData.get(isActivatedAccessor)) {
             if (this.onGround() && this.deltaMovement.lengthSqr() < 0.01 * 0.01) {
-                this.entityData.set(isLandedAccessor, true)
+//                this.entityData.set(isLandedAccessor, true)
+                this.activate()
             }
         }
 
         // Client-side rotation logic
         if (this.level().isClientSide) {
-            val isLanded = this.entityData.get(isLandedAccessor)
-            if (!isLanded && !this.entityData.get(isExplodedAccessor)) {
+            if (!this.entityData.get(isActivatedAccessor)) {
                 // In air: keep rotating
                 this.customXRotO = this.customXRot
                 this.customYRotO = this.customYRot
@@ -158,60 +181,41 @@ abstract class CounterStrikeGrenadeEntity(
      * @param result The block hit result.
      */
     override fun onHitBlock(result: BlockHitResult) {
-        if (level().isClientSide) {
-            randomizeRotation()
+        if (this.entityData.get(isActivatedAccessor)) {
+            return
         }
-
         if (ModConfig.IGNORE_BARRIER_BLOCK.get() && this.level()
                 .getBlockState(result.blockPos).block is BarrierBlock
         ) {
             return
         }
 
-        this.setPos(this.xOld, this.yOld, this.zOld)
-
-        // entity.playSound seems to have a relatively small hearable ange
-        // This function seems to be work fine when calling from server and client side?
-        // So I just make a test here
-        // (In integrated server, haven't tested on other configurations yet)
-        if (this.level().isClientSide && !this.entityData.get(isExplodedAccessor) && !this.entityData.get(
-                isLandedAccessor,
-            )
-        ) {
-            val player = Minecraft.getInstance().player!!
-            val distance = this.position().add(player.position().reverse()).length()
-            val soundInstance = EntityBoundSoundInstance(
-                hitBlockSound,
-                SoundSource.AMBIENT,
-                SoundUtils.getVolumeFromDistance(
-                    distance,
-                    SoundTypes.GRENADE_HIT, // unify volume for all grenades hit sounds
-                ).toFloat(),
-                1f,
-                this,
-                0,
-            )
-            Minecraft.getInstance().soundManager.play(soundInstance)
+        if (level().isClientSide) {
+            randomizeRotation()
+            if (!this.entityData.get(isActivatedAccessor)) {
+                val player = Minecraft.getInstance().player!!
+                val distance = this.position().add(player.position().reverse()).length()
+                val soundInstance = EntityBoundSoundInstance(
+                    hitBlockSound,
+                    SoundSource.AMBIENT,
+                    SoundUtils.getVolumeFromDistance(
+                        distance,
+                        SoundTypes.GRENADE_HIT, // unify volume for all grenades hit sounds
+                    ).toFloat(),
+                    1f,
+                    this,
+                    0,
+                )
+                Minecraft.getInstance().soundManager.play(soundInstance)
+            }
         }
 
-        // Calculate the movement of the entity
-        if (this.entityData.get(isLandedAccessor) || this.entityData.get(isExplodedAccessor)) {
-            return
-        } else {
-            this.bounce(
-                result.direction,
-                speedCoefficient = 0.7f,
-                frictionFactor = 0.9f,
-            )
-            this.setPos(this.xOld, this.yOld, this.zOld)
-
-            this.deltaMovement = this.deltaMovement.scale(0.5)
-        }
+        this.handleBounce(result)
         // fix: the entity will keep bouncing on the ground
         if (result.direction == Direction.UP && this.deltaMovement.length() < 0.05) {
-//            this.setPos(this.x, result.blockPos.y.toDouble() + 1, this.z)
+            //            this.setPos(this.x, result.blockPos.y.toDouble() + 1, this.z)
             this.deltaMovement = Vec3.ZERO
-            this.entityData.set(isLandedAccessor, true)
+            this.isNoGravity = true
         }
     }
 
@@ -219,6 +223,46 @@ abstract class CounterStrikeGrenadeEntity(
         this.customXRotSpeed = (random.nextFloat() - 0.5f) * 40
         this.customYRotSpeed = (random.nextFloat() - 0.5f) * 40
         this.customZRotSpeed = (random.nextFloat() - 0.5f) * 40
+    }
+
+    private fun handleBounce(result: BlockHitResult) {
+        // Get intersect point
+
+        val relativePos = this.center.minus(result.blockPos.center)
+        val speed = this.deltaMovement
+        var scale: Double = 0.0
+        val collisionPoint = when (result.direction) {
+            Direction.DOWN, Direction.UP -> {
+                scale = (relativePos.y.absoluteValue - 0.5 - GRENADE_ENTITY_SIZE_HALF).div(this.deltaMovement.y.absoluteValue)
+                this.center.add(Vec3(0.0, GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign), 0.0)).add(this.deltaMovement.times(scale))
+            }
+
+            Direction.NORTH, Direction.SOUTH -> {
+                scale = (relativePos.z.absoluteValue - 0.5 - GRENADE_ENTITY_SIZE_HALF).div(this.deltaMovement.z.absoluteValue)
+                this.center.add(Vec3(0.0, 0.0, GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign))).add(this.deltaMovement.times(scale))
+            }
+
+            Direction.WEST, Direction.EAST -> {
+                scale = (relativePos.x.absoluteValue - 0.5 - GRENADE_ENTITY_SIZE_HALF).div(this.deltaMovement.x.absoluteValue)
+                this.center.add(Vec3(GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign), 0.0, 0.0)).add(this.deltaMovement.times(scale))
+            }
+        }
+        val newSpeed = when (result.direction) {
+            Direction.UP, Direction.DOWN -> {
+                Vec3(speed.x.times(1 - BOUNCE_FRICTION), speed.y.times(-1.0).times(BOUNCE_RESTORATION_RATE), speed.z.times(1 - BOUNCE_FRICTION))
+            }
+
+            Direction.NORTH, Direction.SOUTH -> {
+                Vec3(speed.x.times(1 - BOUNCE_FRICTION), speed.y.times(1 - BOUNCE_FRICTION), speed.z.times(-1.0).times(BOUNCE_RESTORATION_RATE))
+            }
+
+            Direction.WEST, Direction.EAST -> {
+                Vec3(speed.x.times(-1.0).times(BOUNCE_RESTORATION_RATE), speed.y.times(1 - BOUNCE_FRICTION), speed.z.times(1 - BOUNCE_FRICTION))
+            }
+        }
+        println("newspeed $newSpeed")
+        this.center = collisionPoint.add(newSpeed.times(1 - scale))
+        this.deltaMovement = newSpeed.add(Vec3(0.0, -this.gravity * (1 - scale), 0.0))
     }
 
     private fun bounce(direction: Direction, speedCoefficient: Float, frictionFactor: Float) {
@@ -251,4 +295,73 @@ abstract class CounterStrikeGrenadeEntity(
     override fun shouldBeSaved(): Boolean = false
 
     abstract fun getHitDamageSource(hitEntity: LivingEntity): DamageSource
+
+    override fun activate() {
+        this.deltaMovement = Vec3.ZERO
+        this.isNoGravity = true
+
+        this.entityData.set(isActivatedAccessor, true)
+        if (this.level().isClientSide) {
+            // EMPTY
+        } else {
+            println("Firing grenade activate event ${this.grenadeType}")
+            MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
+        }
+    }
+}
+
+/**
+ * Abstract class for Smoke and Decoy
+ * These only activate after landing
+ * @param delay Grenade will activate after this amount of delay (in tick)
+ * */
+abstract class ActivateAfterLandingGrenadeEntity(
+    pEntityType: EntityType<out ThrowableItemProjectile>,
+    pLevel: Level,
+    grenadeType: GrenadeType,
+    val delay: Int,
+) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
+    var lastTimeLandingPos: BlockPos? = null
+
+    companion object {
+        val isLandedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId<Boolean>(ActivateAfterLandingGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
+    }
+
+    override fun defineSynchedData() {
+        super.defineSynchedData()
+        this.entityData.define(isLandedAccessor, false)
+    }
+
+    override fun onHitBlock(result: BlockHitResult) {
+        super.onHitBlock(result)
+        if (lastTimeLandingPos != null && lastTimeLandingPos == result.blockPos) {
+            this.activate()
+        }
+        if (lastTimeLandingPos == null || lastTimeLandingPos != result.blockPos) {
+            lastTimeLandingPos = result.blockPos
+        }
+    }
+}
+
+/**
+ * Abstract class for HE Grenade and Fire Grenade
+ * These grenades activate after certain amount of time
+ * @param fuseTime Grenade will activate after this amount of delay (in tick)
+ * */
+abstract class SetTimeActivateGrenadeEntity(
+    pEntityType: EntityType<out ThrowableItemProjectile>,
+    pLevel: Level,
+    grenadeType: GrenadeType,
+    val fuseTime: Int,
+) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
+    // Can we use entity.tickCount here?
+    var tickSinceSpawn: Int = 0
+
+    override fun tick() {
+        super.tick()
+        tickSinceSpawn++
+        if (!this.entityData.get(isActivatedAccessor) && tickSinceSpawn > fuseTime) {
+            this.activate()
+        }
+    }
 }

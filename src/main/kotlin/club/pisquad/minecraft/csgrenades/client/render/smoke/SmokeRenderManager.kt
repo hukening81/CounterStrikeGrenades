@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.client.render.smoke
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.millToTick
 import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registry.ModParticles

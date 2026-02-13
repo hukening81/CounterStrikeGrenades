@@ -1,8 +1,10 @@
-package club.pisquad.minecraft.csgrenades.entity
+package club.pisquad.minecraft.csgrenades.entity.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.client.render.smoke.SmokeRenderManager
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.entity.ActivateAfterLandingGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.AbstractFireGrenadeEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.registry.ModDamageType
@@ -11,6 +13,7 @@ import club.pisquad.minecraft.csgrenades.registry.ModSerializers
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -23,6 +26,7 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.projectile.AbstractArrow
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
@@ -48,17 +52,24 @@ import net.minecraftforge.fml.ModList
 import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
 import java.time.Duration
 import java.time.Instant
+import kotlin.collections.iterator
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 import kotlin.random.Random
 
-class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.FLASH_BANG) {
+class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
+    ActivateAfterLandingGrenadeEntity(
+        pEntityType,
+        pLevel,
+        GrenadeType.FLASH_BANG,
+        ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get().toTick().toInt(),
+    ) {
 
     private var lastPos: Vec3i = Vec3i(0, 0, 0)
     private val particles = mutableMapOf<Vec3i, List<SmokeGrenadeParticle>>()
     private var explosionTime: Instant? = null
-    private val spreadBlocksCache: MutableList<@Serializable BlockPos> = mutableListOf()
-    private var stationaryTicks = 0
+//    private val spreadBlocksCache: MutableList<@Serializable BlockPos> = mutableListOf()
 
     // For freezing rotation after explosion
     private var hasSavedFinalRotation = false
@@ -67,27 +78,19 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private var finalYRot = 0f
     private var finalZRot = 0f
 
-    var center: Vec3
-        get() {
-            return this.position().add(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0))
-        }
-        set(pos: Vec3) {
-            this.setPos(pos.minus(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0)))
-        }
-
     override fun getDefaultItem(): Item = ModItems.SMOKE_GRENADE_ITEM.get()
 
-    companion object {
-        val spreadBlocksAccessor: EntityDataAccessor<List<@Serializable BlockPos>> = SynchedEntityData.defineId(
-            SmokeGrenadeEntity::class.java,
-            ModSerializers.blockPosListEntityDataSerializer,
-        )
-    }
-
-    override fun defineSynchedData() {
-        super.defineSynchedData()
-        this.entityData.define(spreadBlocksAccessor, listOf())
-    }
+//    companion object {
+//        val spreadBlocksAccessor: EntityDataAccessor<List<@Serializable BlockPos>> = SynchedEntityData.defineId(
+//            SmokeGrenadeEntity::class.java,
+//            ModSerializers.blockPosListEntityDataSerializer,
+//        )
+//    }
+//
+//    override fun defineSynchedData() {
+//        super.defineSynchedData()
+//        this.entityData.define(spreadBlocksAccessor, listOf())
+//    }
 
     fun registerParticle(particle: SmokeGrenadeParticle) {
         val pos = particle.pos.toVec3i()
@@ -143,7 +146,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     ).toInt()
 
     override fun tick() {
-        if (this.entityData.get(isExplodedAccessor)) {
+        super.tick()
+        if (this.entityData.get(isActivatedAccessor)) {
             // Forcefully freeze rotation and position
             if (this.level().isClientSide) {
                 if (!hasSavedFinalRotation) {
@@ -160,10 +164,10 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 this.customXRotO = finalXRot
                 this.customYRotO = finalYRot
                 this.customZRotO = finalZRot
-            }
 
-            // Smoke-specific logic still needs to run
-            if (this.level() is ServerLevel) {
+                this.clientRenderEffect()
+                this.disperseSmokeByProjectiles()
+            } else {
                 if (this.explosionTime != null && Duration.between(
                         this.explosionTime,
                         Instant.now(),
@@ -174,32 +178,6 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                     this.kill()
                 }
                 extinguishNearbyFires()
-            }
-            if (this.level().isClientSide) {
-                this.disperseSmokeByProjectiles()
-            }
-            return // IMPORTANT: Do not execute any more tick logic (including super.tick())
-        }
-
-        super.tick() // Only run physics tick if not exploded
-
-        if (this.entityData.get(isLandedAccessor)) {
-            if (this.position() == Vec3(this.xOld, this.yOld, this.zOld)) {
-                stationaryTicks++
-            } else {
-                stationaryTicks = 0
-            }
-            if (stationaryTicks > ModConfig.SmokeGrenade.FUSE_TIME_AFTER_LANDING.get().millToTick() &&
-                this.explosionTime == null
-            ) {
-                if (this.level().isClientSide) {
-                    this.clientRenderEffect()
-                } else {
-                    this.entityData.set(spreadBlocksAccessor, calculateSpreadBlocks())
-                    this.setItem(net.minecraft.world.item.ItemStack.EMPTY)
-                }
-                this.entityData.set(isExplodedAccessor, true)
-                this.explosionTime = Instant.now()
             }
         }
     }
@@ -214,7 +192,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         // A large bounding box to catch any arrows that might be nearby. The swept BB check is more precise.
         val searchBB = this.boundingBox.inflate(64.0)
         val nearbyArrows = this.level().getEntitiesOfClass(
-            net.minecraft.world.entity.projectile.AbstractArrow::class.java,
+            AbstractArrow::class.java,
             searchBB,
         ) { arrow -> arrow.deltaMovement.lengthSqr() > 0.01 } // Only consider moving arrows
 
@@ -244,7 +222,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
 
         // --- TACZ BULLET COMPATIBILITY ---
         if (this.level().isClientSide && ModList.get().isLoaded("tacz")) {
-            val clientLevel = this.level() as? net.minecraft.client.multiplayer.ClientLevel ?: return
+            val clientLevel = this.level() as? ClientLevel ?: return
             val allRenderEntities = clientLevel.entitiesForRendering()
 
             if (allRenderEntities.none()) {
@@ -297,7 +275,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         super.onHitBlock(result)
         if (result.direction == Direction.UP) {
             if (this.extinguishNearbyFires() > 0) {
-                this.entityData.set(isLandedAccessor, true)
+//                this.entityData.set(isLandedAccessor, true)
                 if (this.level() is ServerLevel && result.isInside) {
                     this.setPos(Vec3(this.position().x, result.blockPos.y + 1.0, this.position().z))
                 }
@@ -306,10 +284,10 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     }
 
     private fun extinguishNearbyFires(): Int {
-        val extinguishedFires: List<AbstractFireGrenade>
+        val extinguishedFires: List<AbstractFireGrenadeEntity>
         val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get()
         val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()
-        if (this.entityData.get(isExplodedAccessor)) {
+        if (this.entityData.get(isActivatedAccessor)) {
             val bb = AABB(this.blockPosition()).inflate(
                 smokeRadius.toDouble(),
                 smokeFallingHeight.toDouble(),
@@ -317,18 +295,18 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             )
 
             extinguishedFires = this.level().getEntitiesOfClass(
-                AbstractFireGrenade::class.java,
+                AbstractFireGrenadeEntity::class.java,
                 bb,
             ) {
-                it.entityData.get(isExplodedAccessor) && canDistinguishFire(it.position())
+                it.entityData.get(isActivatedAccessor) && canDistinguishFire(it.position())
             }
         } else {
             val bb = AABB(this.blockPosition()).inflate(ModConfig.FireGrenade.FIRE_RANGE.get().toDouble())
             extinguishedFires = this.level().getEntitiesOfClass(
-                AbstractFireGrenade::class.java,
+                AbstractFireGrenadeEntity::class.java,
                 bb,
             ) {
-                it.entityData.get(isExplodedAccessor) && it.getSpreadBlocks()
+                it.entityData.get(isActivatedAccessor) && it.getSpreadBlocks()
                     .any { pos -> pos.above().center.distanceToSqr(this.position()) < 2 }
             }
         }
@@ -612,7 +590,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         // Find max distance from center for normalization
         var maxDist = 0.0
         for (key in smokeColumns.keys) {
-            val dist = kotlin.math.sqrt((key.first - centerKey.first).toDouble().pow(2.0) + (key.second - centerKey.second).toDouble().pow(2.0))
+            val dist =
+                sqrt((key.first - centerKey.first).toDouble().pow(2.0) + (key.second - centerKey.second).toDouble().pow(2.0))
             if (dist > maxDist) maxDist = dist
         }
         maxDist = maxDist.coerceAtLeast(1.0) // Avoid division by zero
@@ -620,7 +599,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         for ((key, columnBlocks) in smokeColumns) {
             val rawFallDistance = columnFallInfo[key] ?: 0
 
-            val distFromCenter = kotlin.math.sqrt((key.first - centerKey.first).toDouble().pow(2.0) + (key.second - centerKey.second).toDouble().pow(2.0))
+            val distFromCenter =
+                sqrt((key.first - centerKey.first).toDouble().pow(2.0) + (key.second - centerKey.second).toDouble().pow(2.0))
 
             // Weight is high (1.0) at the center, and low (0.0) at the max distance.
             val weight = (1.0 - (distFromCenter / maxDist)).coerceIn(0.0, 1.0)

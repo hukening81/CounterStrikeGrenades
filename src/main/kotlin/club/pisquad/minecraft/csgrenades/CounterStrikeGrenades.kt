@@ -2,7 +2,8 @@ package club.pisquad.minecraft.csgrenades
 
 import club.pisquad.minecraft.csgrenades.command.ModCommands
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.world.item.CreativeModeTabs
 import net.minecraftforge.common.MinecraftForge
@@ -36,17 +37,20 @@ object CounterStrikeGrenades {
 
         Logger.log(Level.INFO, "Hello Counter Strike Grenades")
 
-        val bus = KotlinModLoadingContext.get().getKEventBus()
+        val modBus = KotlinModLoadingContext.get().getKEventBus()
+        val forgeBus = MinecraftForge.EVENT_BUS
 
-        ModEntities.ENTITIES.register(bus)
-        ModItems.ITEMS.register(bus)
-        ModSoundEvents.register(bus)
-        ModParticles.PARTICLE_TYPES.register(bus)
-        ModCreativeTabs.CREATIVE_MODE_TABS.register(bus)
-        bus.addListener(::removeFromCreativeTabs)
+        ModEntities.ENTITIES.register(modBus)
+        ModItems.ITEMS.register(modBus)
+        ModSoundEvents.register(modBus)
+        ModParticles.PARTICLE_TYPES.register(modBus)
+        ModCreativeTabs.CREATIVE_MODE_TABS.register(modBus)
+        modBus.addListener(::removeFromCreativeTabs)
 
-        CsGrenadePacketHandler.registerMessage()
-        MinecraftForge.EVENT_BUS.register(ModCommands)
+        ModPacketHandler.registerMessage()
+
+        forgeBus.register(ModCommands)
+
         ModSerializers.register()
         registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC)
     }
@@ -90,6 +94,8 @@ object CounterStrikeGrenades {
      * Fired on the global Forge bus.
      */
     private fun onServerSetup(event: FMLDedicatedServerSetupEvent) {
+        val forgeBus = MinecraftForge.EVENT_BUS
+        CounterStrikeGrenadeEntity.registerGrenadeEntityEventHandler(forgeBus)
         Logger.log(Level.INFO, "Server starting...")
     }
 }
