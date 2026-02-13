@@ -26,11 +26,11 @@ object DecoySoundController {
         // 优先播放自定义声音
         if (customSound != null && customSound.isNotBlank()) {
             playCustomSound(entity, customSound)
-        } 
+        }
         // 其次播放TACZ枪械声音
         else if (ModList.get().isLoaded("tacz") && gunId.isNotBlank()) {
             TaczApiHandler.playGunSound(entity, ResourceLocation(gunId))
-        } 
+        }
         // 最后使用fallback声音
         else {
             playFallbackSound(entity)
