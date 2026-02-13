@@ -67,14 +67,6 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     private var finalYRot = 0f
     private var finalZRot = 0f
 
-    var center: Vec3
-        get() {
-            return this.position().add(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0))
-        }
-        set(pos: Vec3) {
-            this.setPos(pos.minus(Vec3(GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0, GRENADE_ENTITY_SIZE / 2.0)))
-        }
-
     override fun getDefaultItem(): Item = ModItems.SMOKE_GRENADE_ITEM.get()
 
     companion object {
@@ -143,7 +135,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
     ).toInt()
 
     override fun tick() {
-        if (this.entityData.get(isExplodedAccessor)) {
+        if (this.entityData.get(isActivatedAccessor)) {
             // Forcefully freeze rotation and position
             if (this.level().isClientSide) {
                 if (!hasSavedFinalRotation) {
@@ -198,7 +190,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                     this.entityData.set(spreadBlocksAccessor, calculateSpreadBlocks())
                     this.setItem(net.minecraft.world.item.ItemStack.EMPTY)
                 }
-                this.entityData.set(isExplodedAccessor, true)
+                this.entityData.set(isActivatedAccessor, true)
                 this.explosionTime = Instant.now()
             }
         }
@@ -309,7 +301,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         val extinguishedFires: List<AbstractFireGrenade>
         val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get()
         val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()
-        if (this.entityData.get(isExplodedAccessor)) {
+        if (this.entityData.get(isActivatedAccessor)) {
             val bb = AABB(this.blockPosition()).inflate(
                 smokeRadius.toDouble(),
                 smokeFallingHeight.toDouble(),
@@ -320,7 +312,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 AbstractFireGrenade::class.java,
                 bb,
             ) {
-                it.entityData.get(isExplodedAccessor) && canDistinguishFire(it.position())
+                it.entityData.get(isActivatedAccessor) && canDistinguishFire(it.position())
             }
         } else {
             val bb = AABB(this.blockPosition()).inflate(ModConfig.FireGrenade.FIRE_RANGE.get().toDouble())
@@ -328,7 +320,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
                 AbstractFireGrenade::class.java,
                 bb,
             ) {
-                it.entityData.get(isExplodedAccessor) && it.getSpreadBlocks()
+                it.entityData.get(isActivatedAccessor) && it.getSpreadBlocks()
                     .any { pos -> pos.above().center.distanceToSqr(this.position()) < 2 }
             }
         }

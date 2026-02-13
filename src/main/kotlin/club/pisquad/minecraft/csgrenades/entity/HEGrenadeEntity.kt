@@ -32,7 +32,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     override fun getDefaultItem(): Item = ModItems.HEGRENADE_ITEM.get()
 
     override fun tick() {
-        if (this.entityData.get(isExplodedAccessor)) {
+        if (this.entityData.get(isActivatedAccessor)) {
             if (!this.level().isClientSide) { // Server-side removal
                 this.discard()
             }
@@ -49,7 +49,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
                 HEGrenadeRenderManager.render(HEGrenadeExplosionData(this.position()))
                 this.blowUpNearbySmokeGrenade()
             }
-            this.entityData.set(isExplodedAccessor, true)
+            this.entityData.set(isActivatedAccessor, true)
         }
     }
 

@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.client.sound.DecoySoundController
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeThrowEvent

@@ -26,4 +26,6 @@ object TaczApiHandler {
             }
         }
     }
+
+    fun isLoaded(): Boolean = ModList.get().isLoaded("tacz")
 }

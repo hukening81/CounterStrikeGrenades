@@ -71,7 +71,7 @@ abstract class AbstractFireGrenade(
     }
 
     override fun tick() {
-        val isExploded = this.entityData.get(isExplodedAccessor)
+        val isExploded = this.entityData.get(isActivatedAccessor)
 
         if (isExploded) {
             // This grenade has exploded, stop physics and freeze rotation
@@ -107,7 +107,7 @@ abstract class AbstractFireGrenade(
                     return
                 }
             } else if (this.tickCount > ModConfig.FireGrenade.FUSE_TIME.get().div(50)) {
-                this.entityData.set(isExplodedAccessor, true)
+                this.entityData.set(isActivatedAccessor, true)
                 this.poppedInAir = true
                 CsGrenadePacketHandler.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
@@ -136,14 +136,14 @@ abstract class AbstractFireGrenade(
         // But in MC, all grounds are flat and horizontal
         // we only want the server to handle this logic
 
-        if (this.entityData.get(isExplodedAccessor) || this.entityData.get(isLandedAccessor)) return
+        if (this.entityData.get(isActivatedAccessor) || this.entityData.get(isLandedAccessor)) return
         if (this.extinguished) return
         if (result.direction == Direction.UP) {
             this.deltaMovement = Vec3.ZERO
             this.explosionTick = this.tickCount
             this.isNoGravity = true
             if (!this.level().isClientSide) {
-                this.entityData.set(isExplodedAccessor, true)
+                this.entityData.set(isActivatedAccessor, true)
                 this.entityData.set(isLandedAccessor, true)
                 // Test if any smoke nearby that extinguish this fire
                 val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get().toDouble()
