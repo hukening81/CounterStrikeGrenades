@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.network.message.DecoyShotMessage
 import club.pisquad.minecraft.csgrenades.network.message.FireGrenadeMessage
 import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessage
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
@@ -51,6 +52,14 @@ object CsGrenadePacketHandler {
             FireGrenadeMessage::encoder,
             FireGrenadeMessage::decoder,
             FireGrenadeMessage::handler,
+        )
+        INSTANCE.registerMessage(
+            messageTypeCount,
+            DecoyShotMessage::class.java,
+            DecoyShotMessage::encoder,
+            DecoyShotMessage::decoder,
+            DecoyShotMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
     }
 }

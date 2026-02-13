@@ -44,8 +44,6 @@ object ThrowActionHandler {
     fun onClientTick(event: ClientTickEvent) {
         if (event.phase == TickEvent.Phase.START) return
 
-        DecoySoundController.onClientTick()
-
         val (primaryButtonPressed, secondaryButtonPressed) = getButtonState()
 
         // Test if any screen is opened (e.g. inventory, chat, menu, etc.)

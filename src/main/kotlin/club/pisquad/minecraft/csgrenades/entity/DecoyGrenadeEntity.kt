@@ -1,11 +1,13 @@
 package club.pisquad.minecraft.csgrenades.entity
 
+import club.pisquad.minecraft.csgrenades.compat.tacz.TaczGunDataProvider
+import club.pisquad.minecraft.csgrenades.entity.decoy.DecoyGunData
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.DecoyShotMessage
 import club.pisquad.minecraft.csgrenades.registry.ModDamageType
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.simulation.DecoyFirePatternGenerator
-import com.tacz.guns.api.TimelessAPI
-import com.tacz.guns.api.item.IGun
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -16,15 +18,16 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
-import net.minecraftforge.fml.ModList
+import net.minecraftforge.network.PacketDistributor
 
 class DecoyGrenadeEntity(pEntityType: EntityType<out DecoyGrenadeEntity>, pLevel: Level) : CounterStrikeGrenadeEntity(pEntityType, pLevel, GrenadeType.DECOY_GRENADE) {
 
     private var fireTimestamps: List<Int> = emptyList()
     private var nextFireTimestampIndex: Int = 0
     private var activationTick: Int? = null
+    private var gunData: DecoyGunData? = null
+    private var customSound: String? = null
 
-    // For freezing rotation after landing
     private var hasSavedFinalRotation = false
     private var finalXRot = 0f
     private var finalYRot = 0f
@@ -33,64 +36,33 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out DecoyGrenadeEntity>, pLevel
     companion object {
         private const val TOTAL_DURATION_TICKS = 15 * 20
 
-        // Kept for data synchronization from thrower
-        val CUSTOM_SOUND_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(DecoyGrenadeEntity::class.java, EntityDataSerializers.STRING)
-        val SOUND_COUNTER_ACCESSOR: EntityDataAccessor<Int> = SynchedEntityData.defineId(DecoyGrenadeEntity::class.java, EntityDataSerializers.INT)
-        val GUN_ID_TO_PLAY_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(DecoyGrenadeEntity::class.java, EntityDataSerializers.STRING)
-        val GUN_FIRE_MODE_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(DecoyGrenadeEntity::class.java, EntityDataSerializers.STRING)
-        val GUN_RPM_ACCESSOR: EntityDataAccessor<Int> = SynchedEntityData.defineId(DecoyGrenadeEntity::class.java, EntityDataSerializers.INT)
-        val GUN_SHOOT_INTERVAL_MS_ACCESSOR: EntityDataAccessor<Int> = SynchedEntityData.defineId(DecoyGrenadeEntity::class.java, EntityDataSerializers.INT)
+        val GUN_DATA_ACCESSOR: EntityDataAccessor<String> = SynchedEntityData.defineId(DecoyGrenadeEntity::class.java, EntityDataSerializers.STRING)
     }
 
     override fun defineSynchedData() {
         super.defineSynchedData()
-        entityData.define(CUSTOM_SOUND_ACCESSOR, "")
-        entityData.define(SOUND_COUNTER_ACCESSOR, 0)
-        entityData.define(GUN_ID_TO_PLAY_ACCESSOR, "")
-        entityData.define(GUN_FIRE_MODE_ACCESSOR, "")
-        entityData.define(GUN_RPM_ACCESSOR, 0)
-        entityData.define(GUN_SHOOT_INTERVAL_MS_ACCESSOR, 0)
+        entityData.define(GUN_DATA_ACCESSOR, "")
     }
 
     override fun getDefaultItem(): Item = ModItems.DECOY_GRENADE_ITEM.get()
 
     override fun tick() {
-        // If not landed, run normal physics and rotation
         if (!entityData.get(isLandedAccessor)) {
             super.tick()
             return
         }
 
-        // --- Grenade has landed ---
-
-        // On client, forcefully freeze rotation to prevent twitching
         if (level().isClientSide) {
-            if (!hasSavedFinalRotation) {
-                // Save the final rotation the first tick it's landed
-                finalXRot = this.customXRot
-                finalYRot = this.customYRot
-                finalZRot = this.customZRot
-                hasSavedFinalRotation = true
-            }
-            // On every subsequent tick, force the rotation back to the saved values
-            this.customXRot = finalXRot
-            this.customYRot = finalYRot
-            this.customZRot = finalZRot
-            this.customXRotO = finalXRot
-            this.customYRotO = finalYRot
-            this.customZRotO = finalZRot
-            // Do not call super.tick() here to prevent physics/rotation interference
-            return // No other client logic needed
+            freezeRotation()
+            return
         }
 
-        // On server, handle activation and sound scheduling
         if (activationTick == null) {
             activate()
         }
 
         activationTick?.let { startTick ->
             val currentTickInLifetime = tickCount - startTick
-            // Check for next shot
             if (nextFireTimestampIndex < fireTimestamps.size) {
                 val nextShotTick = fireTimestamps[nextFireTimestampIndex]
                 if (currentTickInLifetime >= nextShotTick) {
@@ -99,11 +71,25 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out DecoyGrenadeEntity>, pLevel
                 }
             }
 
-            // Check for end of life
             if (currentTickInLifetime > TOTAL_DURATION_TICKS) {
                 endOfLifeExplosion()
             }
         }
+    }
+
+    private fun freezeRotation() {
+        if (!hasSavedFinalRotation) {
+            finalXRot = this.customXRot
+            finalYRot = this.customYRot
+            finalZRot = this.customZRot
+            hasSavedFinalRotation = true
+        }
+        this.customXRot = finalXRot
+        this.customYRot = finalYRot
+        this.customZRot = finalZRot
+        this.customXRotO = finalXRot
+        this.customYRotO = finalYRot
+        this.customZRotO = finalZRot
     }
 
     override fun activate() {
@@ -113,38 +99,25 @@ class DecoyGrenadeEntity(pEntityType: EntityType<out DecoyGrenadeEntity>, pLevel
     }
 
     private fun fireShot() {
-        val currentCounter = entityData.get(SOUND_COUNTER_ACCESSOR)
-        entityData.set(SOUND_COUNTER_ACCESSOR, currentCounter + 1)
+        val gunId = gunData?.gunId ?: return
+        CsGrenadePacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), DecoyShotMessage(this.id, gunId, customSound))
     }
 
     fun findAndSetTaczGunIdOnThrow() {
-        if (!ModList.get().isLoaded("tacz")) return
-
         val owner = this.owner
         if (owner is Player) {
-            // Find the first tacz gun in inventory
-            owner.inventory.items.firstNotNullOfOrNull { itemStack ->
-                (itemStack.item as? IGun)?.let { gun ->
-                    val gunId = gun.getGunId(itemStack)
-                    val fireMode = gun.getFireMode(itemStack)
-                    val rpm = gun.getRPM(itemStack)
-                    TimelessAPI.getCommonGunIndex(gunId).ifPresent { commonGunIndex ->
-                        val gunData = commonGunIndex.gunData
-                        val shootIntervalMs = gunData.getShootInterval(owner, fireMode, itemStack).toInt()
-                        entityData.set(GUN_ID_TO_PLAY_ACCESSOR, gunId.toString())
-                        entityData.set(GUN_FIRE_MODE_ACCESSOR, fireMode.name)
-                        entityData.set(GUN_RPM_ACCESSOR, rpm)
-                        entityData.set(GUN_SHOOT_INTERVAL_MS_ACCESSOR, shootIntervalMs)
-                    }
-                    gun // return non-null to stop searching
-                }
+            gunData = TaczGunDataProvider.findGunDataFromPlayer(owner)
+            gunData?.let { data ->
+                entityData.set(GUN_DATA_ACCESSOR, data.gunId)
             }
         }
     }
 
     fun setCustomSound(sound: String) {
-        entityData.set(CUSTOM_SOUND_ACCESSOR, sound)
+        customSound = sound
     }
+
+    fun getGunData(): DecoyGunData? = gunData
 
     private fun endOfLifeExplosion() {
         if (!level().isClientSide) {
