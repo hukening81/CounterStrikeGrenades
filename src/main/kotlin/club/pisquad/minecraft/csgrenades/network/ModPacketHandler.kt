@@ -7,26 +7,44 @@ import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessag
 import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
 import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.SmokeGrenadePacketHandler
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.serializer
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.Level
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.network.NetworkEvent
 import net.minecraftforge.network.NetworkRegistry
+import net.minecraftforge.network.PacketDistributor
 import net.minecraftforge.network.simple.SimpleChannel
 import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Supplier
+import kotlin.reflect.KClass
 
 private const val PROTOCOL_VERSION = "1"
 
-interface CsGrenadeMessageHandler<Msg> {
-    fun encoder(message: Msg, buffer: FriendlyByteBuf)
-    fun decoder(buffer: FriendlyByteBuf): Msg
-    fun handler(msg: Msg, ctx: Supplier<NetworkEvent.Context>)
+abstract class CsGrenadeMessageHandler<Msg : Any>(
+    private val messageClass: KClass<Msg>,
+) {
+    @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
+    fun encoder(message: Msg, buffer: FriendlyByteBuf) {
+        val byteArray = Cbor.encodeToByteArray(messageClass.serializer(), message)
+        buffer.writeByteArray(byteArray)
+    }
+
+    @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
+    fun decoder(buffer: FriendlyByteBuf): Msg = Cbor.decodeFromByteArray(messageClass.serializer(), buffer.readByteArray())
+
+    abstract fun handler(msg: Msg, ctx: Supplier<NetworkEvent.Context>)
 }
 
 interface CsGrenadePacketHandler {
-    fun registerMessages()
+    fun registerMessages(handler: ModPacketHandler)
 }
 
 object ModPacketHandler {
@@ -43,7 +61,7 @@ object ModPacketHandler {
         PROTOCOL_VERSION::equals,
     )
 
-    fun registerMessage() {
+    fun forgeRegisterMessages() {
         INSTANCE.registerMessage(
             messageTypeCount,
             GrenadeThrownMessage::class.java,
@@ -60,11 +78,16 @@ object ModPacketHandler {
             FlashBangExplodedMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
-        HEGrenadePacketHandler.registerMessages()
-        FireGrenadePacketHandler.registerMessages()
+        HEGrenadePacketHandler.registerMessages(this)
+        FireGrenadePacketHandler.registerMessages(this)
+        SmokeGrenadePacketHandler.registerMessages(this)
     }
 
-    fun <M : Any> registerSingleMessage(message: Class<M>, encoder: BiConsumer<M, FriendlyByteBuf>, decoder: Function1<FriendlyByteBuf, M>, consumer: BiConsumer<M, Supplier<NetworkEvent.Context>>, direction: Optional<NetworkDirection>) {
+    fun <M : Any> registerMessage(message: Class<M>, encoder: BiConsumer<M, FriendlyByteBuf>, decoder: Function1<FriendlyByteBuf, M>, consumer: BiConsumer<M, Supplier<NetworkEvent.Context>>, direction: Optional<NetworkDirection>) {
         INSTANCE.registerMessage(messageTypeCount, message, encoder, decoder, consumer, direction)
+    }
+
+    fun sendMessageToPlayer(dimension: ResourceKey<Level>, message: Any) {
+        INSTANCE.send(PacketDistributor.DIMENSION.with { dimension }, message)
     }
 }

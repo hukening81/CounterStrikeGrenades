@@ -6,8 +6,8 @@ import net.minecraftforge.network.NetworkDirection
 import java.util.Optional
 
 object FireGrenadePacketHandler : CsGrenadePacketHandler {
-    override fun registerMessages() {
-        ModPacketHandler.registerSingleMessage(
+    override fun registerMessages(handler: ModPacketHandler) {
+        handler.registerMessage(
             FireGrenadeActivatedMessage::class.java,
             FireGrenadeActivatedMessage::encoder,
             FireGrenadeActivatedMessage::decoder,

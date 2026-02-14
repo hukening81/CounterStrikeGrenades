@@ -49,7 +49,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         if (this.level().isClientSide) {
             // EMPTY
         } else {
-            ModPacketHandler.INSTANCE.send(PacketDistributor.DIMENSION.with { this.level().dimension() }, HEGrenadeActivatedMessage(this.center))
+            ModPacketHandler.sendMessageToPlayer(this.level().dimension(), HEGrenadeActivatedMessage(this.center))
             this.doDamage()
             this.discard()
         }

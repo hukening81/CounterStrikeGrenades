@@ -47,7 +47,7 @@ object CounterStrikeGrenades {
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modBus)
         modBus.addListener(::removeFromCreativeTabs)
 
-        ModPacketHandler.registerMessage()
+        ModPacketHandler.forgeRegisterMessages()
 
         forgeBus.register(ModCommands)
 

@@ -16,7 +16,7 @@ object HEGrenadeHelper {
             SmokeGrenadeEntity::class.java,
             AABB(BlockPos.containing(center)).inflate(heDamageRadius + smokeRadius, smokeFallingHeight.toDouble() + heDamageRadius, heDamageRadius + smokeRadius),
         ).forEach {
-            it.clearSmokeWithinRange(center, heDamageRadius + 2.5, true)
+//            it.clearSmokeWithinRange(center, heDamageRadius + 2.5, true)
         }
     }
 }

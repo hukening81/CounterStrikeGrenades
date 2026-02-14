@@ -23,12 +23,12 @@ class HEGrenadeActivatedMessage(
     @Serializable(with = Vec3Serializer::class) val position: Vec3,
 
 ) {
-    companion object : CsGrenadeMessageHandler<HEGrenadeActivatedMessage> {
-        override fun encoder(message: HEGrenadeActivatedMessage, buffer: FriendlyByteBuf) {
-            buffer.writeUtf(Json.encodeToString(message))
-        }
-
-        override fun decoder(buffer: FriendlyByteBuf): HEGrenadeActivatedMessage = Json.decodeFromString<HEGrenadeActivatedMessage>(buffer.readUtf())
+    companion object : CsGrenadeMessageHandler<HEGrenadeActivatedMessage>(HEGrenadeActivatedMessage::class) {
+//        override fun encoder(message: HEGrenadeActivatedMessage, buffer: FriendlyByteBuf) {
+//            buffer.writeUtf(Json.encodeToString(message))
+//        }
+//
+//        override fun decoder(buffer: FriendlyByteBuf): HEGrenadeActivatedMessage = Json.decodeFromString<HEGrenadeActivatedMessage>(buffer.readUtf())
 
         override fun handler(msg: HEGrenadeActivatedMessage, ctx: Supplier<NetworkEvent.Context>) {
             val context = ctx.get()

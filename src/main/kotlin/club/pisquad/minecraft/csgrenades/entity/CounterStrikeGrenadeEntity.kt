@@ -321,7 +321,7 @@ abstract class ActivateAfterLandingGrenadeEntity(
     grenadeType: GrenadeType,
     val delay: Int,
 ) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
-    var lastTimeLandingPos: BlockPos? = null
+    var tickSinceLanding: Int = 0
 
     companion object {
         val isLandedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId<Boolean>(ActivateAfterLandingGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
@@ -332,13 +332,22 @@ abstract class ActivateAfterLandingGrenadeEntity(
         this.entityData.define(isLandedAccessor, false)
     }
 
-    override fun onHitBlock(result: BlockHitResult) {
-        super.onHitBlock(result)
-        if (lastTimeLandingPos != null && lastTimeLandingPos == result.blockPos) {
-            this.activate()
-        }
-        if (lastTimeLandingPos == null || lastTimeLandingPos != result.blockPos) {
-            lastTimeLandingPos = result.blockPos
+    override fun tick() {
+        super.tick()
+        // This is a little bit tricky
+        // super.onHitBlock() contains a mechanism to freeze the entity after landing on groud
+        // we rely on that the check if we are landed
+        if (this.level().isClientSide) {
+            // EMPTY
+        } else {
+            if (this.entityData.get(isLandedAccessor)) {
+                if (tickSinceLanding > delay) {
+                    this.activate()
+                }
+                tickSinceLanding++
+            } else {
+                this.entityData.set(isLandedAccessor, true)
+            }
         }
     }
 }

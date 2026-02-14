@@ -21,15 +21,19 @@ val forgeVersionRange: String by project
 val modAuthors: String by project
 val modDescription: String by project
 
+val kotlinSerializationVersion = "1.10.0"
+
 plugins {
     id("idea")
     id("maven-publish")
     id("net.minecraftforge.gradle").version("[6.0,6.2)")
     id("org.parchmentmc.librarian.forgegradle").version("1.+")
     // Adds the Kotlin Gradle plugin
-    id("org.jetbrains.kotlin.jvm").version("2.3.0")
+//    id("org.jetbrains.kotlin.jvm").version("2.3.0")
     // OPTIONAL Kotlin Serialization plugin
-    id("org.jetbrains.kotlin.plugin.serialization").version("2.3.0")
+//    id("org.jetbrains.kotlin.plugin.serialization").version("2.3.0")
+    kotlin("plugin.serialization").version("2.3.0")
+    kotlin("jvm").version("2.3.0")
     id("com.gradleup.shadow").version("9.2.0")
 }
 
@@ -63,9 +67,13 @@ configure<UserDevExtension> {
             property("mixin.env.remapRefMap", "true")
             property("mixin.env.refMapRemappingFile", "$projectDir/build/createSrgToMcp/output.srg")
 
-            if (System.getProperty("os.name")?.contains("linux", ignoreCase = true) == true) {
+            if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
+                // NOTE(hukening81): This is mainly for my use case, since native glfw has some issue under wayland what will crash the test instance.
                 println("Running on a linux machine, use custom glfw library")
                 jvmArg("-Dorg.lwjgl.glfw.libname=/usr/lib/libglfw.so")
+            }
+            lazyToken("minecraft_classpath") {
+                configurations.getByName("shade").files.joinToString(File.pathSeparator)
             }
             mods {
                 create(modId) {
@@ -153,6 +161,11 @@ repositories {
     }
 }
 
+configurations {
+    val shade by creating
+    implementation.get().extendsFrom(shade)
+}
+
 dependencies {
     // Use the latest version of Minecraft Forge
     minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
@@ -160,10 +173,17 @@ dependencies {
     implementation("thedarkcolour:kotlinforforge:$kffVersion")
     implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:7401617"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.10.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor-jvm:1.10.0")
+    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinSerializationVersion") {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
 
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.10.0")
+    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-cbor-jvm:$kotlinSerializationVersion") {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -198,6 +218,7 @@ tasks.withType<JavaCompile>().configureEach {
     this.options.encoding = "UTF-8"
 }
 tasks.named<Jar>("jar") {
+    archiveClassifier = "slim"
     manifest {
         attributes(
             "Specification-Title" to modId,
@@ -209,13 +230,49 @@ tasks.named<Jar>("jar") {
             "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date()),
         )
     }
+//    finalizedBy("reobfJar")
 }
+// Ugly workaround :(
+// tasks.matching { it.name.startsWith("reobf") }.configureEach {
+//    mustRunAfter(tasks.shadowJar)
+// }
 tasks.shadowJar {
-    enableAutoRelocation = true
+//    enableAutoRelocation = true
+    archiveClassifier.set("")
+    configurations = listOf(project.configurations.getByName("shade"))
+    relocate("kotlinx.serialization", "club.pisquasd.csgrenades.shadow.serialization")
+    from(sourceSets.main.get().output)
+//    dependencies {
+//        include("thedarkcolour:kotlinforforge:$kffVersion")
+//    }
+//    minimizeJar = true
     isZip64 = true
+    manifest {
+        attributes(
+            "Specification-Title" to modId,
+            "Specification-Vendor" to modAuthors,
+            "Specification-Version" to "1",
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to archiveVersion.get(),
+            "Implementation-Vendor" to modAuthors,
+            "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date()),
+        )
+    }
+    finalizedBy("reobfShadowJar")
+}
+// tasks.named("reobfJar") {
+//    dependsOn(tasks.shadowJar)
+// }
+// tasks.named("reobfJarJar") {
+//    dependsOn(tasks.shadowJar)
+// }
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
+}
+reobf {
+    create("shadowJar")
 }
 // The below is only required if using "maven-publish" and you want to publish to maven or use JitPack
-// jar.finalizedBy("reobfJar")
 // publishing {
 //    publications {
 //        mavenJava(MavenPublication) {

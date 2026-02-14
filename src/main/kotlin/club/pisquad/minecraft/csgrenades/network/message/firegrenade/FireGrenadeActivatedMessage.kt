@@ -29,15 +29,15 @@ class FireGrenadeActivatedMessage(
 //        ExtinguishedBySmoke,
     }
 
-    companion object : CsGrenadeMessageHandler<FireGrenadeActivatedMessage> {
-        override fun encoder(message: FireGrenadeActivatedMessage, buffer: FriendlyByteBuf) {
-            buffer.writeUtf(Json.encodeToString(message))
-        }
-
-        override fun decoder(buffer: FriendlyByteBuf): FireGrenadeActivatedMessage {
-            val text = buffer.readUtf()
-            return Json.decodeFromString<FireGrenadeActivatedMessage>(text)
-        }
+    companion object : CsGrenadeMessageHandler<FireGrenadeActivatedMessage>(FireGrenadeActivatedMessage::class) {
+//        override fun encoder(message: FireGrenadeActivatedMessage, buffer: FriendlyByteBuf) {
+//            buffer.writeUtf(Json.encodeToString(message))
+//        }
+//
+//        override fun decoder(buffer: FriendlyByteBuf): FireGrenadeActivatedMessage {
+//            val text = buffer.readUtf()
+//            return Json.decodeFromString<FireGrenadeActivatedMessage>(text)
+//        }
 
         override fun handler(msg: FireGrenadeActivatedMessage, ctx: Supplier<NetworkEvent.Context>) {
             val context = ctx.get()
