@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.client.render.smoke
+package club.pisquad.minecraft.csgrenades.client.render.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*
