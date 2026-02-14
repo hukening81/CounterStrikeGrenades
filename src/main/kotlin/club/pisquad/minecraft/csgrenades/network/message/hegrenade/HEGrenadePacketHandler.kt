@@ -1,9 +1,8 @@
 package club.pisquad.minecraft.csgrenades.network.message.hegrenade
 
-import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.network.*
 import net.minecraftforge.network.NetworkDirection
-import java.util.Optional
+import java.util.*
 
 object HEGrenadePacketHandler : CsGrenadePacketHandler {
     override fun registerMessages(handler: ModPacketHandler) {

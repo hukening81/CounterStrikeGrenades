@@ -1,18 +1,17 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.GrenadeEntityInterface
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.AbstractFireGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import net.minecraft.client.Minecraft // Import Minecraft
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.renderer.texture.TextureAtlas
-import net.minecraft.client.resources.model.BakedModel // Import BakedModel
+import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity

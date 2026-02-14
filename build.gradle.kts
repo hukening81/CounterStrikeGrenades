@@ -13,7 +13,6 @@ val mappingVersion: String by project
 val configMappingVersion = mappingVersion
 val minecraftVersion: String by project
 val forgeVersion: String by project
-val kffVersion: String by project
 val modName: String by project
 val modLicense: String by project
 val minecraftVersionRange: String by project
@@ -132,11 +131,6 @@ configure<UserDevExtension> {
 sourceSets.main.get().resources { srcDirs("src/generated/resources/") }
 
 repositories {
-    maven {
-        name = "Kotlin for Forge"
-        url = uri("https://thedarkcolour.github.io/KotlinForForge/")
-        content { includeGroup("thedarkcolour") }
-    }
     exclusiveContent {
         forRepository {
             maven {
@@ -170,7 +164,6 @@ dependencies {
     // Use the latest version of Minecraft Forge
     minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
-    implementation("thedarkcolour:kotlinforforge:$kffVersion")
     implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:7401617"))
 
     "shade"("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinSerializationVersion") {
@@ -181,7 +174,7 @@ dependencies {
         exclude(group = "org.jetbrains", module = "annotations")
     }
 
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
+    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
         exclude(group = "org.jetbrains", module = "annotations")
     }
 }

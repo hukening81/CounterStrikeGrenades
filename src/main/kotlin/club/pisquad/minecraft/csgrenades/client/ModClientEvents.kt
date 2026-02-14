@@ -1,16 +1,19 @@
 package club.pisquad.minecraft.csgrenades.client
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.registry.ModItems
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.api.distmarker.Dist
+import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.client.event.ModelEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 
+@OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = [Dist.CLIENT])
 object ModClientEvents {
 
+    @JvmStatic
     @SubscribeEvent
     fun onModelsRegistered(event: ModelEvent.RegisterAdditional) {
         val grenadeItems = listOf(

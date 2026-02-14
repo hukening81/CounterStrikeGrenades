@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.event
 
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.enums.*
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraftforge.event.entity.player.PlayerEvent

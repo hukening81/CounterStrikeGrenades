@@ -1,8 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.registry.ModDamageType
-import club.pisquad.minecraft.csgrenades.registry.ModItems
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.damagesource.DamageSource

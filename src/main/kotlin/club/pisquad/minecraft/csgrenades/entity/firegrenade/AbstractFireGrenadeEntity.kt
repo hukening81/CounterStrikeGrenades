@@ -1,15 +1,14 @@
 package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
 import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.client.render.firegrenade.FireGrenadeRenderer
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.SetTimeActivateGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadeActivatedMessage
-import club.pisquad.minecraft.csgrenades.registry.ModSerializers
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.client.render.firegrenade.*
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.network.*
+import club.pisquad.minecraft.csgrenades.network.message.firegrenade.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.Registries

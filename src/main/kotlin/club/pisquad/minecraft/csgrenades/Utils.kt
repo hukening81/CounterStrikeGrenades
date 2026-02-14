@@ -1,13 +1,10 @@
 package club.pisquad.minecraft.csgrenades
 
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs

@@ -1,9 +1,8 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.client.input.ThrowActionHandler
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.linearInterpolate
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.client.input.*
+import club.pisquad.minecraft.csgrenades.config.*
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.event.ComputeFovModifierEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -11,6 +10,8 @@ import net.minecraftforge.fml.common.Mod
 
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object FovEffectRenderer {
+
+    @JvmStatic
     @SubscribeEvent
     fun onFovModifierEvent(event: ComputeFovModifierEvent) {
         if (ThrowActionHandler.currentThrowSpeed == null) {

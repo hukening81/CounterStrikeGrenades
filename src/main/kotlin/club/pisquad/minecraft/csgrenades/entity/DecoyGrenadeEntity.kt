@@ -1,9 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.compat.tacz.TaczApiHandler
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.registry.ModDamageType
-import club.pisquad.minecraft.csgrenades.registry.ModItems
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import com.tacz.guns.api.item.IGun
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor

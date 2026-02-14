@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.event
 
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.enums.*
 import net.minecraftforge.event.entity.EntityEvent
 
 /**

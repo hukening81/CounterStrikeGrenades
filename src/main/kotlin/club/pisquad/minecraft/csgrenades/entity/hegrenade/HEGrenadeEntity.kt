@@ -1,14 +1,12 @@
-package club.pisquad.minecraft.csgrenades.entity.grenade
+package club.pisquad.minecraft.csgrenades.entity.hegrenade
 
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.SetTimeActivateGrenadeEntity
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadeActivatedMessage
-import club.pisquad.minecraft.csgrenades.registry.ModDamageType
-import club.pisquad.minecraft.csgrenades.registry.ModItems
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
-import club.pisquad.minecraft.csgrenades.toTick
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.network.*
+import club.pisquad.minecraft.csgrenades.network.message.hegrenade.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.core.registries.Registries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
@@ -22,8 +20,6 @@ import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
-import net.minecraftforge.eventbus.api.IEventBus
-import net.minecraftforge.network.PacketDistributor
 import kotlin.math.max
 
 class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
@@ -38,11 +34,11 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         this.hitBlockSound = ModSoundEvents.HEGRENADE_BOUNCE.get()
     }
 
-    companion object {
-        fun registerEventHandler(bus: IEventBus) {
-            bus.register(HEGrenadeEventHandler)
-        }
-    }
+//    companion object {
+//        fun registerEventHandler(bus: IEventBus) {
+//            bus.register(HEGrenadeEventHandler)
+//        }
+//    }
 
     override fun activate() {
         super.activate()

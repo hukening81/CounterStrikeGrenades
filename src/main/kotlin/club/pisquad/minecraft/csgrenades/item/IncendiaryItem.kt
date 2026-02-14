@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.item
 
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.registry.*
 
 class IncendiaryItem(properties: Properties) : CounterStrikeGrenadeItem(properties) {
     init {

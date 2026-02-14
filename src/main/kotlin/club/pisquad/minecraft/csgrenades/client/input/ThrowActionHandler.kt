@@ -1,13 +1,12 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.event.GrenadeThrowEvent
-import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
-import club.pisquad.minecraft.csgrenades.linearInterpolate
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.event.*
+import club.pisquad.minecraft.csgrenades.item.*
+import club.pisquad.minecraft.csgrenades.network.*
+import club.pisquad.minecraft.csgrenades.network.message.*
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Rotations
 import net.minecraft.world.InteractionHand
@@ -39,6 +38,7 @@ object ThrowActionHandler {
     private var screenOpened = false
     private var buttonPressedWhenScreenOpen = false
 
+    @JvmStatic
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent) {
         if (event.phase == TickEvent.Phase.START) return

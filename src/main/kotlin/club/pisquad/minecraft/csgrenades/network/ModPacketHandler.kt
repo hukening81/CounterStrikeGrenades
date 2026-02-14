@@ -2,12 +2,11 @@
 
 package club.pisquad.minecraft.csgrenades.network
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessage
-import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
-import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.SmokeGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.network.message.*
+import club.pisquad.minecraft.csgrenades.network.message.firegrenade.*
+import club.pisquad.minecraft.csgrenades.network.message.hegrenade.*
+import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.cbor.Cbor
@@ -61,7 +60,7 @@ object ModPacketHandler {
         PROTOCOL_VERSION::equals,
     )
 
-    fun forgeRegisterMessages() {
+    fun register() {
         INSTANCE.registerMessage(
             messageTypeCount,
             GrenadeThrownMessage::class.java,

@@ -1,11 +1,9 @@
 package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
 import net.minecraft.sounds.SoundSource
-import net.minecraft.world.phys.Vec3
-import java.util.logging.Level
 import kotlin.random.Random
 
 object FireGrenadeHelper {

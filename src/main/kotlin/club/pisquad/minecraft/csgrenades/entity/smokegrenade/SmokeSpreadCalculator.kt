@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.smokegrenade
 
+import club.pisquad.minecraft.csgrenades.*
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
@@ -21,9 +22,6 @@ import net.minecraft.world.level.block.state.properties.SlabType
 import net.minecraft.world.level.block.state.properties.WallSide
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.Tags
-import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.div
-import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
-import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.times
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -70,7 +68,7 @@ class SmokeSpreadCalculator(val level: ServerLevel, val center: Vec3) {
                 run {
                     val massCenter = this.filter { it.distanceToSqr(probe) < 1 }.map { it.position }.reduce { acc, vec3 -> acc.add(vec3) }.div(this.size.toDouble())
                     val force = 1.div(probe.distanceToSqr(massCenter).pow(2))
-                    probe.velocity = probe.position.minus(massCenter).times(force)
+                    probe.velocity = probe.position.minus(massCenter).scale(force)
                 }
             }
         }

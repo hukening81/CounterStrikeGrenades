@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.particle
 
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.millToTick
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.config.*
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Camera
 import net.minecraft.client.multiplayer.ClientLevel

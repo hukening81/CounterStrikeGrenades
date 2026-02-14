@@ -4,9 +4,7 @@ import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.network.message.*
 import club.pisquad.minecraft.csgrenades.registry.*
 import club.pisquad.minecraft.csgrenades.sound.*
-import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.BufferUploader
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.PoseStack
@@ -14,14 +12,11 @@ import com.mojang.blaze3d.vertex.Tesselator
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.GameRenderer
-import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.sounds.SoundEvents
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.client.event.RenderLevelStageEvent
-import net.minecraftforge.client.event.ScreenEvent
 import net.minecraftforge.client.event.sound.PlaySoundEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -78,6 +73,7 @@ object FlashbangBlindEffectRenderer {
         playRingSound(effectData)
     }
 
+    @JvmStatic
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         // If the player is not flashed, do nothing.
@@ -109,6 +105,7 @@ object FlashbangBlindEffectRenderer {
         event.sound = null
     }
 
+    @JvmStatic
     @SubscribeEvent
     fun eventHandler(event: RenderLevelStageEvent) {
         if (event.stage != RenderLevelStageEvent.Stage.AFTER_LEVEL) return
@@ -151,7 +148,7 @@ object FlashbangBlindEffectRenderer {
         RenderSystem.defaultBlendFunc()
         RenderSystem.setShader { GameRenderer.getPositionColorShader() }
 
-        val color = 0xFFFFFFFF.toInt()
+        0xFFFFFFFF.toInt()
 
         val matrix = poseStack.last().pose()
 

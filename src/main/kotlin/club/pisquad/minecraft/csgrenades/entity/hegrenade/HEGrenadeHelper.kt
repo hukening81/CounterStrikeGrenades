@@ -1,7 +1,7 @@
-package club.pisquad.minecraft.csgrenades.entity.grenade
+package club.pisquad.minecraft.csgrenades.entity.hegrenade
 
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.AABB

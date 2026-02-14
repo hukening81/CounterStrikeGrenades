@@ -1,22 +1,21 @@
 package club.pisquad.minecraft.csgrenades.registry
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.entity.*
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.MolotovEntity
-import club.pisquad.minecraft.csgrenades.entity.grenade.HEGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
+import club.pisquad.minecraft.csgrenades.entity.hegrenade.*
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.level.Level
+import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.ForgeRegistries
 import net.minecraftforge.registries.RegistryObject
 
 object ModEntities {
-    val entitySize = GRENADE_ENTITY_SIZE.toFloat()
+    const val ENTITY_SIZE = GRENADE_ENTITY_SIZE.toFloat()
     val ENTITIES: DeferredRegister<EntityType<*>> =
         DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, CounterStrikeGrenades.ID)
 
@@ -24,7 +23,7 @@ object ModEntities {
         EntityType.Builder.of(
             { pEntityType: EntityType<FlashBangEntity>, pLevel: Level -> FlashBangEntity(pEntityType, pLevel) },
             MobCategory.MISC,
-        ).sized(entitySize, entitySize)
+        ).sized(ENTITY_SIZE, ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "flashbang").toString())
     }
 
@@ -32,7 +31,7 @@ object ModEntities {
         EntityType.Builder.of(
             { pEntityType: EntityType<SmokeGrenadeEntity>, pLevel: Level -> SmokeGrenadeEntity(pEntityType, pLevel) },
             MobCategory.MISC,
-        ).sized(entitySize, entitySize)
+        ).sized(ENTITY_SIZE, ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "smokegrenade").toString())
     }
 
@@ -40,7 +39,7 @@ object ModEntities {
         EntityType.Builder.of(
             { pEntityType: EntityType<HEGrenadeEntity>, pLevel: Level -> HEGrenadeEntity(pEntityType, pLevel) },
             MobCategory.MISC,
-        ).sized(entitySize, entitySize)
+        ).sized(ENTITY_SIZE, ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "hegrenade").toString())
     }
 
@@ -48,7 +47,7 @@ object ModEntities {
         EntityType.Builder.of(
             { pEntityType: EntityType<IncendiaryEntity>, pLevel: Level -> IncendiaryEntity(pEntityType, pLevel) },
             MobCategory.MISC,
-        ).sized(entitySize, entitySize)
+        ).sized(ENTITY_SIZE, ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "incendiary").toString())
     }
 
@@ -56,7 +55,7 @@ object ModEntities {
         EntityType.Builder.of(
             { pEntityType: EntityType<MolotovEntity>, pLevel: Level -> MolotovEntity(pEntityType, pLevel) },
             MobCategory.MISC,
-        ).sized(entitySize, entitySize)
+        ).sized(ENTITY_SIZE, ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "molotov").toString())
     }
 
@@ -64,7 +63,11 @@ object ModEntities {
         EntityType.Builder.of(
             { pEntityType: EntityType<DecoyGrenadeEntity>, pLevel: Level -> DecoyGrenadeEntity(pEntityType, pLevel) },
             MobCategory.MISC,
-        ).sized(entitySize, entitySize)
+        ).sized(ENTITY_SIZE, ENTITY_SIZE)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "decoy").toString())
+    }
+
+    fun register(bus: IEventBus) {
+        ENTITIES.register(bus)
     }
 }

@@ -1,17 +1,19 @@
 package club.pisquad.minecraft.csgrenades.client.render.flashbang
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.network.message.AffectedPlayerInfo
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.network.message.*
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.player.Player
 import net.minecraftforge.api.distmarker.Dist
+import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
+@OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object FlashbangParticleEffectRenderer {
     //    value is the time we should stop rendering, in Epoch milisecond
@@ -28,13 +30,14 @@ object FlashbangParticleEffectRenderer {
         }
     }
 
+    @JvmStatic
     @SubscribeEvent
     fun render(event: TickEvent.ClientTickEvent) {
         if (event.phase == TickEvent.Phase.END) {
             val timeNowEpoch = Instant.now().toEpochMilli()
             val level = Minecraft.getInstance().level ?: return
             renderingPlayers.filter { it.value < timeNowEpoch }.forEach { renderingPlayers.remove(it.key) }
-            renderingPlayers.forEach { (uuid, time) ->
+            renderingPlayers.forEach { (uuid, _) ->
                 level.getPlayerByUUID(uuid)?.let { createParticleAtPlayer(it) }
             }
         }

@@ -1,9 +1,8 @@
 package club.pisquad.minecraft.csgrenades.client.render.firegrenade
 
 import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.AbstractFireGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource

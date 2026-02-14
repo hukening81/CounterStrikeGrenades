@@ -1,17 +1,15 @@
 package club.pisquad.minecraft.csgrenades.entity.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.ActivateAfterLandingGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.AbstractFireGrenadeEntity
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
-import club.pisquad.minecraft.csgrenades.network.data.RoundedVec3
-import club.pisquad.minecraft.csgrenades.network.data.round
-import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.SmokeGrenadeActivatedMessage
-import club.pisquad.minecraft.csgrenades.particle.SmokeGrenadeParticle
-import club.pisquad.minecraft.csgrenades.registry.ModDamageType
-import club.pisquad.minecraft.csgrenades.registry.ModItems
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.network.*
+import club.pisquad.minecraft.csgrenades.network.data.*
+import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.*
+import club.pisquad.minecraft.csgrenades.particle.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries

@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.registry
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraftforge.eventbus.api.IEventBus
@@ -39,8 +39,8 @@ object ModSoundEvents {
     val INCENDIARY_BOUNCE = registerSoundEvents("incendiary.bounce")
     val INCENDIARY_POP = registerSoundEvents("incendiary.pop")
 
-    fun register(eventBus: IEventBus) {
-        SOUND_EVENTS.register(eventBus)
+    fun register(bus: IEventBus) {
+        SOUND_EVENTS.register(bus)
     }
 
     private fun registerSoundEvents(name: String): RegistryObject<SoundEvent> {

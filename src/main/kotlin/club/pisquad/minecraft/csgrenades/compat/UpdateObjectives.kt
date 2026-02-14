@@ -1,11 +1,10 @@
 package club.pisquad.minecraft.csgrenades.compat
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.entity.*
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.MolotovEntity
-import club.pisquad.minecraft.csgrenades.entity.grenade.HEGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
+import club.pisquad.minecraft.csgrenades.entity.hegrenade.*
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*
 import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.world.entity.player.Player

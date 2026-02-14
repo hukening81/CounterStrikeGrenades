@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.event
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.api.*
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
@@ -16,6 +16,7 @@ object ModEvents {
      * 监听服务器Tick事件，用于更新闪光弹致盲状态。
      * @param event Tick事件。
      */
+    @JvmStatic
     @SubscribeEvent
     fun onServerTick(event: TickEvent.ServerTickEvent) {
         if (event.phase == TickEvent.Phase.END) {

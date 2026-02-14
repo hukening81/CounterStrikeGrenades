@@ -1,10 +1,9 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.client.input.ThrowActionHandler
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
-import club.pisquad.minecraft.csgrenades.linearInterpolate
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.client.input.*
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.item.*
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GameRenderer
@@ -54,6 +53,7 @@ object TrajectoryRenderer {
             )
     }
 
+    @JvmStatic
     @SubscribeEvent
     fun onRenderLevelStage(event: RenderLevelStageEvent) {
         if (event.stage != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {

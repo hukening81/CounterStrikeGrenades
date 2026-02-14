@@ -1,20 +1,12 @@
 package club.pisquad.minecraft.csgrenades.entity
 
-import club.pisquad.minecraft.csgrenades.BOUNCE_FRICTION
-import club.pisquad.minecraft.csgrenades.BOUNCE_RESTORATION_RATE
-import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE
-import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
-import club.pisquad.minecraft.csgrenades.SoundTypes
-import club.pisquad.minecraft.csgrenades.SoundUtils
-import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.grenade.HEGrenadeEntity
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
-import club.pisquad.minecraft.csgrenades.snapToAxis
+import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.event.*
+import club.pisquad.minecraft.csgrenades.registry.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
-import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -32,11 +24,6 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent
-import net.minecraftforge.eventbus.EventBus
-import net.minecraftforge.eventbus.api.IEventBus
-import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.minus
-import thedarkcolour.kotlinforforge.forge.vectorutil.v3d.times
 import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.sign
@@ -85,9 +72,9 @@ abstract class CounterStrikeGrenadeEntity(
         val isActivatedAccessor: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
 
-        fun registerGrenadeEntityEventHandler(bus: IEventBus) {
-            HEGrenadeEntity.registerEventHandler(bus)
-        }
+//        fun registerGrenadeEntityEventHandler(bus: IEventBus) {
+//            HEGrenadeEntity.registerEventHandler(bus)
+//        }
     }
 
     override fun defineSynchedData() {
@@ -234,17 +221,17 @@ abstract class CounterStrikeGrenadeEntity(
         val collisionPoint = when (result.direction) {
             Direction.DOWN, Direction.UP -> {
                 scale = (relativePos.y.absoluteValue - 0.5 - GRENADE_ENTITY_SIZE_HALF).div(this.deltaMovement.y.absoluteValue)
-                this.center.add(Vec3(0.0, GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign), 0.0)).add(this.deltaMovement.times(scale))
+                this.center.add(Vec3(0.0, GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign), 0.0)).add(this.deltaMovement.scale(scale))
             }
 
             Direction.NORTH, Direction.SOUTH -> {
                 scale = (relativePos.z.absoluteValue - 0.5 - GRENADE_ENTITY_SIZE_HALF).div(this.deltaMovement.z.absoluteValue)
-                this.center.add(Vec3(0.0, 0.0, GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign))).add(this.deltaMovement.times(scale))
+                this.center.add(Vec3(0.0, 0.0, GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign))).add(this.deltaMovement.scale(scale))
             }
 
             Direction.WEST, Direction.EAST -> {
                 scale = (relativePos.x.absoluteValue - 0.5 - GRENADE_ENTITY_SIZE_HALF).div(this.deltaMovement.x.absoluteValue)
-                this.center.add(Vec3(GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign), 0.0, 0.0)).add(this.deltaMovement.times(scale))
+                this.center.add(Vec3(GRENADE_ENTITY_SIZE_HALF.times(relativePos.y.sign), 0.0, 0.0)).add(this.deltaMovement.scale(scale))
             }
         }
         val newSpeed = when (result.direction) {
@@ -261,7 +248,7 @@ abstract class CounterStrikeGrenadeEntity(
             }
         }
         println("newspeed $newSpeed")
-        this.center = collisionPoint.add(newSpeed.times(1 - scale))
+        this.center = collisionPoint.add(newSpeed.scale(1 - scale))
         this.deltaMovement = newSpeed.add(Vec3(0.0, -this.gravity * (1 - scale), 0.0))
     }
 
