@@ -4,13 +4,12 @@ import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.api.*
 import club.pisquad.minecraft.csgrenades.client.render.flashbang.*
 import club.pisquad.minecraft.csgrenades.config.*
+import club.pisquad.minecraft.csgrenades.network.*
 import club.pisquad.minecraft.csgrenades.network.serializer.*
 import club.pisquad.minecraft.csgrenades.registry.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
-import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.player.Player
@@ -21,11 +20,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
 import java.util.*
 import java.util.function.Supplier
-import kotlin.math.PI
-import kotlin.math.acos
-import kotlin.math.max
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @Serializable
 data class FlashbangEffectData(
@@ -127,18 +122,9 @@ class FlashBangExplodedMessage(
     @Serializable(with = Vec3Serializer::class) val position: Vec3,
     val affectedPlayers: List<AffectedPlayerInfo>,
 ) {
-    companion object {
+    companion object : CsGrenadeMessageHandler<FlashBangExplodedMessage>(FlashBangExplodedMessage::class) {
 
-        fun encoder(msg: FlashBangExplodedMessage, buffer: FriendlyByteBuf) {
-            buffer.writeUtf(Json.encodeToString(msg))
-        }
-
-        fun decoder(buffer: FriendlyByteBuf): FlashBangExplodedMessage {
-            val text = buffer.readUtf()
-            return Json.decodeFromString<FlashBangExplodedMessage>(text)
-        }
-
-        fun handler(msg: FlashBangExplodedMessage, ctx: Supplier<NetworkEvent.Context>) {
+        override fun handler(msg: FlashBangExplodedMessage, ctx: Supplier<NetworkEvent.Context>) {
             val context = ctx.get()
             context.packetHandled = true
             if (context.direction.receptionSide.isClient) {

@@ -26,7 +26,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     SetTimeActivateGrenadeEntity(
         pEntityType,
         pLevel,
-        GrenadeType.HEGRENADE,
+        GrenadeType.HE_GRENADE,
         ModConfig.HEGrenade.FUSE_TIME.get().toTick().toInt(),
     ) {
 

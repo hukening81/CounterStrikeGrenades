@@ -174,9 +174,9 @@ dependencies {
         exclude(group = "org.jetbrains", module = "annotations")
     }
 
-    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
-        exclude(group = "org.jetbrains", module = "annotations")
-    }
+//    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
+//        exclude(group = "org.jetbrains", module = "annotations")
+//    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -5,16 +5,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.AirBlock
-import net.minecraft.world.level.block.ChainBlock
-import net.minecraft.world.level.block.FenceBlock
-import net.minecraft.world.level.block.FenceGateBlock
-import net.minecraft.world.level.block.IronBarsBlock
-import net.minecraft.world.level.block.SignBlock
-import net.minecraft.world.level.block.SlabBlock
-import net.minecraft.world.level.block.StairBlock
-import net.minecraft.world.level.block.TrapDoorBlock
-import net.minecraft.world.level.block.WallBlock
+import net.minecraft.world.level.block.*
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.Half
@@ -22,7 +13,6 @@ import net.minecraft.world.level.block.state.properties.SlabType
 import net.minecraft.world.level.block.state.properties.WallSide
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.Tags
-import kotlin.math.pow
 import kotlin.random.Random
 
 private class BlockStateCache(val level: Level) {
@@ -57,18 +47,24 @@ private class SmokeSpreadProbe(
 }
 
 class SmokeSpreadCalculator(val level: ServerLevel, val center: Vec3) {
-    val probeCount: Int = 10
+    val probeCount: Int = 1000
     val velocityScale: Double = 1.5
-    val walkIteration = 1000
+    val walkIteration = 10
     private val cache: BlockStateCache = BlockStateCache(level)
 
     companion object {
         private fun HashSet<SmokeSpreadProbe>.updateVelocity() {
             this.forEach { probe ->
                 run {
-                    val massCenter = this.filter { it.distanceToSqr(probe) < 1 }.map { it.position }.reduce { acc, vec3 -> acc.add(vec3) }.div(this.size.toDouble())
-                    val force = 1.div(probe.distanceToSqr(massCenter).pow(2))
-                    probe.velocity = probe.position.minus(massCenter).scale(force)
+                    val neighbors = this.filter { it.distanceToSqr(probe) < 0.5 }
+                    if (neighbors.isEmpty()) {
+                        probe.velocity = Vec3.ZERO
+                        return
+                    }
+                    val massCenter = neighbors.map { it.position }.reduce { acc, vec3 -> acc.add(vec3) }.div(neighbors.size.toDouble())
+//                    val force = 1.div(probe.distanceToSqr(massCenter))
+                    val rawVelocity = probe.position.minus(massCenter)
+                    probe.velocity = rawVelocity.normalize()
                 }
             }
         }

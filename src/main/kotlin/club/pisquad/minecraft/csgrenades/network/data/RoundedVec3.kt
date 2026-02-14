@@ -2,8 +2,7 @@ package club.pisquad.minecraft.csgrenades.network.data
 
 import kotlinx.serialization.Serializable
 import net.minecraft.world.phys.Vec3
-import kotlin.math.pow
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 @Serializable
 class RoundedDouble(val value: Long) {
@@ -12,7 +11,7 @@ class RoundedDouble(val value: Long) {
         fun fromDouble(value: Double): RoundedDouble = RoundedDouble(value.times(10.0.pow(DECIMAL)).roundToInt().toLong())
     }
 
-    fun toDouble(): Double = value.div(2.0)
+    fun toDouble(): Double = value.div(10.0.pow(DECIMAL))
 }
 
 fun Double.round(): RoundedDouble = RoundedDouble.fromDouble(this)

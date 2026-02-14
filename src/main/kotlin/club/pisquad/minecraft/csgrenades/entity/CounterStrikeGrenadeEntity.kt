@@ -25,8 +25,7 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
 import java.util.*
-import kotlin.math.absoluteValue
-import kotlin.math.sign
+import kotlin.math.*
 
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out ThrowableItemProjectile>,
@@ -84,6 +83,8 @@ abstract class CounterStrikeGrenadeEntity(
 //        this.entityData.define(isExplodedAccessor, false)
         this.entityData.define(isActivatedAccessor, false)
     }
+
+    fun isActivated(): Boolean = this.entityData.get(isActivatedAccessor)
 
     override fun onHitEntity(result: EntityHitResult) {
         if (level().isClientSide) {
@@ -327,13 +328,17 @@ abstract class ActivateAfterLandingGrenadeEntity(
         if (this.level().isClientSide) {
             // EMPTY
         } else {
-            if (this.entityData.get(isLandedAccessor)) {
-                if (tickSinceLanding > delay) {
-                    this.activate()
-                }
-                tickSinceLanding++
+            if (this.entityData.get(isActivatedAccessor)) {
+                // EMPTY
             } else {
-                this.entityData.set(isLandedAccessor, true)
+                if (this.entityData.get(isLandedAccessor)) {
+                    if (tickSinceLanding > delay) {
+                        this.activate()
+                    }
+                    tickSinceLanding++
+                } else {
+                    this.entityData.set(isLandedAccessor, true)
+                }
             }
         }
     }

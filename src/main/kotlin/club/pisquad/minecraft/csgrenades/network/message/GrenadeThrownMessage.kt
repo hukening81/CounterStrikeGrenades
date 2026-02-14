@@ -1,12 +1,11 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.network.*
 import club.pisquad.minecraft.csgrenades.network.serializer.*
 import club.pisquad.minecraft.csgrenades.registry.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import net.minecraft.core.Rotations
-import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
@@ -24,18 +23,9 @@ class GrenadeThrownMessage(
     @Serializable(with = RotationSerializer::class) val rotation: Rotations,
     val customSound: String? = null,
 ) {
-    companion object {
+    companion object : CsGrenadeMessageHandler<GrenadeThrownMessage>(GrenadeThrownMessage::class) {
 
-        fun encoder(msg: GrenadeThrownMessage, buffer: FriendlyByteBuf) {
-            buffer.writeUtf(Json.encodeToString(msg))
-        }
-
-        fun decoder(buffer: FriendlyByteBuf): GrenadeThrownMessage {
-            val text = buffer.readUtf()
-            return Json.decodeFromString<GrenadeThrownMessage>(text)
-        }
-
-        fun handler(msg: GrenadeThrownMessage, ctx: Supplier<NetworkEvent.Context>) {
+        override fun handler(msg: GrenadeThrownMessage, ctx: Supplier<NetworkEvent.Context>) {
             val context = ctx.get()
             val player: ServerPlayer = context.sender ?: return
 
@@ -44,7 +34,7 @@ class GrenadeThrownMessage(
             val entityType = when (msg.grenadeType) {
                 GrenadeType.FLASH_BANG -> ModEntities.FLASH_BANG_ENTITY.get()
                 GrenadeType.SMOKE_GRENADE -> ModEntities.SMOKE_GRENADE_ENTITY.get()
-                GrenadeType.HEGRENADE -> ModEntities.HEGRENADE_ENTITY.get()
+                GrenadeType.HE_GRENADE -> ModEntities.HEGRENADE_ENTITY.get()
                 GrenadeType.INCENDIARY -> ModEntities.INCENDIARY_ENTITY.get()
                 GrenadeType.MOLOTOV -> ModEntities.MOLOTOV_ENTITY.get()
                 GrenadeType.DECOY_GRENADE -> ModEntities.DECOY_GRENADE_ENTITY.get()

@@ -7,12 +7,11 @@ import net.minecraftforge.network.NetworkEvent
 import java.util.function.Supplier
 
 @Serializable
-class SmokeGrenadeActivatedMessage(
-    val points: List<RoundedVec3>,
-) {
+class SmokeGrenadeActivatedMessage {
+    // Due to implementation change, this message is not being used
     companion object : CsGrenadeMessageHandler<SmokeGrenadeActivatedMessage>(SmokeGrenadeActivatedMessage::class) {
         override fun handler(msg: SmokeGrenadeActivatedMessage, ctx: Supplier<NetworkEvent.Context>) {
-            println("SmokeGrenadeActivatedMessage ${msg.points.size}")
+            println("SmokeGrenadeActivatedMessage")
         }
     }
 }
