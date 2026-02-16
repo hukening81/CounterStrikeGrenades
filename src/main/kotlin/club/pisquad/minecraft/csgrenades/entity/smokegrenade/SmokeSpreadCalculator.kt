@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.smokegrenade
 
-import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.div
+import club.pisquad.minecraft.csgrenades.minus
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
@@ -12,6 +13,7 @@ import net.minecraft.world.level.block.state.properties.Half
 import net.minecraft.world.level.block.state.properties.SlabType
 import net.minecraft.world.level.block.state.properties.WallSide
 import net.minecraft.world.phys.Vec3
+import net.minecraftforge.common.IPlantable
 import net.minecraftforge.common.Tags
 import kotlin.random.Random
 
@@ -250,6 +252,18 @@ class SmokeSpreadCalculator(val level: ServerLevel, val center: Vec3) {
                         return emptyList()
                     }
                 }
+            }
+
+            is IPlantable -> {
+                return blockAt.adjacent().toList().filterAir(this.level)
+            }
+
+            is BedBlock -> {
+                val part = blockAtState.getValue(BlockStateProperties.BED_PART)
+                val facing = blockAtState.getValue(BlockStateProperties.FACING)
+//                blockAtState.getVisualShape()
+
+                return listOf()
             }
 
             else -> {

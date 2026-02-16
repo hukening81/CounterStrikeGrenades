@@ -6,5 +6,5 @@ enum class GrenadeType {
     HE_GRENADE,
     INCENDIARY,
     MOLOTOV,
-    DECOY_GRENADE,
+    DECOY,
 }

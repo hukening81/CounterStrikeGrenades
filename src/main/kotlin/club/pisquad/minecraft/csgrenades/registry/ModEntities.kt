@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.entity.decoy.DecoyGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
 import club.pisquad.minecraft.csgrenades.entity.hegrenade.*
 import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*

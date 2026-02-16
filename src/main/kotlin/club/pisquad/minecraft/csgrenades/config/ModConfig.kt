@@ -56,6 +56,9 @@ object ModConfig {
         lateinit var MIN_DURATION: ForgeConfigSpec.DoubleValue
         lateinit var DISTANCE_DECAY_EXPONENT: ForgeConfigSpec.DoubleValue
     }
+    object Decoy {
+        lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.DoubleValue
+    }
 
     enum class SelfDamageSetting {
         NEVER,
@@ -140,6 +143,9 @@ object ModConfig {
         builder.comment("Controls the curve of how the effect fades with distance. 1.0 is linear, >1.0 is steeper falloff at range (stronger close up).")
         Flashbang.DISTANCE_DECAY_EXPONENT = builder.defineInRange("distanceDecayExponent", 2.0, 0.5, 5.0)
         builder.pop()
+
+        builder.push("Decoy")
+        Decoy.FUSE_TIME_AFTER_LANDING = builder.defineInRange("fuse_time_after_landing", 0.5, 0.0, 10.0)
 
         SPEC = builder.build()
     }

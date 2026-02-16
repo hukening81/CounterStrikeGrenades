@@ -6,6 +6,6 @@ import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 class DecoyGrenadeItem(properties: Properties) : CounterStrikeGrenadeItem(properties) {
     init {
         drawSound = ModSoundEvents.DECOY_GRENADE_DRAW.get()
-        grenadeType = GrenadeType.DECOY_GRENADE
+        grenadeType = GrenadeType.DECOY
     }
 }

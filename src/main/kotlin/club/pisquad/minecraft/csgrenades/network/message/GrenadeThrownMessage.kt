@@ -1,9 +1,11 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
-import club.pisquad.minecraft.csgrenades.enums.*
-import club.pisquad.minecraft.csgrenades.network.*
-import club.pisquad.minecraft.csgrenades.network.serializer.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
+import club.pisquad.minecraft.csgrenades.network.serializer.RotationSerializer
+import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import kotlinx.serialization.Serializable
 import net.minecraft.core.Rotations
 import net.minecraft.server.level.ServerLevel
@@ -21,7 +23,6 @@ class GrenadeThrownMessage(
     val grenadeType: GrenadeType,
     @Serializable(with = Vec3Serializer::class) val position: Vec3,
     @Serializable(with = RotationSerializer::class) val rotation: Rotations,
-    val customSound: String? = null,
 ) {
     companion object : CsGrenadeMessageHandler<GrenadeThrownMessage>(GrenadeThrownMessage::class) {
 
@@ -37,19 +38,19 @@ class GrenadeThrownMessage(
                 GrenadeType.HE_GRENADE -> ModEntities.HEGRENADE_ENTITY.get()
                 GrenadeType.INCENDIARY -> ModEntities.INCENDIARY_ENTITY.get()
                 GrenadeType.MOLOTOV -> ModEntities.MOLOTOV_ENTITY.get()
-                GrenadeType.DECOY_GRENADE -> ModEntities.DECOY_GRENADE_ENTITY.get()
+                GrenadeType.DECOY -> ModEntities.DECOY_GRENADE_ENTITY.get()
             }
 
             val grenadeEntity = entityType.create(serverLevel) ?: return
             grenadeEntity.owner = context.sender?.level()?.getPlayerByUUID(msg.ownerUUID)
 
-            if (grenadeEntity is club.pisquad.minecraft.csgrenades.entity.DecoyGrenadeEntity) {
-                grenadeEntity.findAndSetTaczGunIdOnThrow()
-                if (!msg.customSound.isNullOrBlank()) {
-                    grenadeEntity.setCustomSound(msg.customSound)
-                }
-            }
-
+//            if (grenadeEntity is club.pisquad.minecraft.csgrenades.entity.decoy.DecoyGrenadeEntity) {
+//                grenadeEntity.findAndSetTaczGunIdOnThrow()
+//                if (!msg.customSound.isNullOrBlank()) {
+//                    grenadeEntity.setCustomSound(msg.customSound)
+//                }
+//            }
+//
             grenadeEntity.setPos(msg.position)
             grenadeEntity.shootFromRotation(
                 player,
