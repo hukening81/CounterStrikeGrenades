@@ -1,10 +1,10 @@
 package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.config.*
-import club.pisquad.minecraft.csgrenades.enums.*
-import club.pisquad.minecraft.csgrenades.event.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
 import net.minecraft.core.Direction
@@ -25,7 +25,8 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
 import java.util.*
-import kotlin.math.*
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out ThrowableItemProjectile>,
@@ -322,9 +323,6 @@ abstract class ActivateAfterLandingGrenadeEntity(
 
     override fun tick() {
         super.tick()
-        // This is a little bit tricky
-        // super.onHitBlock() contains a mechanism to freeze the entity after landing on groud
-        // we rely on that the check if we are landed
         if (this.level().isClientSide) {
             // EMPTY
         } else {
@@ -337,7 +335,11 @@ abstract class ActivateAfterLandingGrenadeEntity(
                     }
                     tickSinceLanding++
                 } else {
-                    this.entityData.set(isLandedAccessor, true)
+                    // super.onHitBlock() contains a mechanism to freeze the entity after landing on groud
+                    // we rely on that the check if we are landed
+                    if (this.deltaMovement == Vec3.ZERO) {
+                        this.entityData.set(isLandedAccessor, true)
+                    }
                 }
             }
         }
