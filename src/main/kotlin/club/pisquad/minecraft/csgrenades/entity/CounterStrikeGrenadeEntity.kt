@@ -1,17 +1,14 @@
 package club.pisquad.minecraft.csgrenades.entity
 
 import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
-import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
+import club.pisquad.minecraft.csgrenades.util.GrenadeTrajectoryHelper
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
@@ -19,7 +16,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.BarrierBlock
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
@@ -50,6 +46,8 @@ abstract class CounterStrikeGrenadeEntity(
     var customXRotO: Float = 0f
     var customYRotO: Float = 0f
     var customZRotO: Float = 0f
+
+    var trajectoryHelper: GrenadeTrajectoryHelper? = null
 
     var center: Vec3
         get() {
@@ -116,6 +114,16 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun tick() {
         super.tick()
+        if (trajectoryHelper == null) {
+            this.trajectoryHelper = GrenadeTrajectoryHelper(level(), this)
+            trajectoryHelper!!.init(center, deltaMovement)
+        } else {
+            trajectoryHelper!!.step()
+            val lastNode = trajectoryHelper!!.trajectory.last()
+            this.center = lastNode.position
+            this.deltaMovement = lastNode.velocity
+//            println("$center \t $deltaMovement")
+        }
 
         // New, more robust landing detection
         if (!this.entityData.get(isActivatedAccessor)) {
@@ -170,43 +178,51 @@ abstract class CounterStrikeGrenadeEntity(
      * @param result The block hit result.
      */
     override fun onHitBlock(result: BlockHitResult) {
-        if (this.entityData.get(isActivatedAccessor)) {
-            return
-        }
-        if (ModConfig.IGNORE_BARRIER_BLOCK.get() && this.level()
-                .getBlockState(result.blockPos).block is BarrierBlock
-        ) {
-            return
-        }
-
-        if (level().isClientSide) {
+        if (this.level().isClientSide) {
             randomizeRotation()
-            if (!this.entityData.get(isActivatedAccessor)) {
-                val player = Minecraft.getInstance().player!!
-                val distance = this.position().add(player.position().reverse()).length()
-                val soundInstance = EntityBoundSoundInstance(
-                    hitBlockSound,
-                    SoundSource.AMBIENT,
-                    SoundUtils.getVolumeFromDistance(
-                        distance,
-                        SoundTypes.GRENADE_HIT, // unify volume for all grenades hit sounds
-                    ).toFloat(),
-                    1f,
-                    this,
-                    0,
-                )
-                Minecraft.getInstance().soundManager.play(soundInstance)
-            }
-        }
-
-        this.handleBounce(result)
-        // fix: the entity will keep bouncing on the ground
-        if (result.direction == Direction.UP && this.deltaMovement.length() < 0.05) {
-            //            this.setPos(this.x, result.blockPos.y.toDouble() + 1, this.z)
-            this.deltaMovement = Vec3.ZERO
-            this.isNoGravity = true
         }
     }
+//        if (this.entityData.get(isActivatedAccessor)) {
+//            return
+//        }
+// //        println("${this.position()}\t${result.blockPos}")
+//
+//        if (ModConfig.IGNORE_BARRIER_BLOCK.get() && this.level()
+//                .getBlockState(result.blockPos).block is BarrierBlock
+//        ) {
+//            return
+//        }
+//
+//        if (level().isClientSide) {
+//            randomizeRotation()
+//            if (!this.entityData.get(isActivatedAccessor)) {
+//                val player = Minecraft.getInstance().player!!
+//                val distance = this.position().add(player.position().reverse()).length()
+//                val soundInstance = EntityBoundSoundInstance(
+//                    hitBlockSound,
+//                    SoundSource.AMBIENT,
+//                    SoundUtils.getVolumeFromDistance(
+//                        distance,
+//                        SoundTypes.GRENADE_HIT, // unify volume for all grenades hit sounds
+//                    ).toFloat(),
+//                    1f,
+//                    this,
+//                    0,
+//                )
+//                Minecraft.getInstance().soundManager.play(soundInstance)
+//            }
+//        }
+//
+//        this.center = bounceResult.position
+//        this.deltaMovement = bounceResult.velocity
+//
+//        // fix: the entity will keep bouncing on the ground
+//        if (result.direction == Direction.UP && this.deltaMovement.length() < 0.05) {
+//            //            this.setPos(this.x, result.blockPos.y.toDouble() + 1, this.z)
+//            this.deltaMovement = Vec3.ZERO
+//            this.isNoGravity = true
+//        }
+//    }
 
     private fun randomizeRotation() {
         this.customXRotSpeed = (random.nextFloat() - 0.5f) * 40
@@ -249,7 +265,6 @@ abstract class CounterStrikeGrenadeEntity(
                 Vec3(speed.x.times(-1.0).times(BOUNCE_RESTORATION_RATE), speed.y.times(1 - BOUNCE_FRICTION), speed.z.times(1 - BOUNCE_FRICTION))
             }
         }
-        println("newspeed $newSpeed")
         this.center = collisionPoint.add(newSpeed.scale(1 - scale))
         this.deltaMovement = newSpeed.add(Vec3(0.0, -this.gravity * (1 - scale), 0.0))
     }

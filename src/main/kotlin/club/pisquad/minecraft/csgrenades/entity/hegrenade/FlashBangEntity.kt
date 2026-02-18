@@ -1,10 +1,14 @@
-package club.pisquad.minecraft.csgrenades.entity
+package club.pisquad.minecraft.csgrenades.entity.hegrenade
 
-import club.pisquad.minecraft.csgrenades.config.*
-import club.pisquad.minecraft.csgrenades.enums.*
-import club.pisquad.minecraft.csgrenades.network.*
-import club.pisquad.minecraft.csgrenades.network.message.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.AffectedPlayerInfo
+import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessage
+import club.pisquad.minecraft.csgrenades.network.message.FlashbangEffectData
+import club.pisquad.minecraft.csgrenades.registry.ModDamageType
+import club.pisquad.minecraft.csgrenades.registry.ModItems
 import net.minecraft.core.registries.Registries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
@@ -47,7 +51,7 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     private fun calculateAffectedPlayers(): List<AffectedPlayerInfo> {
         val level = this.level() as ServerLevel
         return level.getPlayers { it.distanceToSqr(this.position()) < 256 * 256 }.map {
-            AffectedPlayerInfo(it.uuid, FlashbangEffectData.create(this.level(), this.position(), it))
+            AffectedPlayerInfo(it.uuid, FlashbangEffectData.Companion.create(this.level(), this.position(), it))
         }.filter { it.effectData.effectSustain > 0 }
     }
 }
