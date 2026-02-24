@@ -77,6 +77,15 @@ object ModPacketHandler {
             FlashBangExplodedMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
+        INSTANCE.registerMessage(
+            messageTypeCount,
+            ClientGrenadeThrowMessage::class.java,
+            ClientGrenadeThrowMessage::encoder,
+            ClientGrenadeThrowMessage::decoder,
+            ClientGrenadeThrowMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_SERVER)
+            )
+
         HEGrenadePacketHandler.registerMessages(this)
         FireGrenadePacketHandler.registerMessages(this)
         SmokeGrenadePacketHandler.registerMessages(this)
