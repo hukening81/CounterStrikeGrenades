@@ -3,19 +3,25 @@ package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
-import net.minecraft.nbt.CompoundTag
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.Cbor
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
+import net.minecraftforge.network.NetworkHooks
 
 
 /**Helper class that implements custom physics required by grenades
  * It updates vanilla `position` and `deltaMovement`, alongside the provided `center` and `velocity`
  * */
-abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajectoryEntity>, pLevel: Level) : Entity(pEntityType, pLevel),
-    IEntityAdditionalSpawnData {
+abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajectoryEntity>, pLevel: Level) : Entity(pEntityType, pLevel), IEntityAdditionalSpawnData {
 
     var center: Vec3
         get() {
@@ -49,26 +55,55 @@ abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajecto
 
     var trajectory: Trajectory = Trajectory(Vec3.ZERO, Vec3.ZERO)
 
+    @Serializable
+    private data class SpawnData(
+        @Serializable(with = Vec3Serializer::class) val position: Vec3,
+        @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
+    )
+
     override fun defineSynchedData() {
         TODO("Not yet implemented")
     }
 
-    override fun readAdditionalSaveData(pCompound: CompoundTag?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun addAdditionalSaveData(pCompound: CompoundTag?) {
-        TODO("Not yet implemented")
-    }
+//    override fun readAdditionalSaveData(pCompound: CompoundTag?) {
+//        TODO("Not yet implemented")
+//    }
+//
+//    override fun addAdditionalSaveData(pCompound: CompoundTag?) {
+//        TODO("Not yet implemented")
+//    }
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
 
         // Check if movement state is properly initialized
         val firstNode = trajectory.getNode(0)
-        if (firstNode.position == Vec3.ZERO && firstNode.velocity == Vec3.ZERO) {
+        if ((firstNode.position == Vec3.ZERO && firstNode.velocity == Vec3.ZERO) || trajectory.nodes.size != 1) {
             throw Exception("Grenade's Movement state is not initialized")
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun readSpawnData(additionalData: FriendlyByteBuf) {
+        val spawnData: SpawnData = Cbor.decodeFromByteArray(SpawnData.serializer(), additionalData.readByteArray())
+        initializeMovementState(spawnData.position, spawnData.velocity)
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun writeSpawnData(buffer: FriendlyByteBuf) {
+        val spawnData = SpawnData(
+            this.center,
+            this.velocity,
+        )
+        buffer.writeByteArray(Cbor.encodeToByteArray(SpawnData.serializer(), spawnData))
+    }
+
+    override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
+        // Ensures additional spawn data is properly handled
+        return NetworkHooks.getEntitySpawningPacket(this)
+    }
+
+    fun initializeMovementState(position: Vec3, velocity: Vec3) {
+        trajectory.replaceNode(0, Trajectory.TrajectoryNode(0, position, velocity, 0.0))
+    }
 }
