@@ -1,25 +1,30 @@
-@file:Suppress("ktlint:standard:property-naming")
-
 package club.pisquad.minecraft.csgrenades.config
 
+import club.pisquad.minecraft.csgrenades.config.sections.DecoyConfig
+import club.pisquad.minecraft.csgrenades.config.sections.FlashBangConfig
+import club.pisquad.minecraft.csgrenades.config.sections.HEGrenadeConfig
+import club.pisquad.minecraft.csgrenades.config.sections.IncendiaryConfig
+import club.pisquad.minecraft.csgrenades.config.sections.MolotovConfig
+import club.pisquad.minecraft.csgrenades.config.sections.PhysicsConfig
+import club.pisquad.minecraft.csgrenades.config.sections.SmokeGrenadeConfig
+import club.pisquad.minecraft.csgrenades.config.sections.ThrowConfig
 import net.minecraftforge.common.ForgeConfigSpec
 
 object ModConfig {
     val SPEC: ForgeConfigSpec
+    val physics = PhysicsConfig
+    val throwConfig = ThrowConfig
+    val hegrenade = HEGrenadeConfig
+    val flashbang = FlashBangConfig
+    val smokegrenade = SmokeGrenadeConfig
+    val incendiary = IncendiaryConfig
+    val molotov = MolotovConfig
+    val decoy = DecoyConfig
 
-    var IGNORE_BARRIER_BLOCK: ForgeConfigSpec.BooleanValue
 
-    var FOV_EFFECT_AMOUNT: ForgeConfigSpec.DoubleValue
-    var DAMAGE_NON_PLAYER_ENTITY: ForgeConfigSpec.BooleanValue
-    var TRAJECTORY_PREVIEW_COLOR: ForgeConfigSpec.ConfigValue<String>
-
-    object Throw {
-        lateinit var COOLDOWN: ForgeConfigSpec.DoubleValue
-        lateinit var THROW_SPEED_WEAK: ForgeConfigSpec.DoubleValue
-        lateinit var THROW_SPEED_MEDIUM: ForgeConfigSpec.DoubleValue
-        lateinit var THROW_SPEED_STRONG: ForgeConfigSpec.DoubleValue
-        lateinit var THROW_STRENGTH_TRANSITION_TIME: ForgeConfigSpec.DoubleValue
-    }
+    //    var FOV_EFFECT_AMOUNT: ForgeConfigSpec.DoubleValue
+//    var DAMAGE_NON_PLAYER_ENTITY: ForgeConfigSpec.BooleanValue
+//    var TRAJECTORY_PREVIEW_COLOR: ForgeConfigSpec.ConfigValue<String>
 
     object SmokeGrenade {
         lateinit var SMOKE_RADIUS: ForgeConfigSpec.IntValue
@@ -72,83 +77,15 @@ object ModConfig {
     init {
         val builder = ForgeConfigSpec.Builder()
         builder.comment("Configs for Counter Strike Grenade")
-//        builder.comment("Configs are separated into different scopes based on the type of grenade")
 
-//      Common configs
-        builder.comment("Should grenade entities fly through barrier block?")
-        IGNORE_BARRIER_BLOCK = builder.define("ignore_barrier_block", false)
-        builder.comment("The color of the grenade trajectory preview line, in #RRGGBB hex format.")
-        TRAJECTORY_PREVIEW_COLOR = builder.define("trajectory_preview_color", "#FFFFFF")
-//      GRENADE_ENTITY_SIZE = builder.defineInRange("grenade_entity_size", 0.3, 0.1, 10.0)
-        FOV_EFFECT_AMOUNT = builder.defineInRange("fov_effect_amount", 0.12, 0.0, 1.0)
-        builder.comment("Damage living entities other than player")
-        DAMAGE_NON_PLAYER_ENTITY = builder.define("damage_non_player_entity", true)
+        physics.build(builder)
+        throwConfig.build(builder)
+        hegrenade.build(builder)
+        flashbang.build(builder)
+        smokegrenade.build(builder)
+        incendiary.build(builder)
+        molotov.build(builder)
 
-        builder.push("Throw")
-        builder.comment("Throw cooldown")
-        Throw.COOLDOWN = builder.defineInRange("grenade_throw_cooldown", 1.0, 0.1, 10.0)
-        builder.comment("Throw speed when using primary button (left click by default)")
-        Throw.THROW_SPEED_STRONG = builder.defineInRange("throw_speed_strong", 25.0, 1.0, 100.0)
-        Throw.THROW_SPEED_MEDIUM = builder.defineInRange("throw_speed_medium", 20.0, 0.1, 100.0)
-        builder.comment("Throw speed when using secondary button (right click by default)")
-        Throw.THROW_SPEED_WEAK = builder.defineInRange("throw_speed_weak", 15.0, 0.1, 100.0)
-        builder.comment("Transition time for throw speed")
-        Throw.THROW_STRENGTH_TRANSITION_TIME = builder.defineInRange("throw_strength_transition_time", 1.0, 0.1, 10.0)
-        builder.pop()
-
-        builder.push("SmokeGrenade")
-        builder.comment("Smoke radius, in block")
-        SmokeGrenade.SMOKE_RADIUS = builder.defineInRange("smoke_radius", 6, 2, 10)
-        SmokeGrenade.FUSE_TIME_AFTER_LANDING = builder.defineInRange("fuse_time_after_landing", 0.5, 0.0, 10.0)
-        SmokeGrenade.SMOKE_LIFETIME = builder.defineInRange("smoke_lifetime", 20000, 0, 60 * 1000.toLong())
-        SmokeGrenade.TIME_BEFORE_REGENERATE = builder.defineInRange("time_before_regenerate", 1000, 0, 10000.toLong())
-        SmokeGrenade.REGENERATION_TIME = builder.defineInRange("regeneration_time", 3000, 0, 10000.toLong())
-        SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT = builder.defineInRange("smoke_max_falling_height", 8, 0, 100)
-        builder.comment("The radius of smoke cleared by a passing arrow, in blocks.")
-        SmokeGrenade.ARROW_CLEAR_RANGE = builder.defineInRange("arrow_clear_range", 1.2, 0.1, 10.0)
-        builder.comment("The radius of smoke cleared by a passing bullet (e.g. from Tacz), in blocks.")
-        SmokeGrenade.BULLET_CLEAR_RANGE = builder.defineInRange("bullet_clear_range", 1.0, 0.1, 10.0)
-        builder.pop()
-
-        builder.push("HEGrenade")
-        builder.comment("HE grenade's damage follow a linear decay function")
-        HEGrenade.BASE_DAMAGE = builder.defineInRange("base_damage", 30.0, 0.0, 100.0)
-        HEGrenade.DAMAGE_RADIUS = builder.defineInRange("damage_range", 5.0, 0.0, 100.0)
-        HEGrenade.HEAD_DAMAGE_BOOST = builder.defineInRange("head_damage_boost", 1.5, 0.0, 100.0)
-        builder.comment("Fuse time before explosion, in milliseconds")
-        HEGrenade.FUSE_TIME = builder.defineInRange("fuseTime", 2.0, 0.5, 60.0)
-        HEGrenade.CAUSE_DAMAGE_TO_OWNER = builder.defineEnum("causeDamageToOwner", SelfDamageSetting.ALWAYS, SelfDamageSetting.entries)
-        builder.pop()
-
-        builder.push("FireGrenade")
-        FireGrenade.FIRE_RANGE = builder.defineInRange("fire_range", 6, 0, 100)
-        builder.comment("Lifetime of the fire, in milliseconds")
-        FireGrenade.LIFETIME = builder.defineInRange("lifetime", 7000, 0, 100 * 1000.toLong())
-        builder.comment("Fuse time before air explode, in milliseconds")
-        FireGrenade.FUSE_TIME = builder.defineInRange("fuse_time", 2.0, 0.5, 60.0)
-        FireGrenade.FIRE_EXTINGUISH_RANGE = builder.defineInRange("fire_extinguish_range", 6, 0, 100)
-        FireGrenade.FIRE_MAX_SPREAD_DOWNWARD = builder.defineInRange("fire_max_spread_downward", 10, 0, 100)
-        FireGrenade.DAMAGE = builder.defineInRange("damage", 3.0, 0.0, 100.0)
-        builder.comment("In what time should fire damage reach its maximum damage (linearly)")
-        FireGrenade.DAMAGE_INCREASE_TIME = builder.defineInRange("damage_increase_time", 2000, 0, 100 * 1000.toLong())
-        FireGrenade.CAUSE_DAMAGE_TO_OWNER = builder.defineEnum("causeDamageToOwner", SelfDamageSetting.ALWAYS, SelfDamageSetting.entries)
-        builder.pop() // Correctly close FireGrenade section
-
-        builder.push("Flashbang")
-        builder.comment("The maximum distance at which the flashbang has a significant effect.")
-        Flashbang.EFFECTIVE_RANGE = builder.defineInRange("effectiveRange", 64.0, 1.0, 256.0)
-        builder.comment("Fuse time from throw to detonation, in milliseconds.")
-        Flashbang.FUSE_TIME = builder.defineInRange("fuseTime", 1600L, 0L, 10000L)
-        builder.comment("Maximum total blindness duration (at point-blank, direct view), in seconds.")
-        Flashbang.MAX_DURATION = builder.defineInRange("maxDuration", 5.0, 0.0, 30.0)
-        builder.comment("Minimum total blindness duration (when fully facing away), in seconds.")
-        Flashbang.MIN_DURATION = builder.defineInRange("minDuration", 0.25, 0.0, 10.0)
-        builder.comment("Controls the curve of how the effect fades with distance. 1.0 is linear, >1.0 is steeper falloff at range (stronger close up).")
-        Flashbang.DISTANCE_DECAY_EXPONENT = builder.defineInRange("distanceDecayExponent", 2.0, 0.5, 5.0)
-        builder.pop()
-
-        builder.push("Decoy")
-        Decoy.FUSE_TIME_AFTER_LANDING = builder.defineInRange("fuse_time_after_landing", 0.5, 0.0, 10.0)
 
         SPEC = builder.build()
     }
