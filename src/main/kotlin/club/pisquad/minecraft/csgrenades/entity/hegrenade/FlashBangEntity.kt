@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.hegrenade
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.AffectedPlayerInfo
@@ -51,7 +51,7 @@ class FlashBangEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     private fun calculateAffectedPlayers(): List<AffectedPlayerInfo> {
         val level = this.level() as ServerLevel
         return level.getPlayers { it.distanceToSqr(this.position()) < 256 * 256 }.map {
-            AffectedPlayerInfo(it.uuid, FlashbangEffectData.Companion.create(this.level(), this.position(), it))
+            AffectedPlayerInfo(it.uuid, FlashbangEffectData.create(this.level(), this.position(), it))
         }.filter { it.effectData.effectSustain > 0 }
     }
 }

@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.enums
 
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import net.minecraft.world.entity.EntityType
 

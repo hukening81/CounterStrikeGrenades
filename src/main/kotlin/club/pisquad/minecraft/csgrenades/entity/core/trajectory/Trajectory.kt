@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.util.trajectory
+package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable

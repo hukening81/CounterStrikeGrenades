@@ -152,6 +152,10 @@ fun renderTestParticleAtPosition(level: Level, position: Vec3) {
     )
 }
 
-fun Vec3.minusEntityOffest(): Vec3 {
+fun Vec3.minusGrenadeSizeOffset(): Vec3 {
     return this.minus(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
+}
+
+fun Vec3.addGrenadeSizeOffset(): Vec3 {
+    return this.add(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
 }

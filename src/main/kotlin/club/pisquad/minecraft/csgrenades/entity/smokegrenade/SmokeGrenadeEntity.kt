@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades.entity.smokegrenade
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.config.*
 import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.entity.core.ActivateAfterLandingGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
 import club.pisquad.minecraft.csgrenades.enums.*
 import club.pisquad.minecraft.csgrenades.network.*

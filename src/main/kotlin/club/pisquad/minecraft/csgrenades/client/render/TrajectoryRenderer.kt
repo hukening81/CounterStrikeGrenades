@@ -2,10 +2,10 @@ package club.pisquad.minecraft.csgrenades.client.render
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.client.input.InputState
+import club.pisquad.minecraft.csgrenades.entity.core.trajectory.Trajectory
+import club.pisquad.minecraft.csgrenades.entity.core.trajectory.TrajectoryHelper
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
 import club.pisquad.minecraft.csgrenades.renderTestParticleAtPosition
-import club.pisquad.minecraft.csgrenades.util.trajectory.Trajectory
-import club.pisquad.minecraft.csgrenades.util.trajectory.TrajectoryHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist

@@ -31,6 +31,6 @@ object ModItems {
     val DECOY_GRENADE_ITEM: RegistryObject<Item> = ITEMS.register(GrenadeType.DECOY.resourceKey) { DecoyGrenadeItem(Item.Properties()) }
 
     fun register(bus: IEventBus) {
-        ITEMS.register(CounterStrikeGrenades.modEventBus)
+        ITEMS.register(bus)
     }
 }

@@ -1,13 +1,11 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.ICounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.ItemRenderer

@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.util
 
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.minus
 import club.pisquad.minecraft.csgrenades.toVec3
 import net.minecraft.core.BlockPos

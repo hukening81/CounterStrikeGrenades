@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.decoy.DecoyGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.MolotovEntity

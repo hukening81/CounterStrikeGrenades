@@ -1,19 +1,17 @@
-package club.pisquad.minecraft.csgrenades.entity
+package club.pisquad.minecraft.csgrenades.entity.core
 
-import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
+import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectoryEntity
+import club.pisquad.minecraft.csgrenades.entity.core.trajectory.Trajectory
+import club.pisquad.minecraft.csgrenades.entity.core.trajectory.TrajectoryHelper
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
-import club.pisquad.minecraft.csgrenades.minus
-import club.pisquad.minecraft.csgrenades.minusEntityOffest
+import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
-import club.pisquad.minecraft.csgrenades.util.trajectory.Trajectory
-import club.pisquad.minecraft.csgrenades.util.trajectory.TrajectoryHelper
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
@@ -21,60 +19,25 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
 
 abstract class CounterStrikeGrenadeEntity(
-    pEntityType: EntityType<out ThrowableItemProjectile>,
+    pEntityType: EntityType<out CounterStrikeGrenadeEntity>,
     pLevel: Level,
     val grenadeType: GrenadeType,
-) : Entity(pEntityType, pLevel),
-    ICounterStrikeGrenadeEntity, IEntityAdditionalSpawnData {
-    override lateinit var ownerUuid: UUID
+) :
+    CustomTrajectoryEntity(pEntityType, pLevel) {
+    lateinit var ownerUuid: UUID
 
     var hitBlockSound = ModSoundEvents.GRENADE_HIT.get()
     var throwSound = ModSoundEvents.GRENADE_THROW.get()
 
-    var trajectory: Trajectory = Trajectory(Vec3.ZERO, Vec3.ZERO)
-
-    override var center: Vec3
-        get() {
-            return this.position().add(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
-        }
-        set(newCenter: Vec3) {
-            val position = newCenter.minus(
-                Vec3(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF),
-            )
-            this.setPos(position)
-        }
-    var centerOld: Vec3
-        get() {
-            return Vec3(
-                this.xo, this.yo, this.zo,
-            ).add(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
-        }
-        set(newCenter) {
-            this.xOld = newCenter.x.minus(GRENADE_ENTITY_SIZE_HALF)
-            this.yOld = newCenter.y.minus(GRENADE_ENTITY_SIZE_HALF)
-            this.zOld = newCenter.z.minus(GRENADE_ENTITY_SIZE_HALF)
-            this.xo = this.xOld
-            this.yo = this.yOld
-            this.zo = this.zOld
-        }
-
-    // Velocity is different from deltaMovement, latter one is the displacement between ticks
-    override val velocity: Vec3
-        get() {
-            return trajectory.velocity
-        }
 
     init {
         isNoGravity = true
@@ -93,8 +56,8 @@ abstract class CounterStrikeGrenadeEntity(
         this.entityData.define(isActivatedAccessor, false)
     }
 
-    override fun initialize(ownerUuid: UUID, position: Vec3, velocity: Vec3) {
-        initializeMovement(position,velocity)
+    fun initialize(ownerUuid: UUID, position: Vec3, velocity: Vec3) {
+        initializeMovement(position, velocity)
         this.ownerUuid = ownerUuid
     }
 
@@ -111,7 +74,7 @@ abstract class CounterStrikeGrenadeEntity(
             println("old ${this.xOld}\t${this.yOld}${this.zOld}")
         }
         TrajectoryHelper.step(level(), trajectory)
-        this.moveTo(trajectory.position.minusEntityOffest())
+        this.moveTo(trajectory.position.minusGrenadeSizeOffset())
     }
 
     /**
@@ -156,8 +119,8 @@ abstract class CounterStrikeGrenadeEntity(
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun readSpawnData(additionalData: FriendlyByteBuf) {
-        val data = Cbor.decodeFromByteArray(GrenadeEntitySpawnData.serializer(),additionalData.readByteArray())
-        initializeMovement(data.position,data.velocity)
+        val data = Cbor.decodeFromByteArray(GrenadeEntitySpawnData.serializer(), additionalData.readByteArray())
+        initializeMovement(data.position, data.velocity)
         this.ownerUuid = data.ownerUuid
     }
 
@@ -167,29 +130,24 @@ abstract class CounterStrikeGrenadeEntity(
         val data = GrenadeEntitySpawnData(
             this.ownerUuid,
             firstNode.position,
-            firstNode.velocity
+            firstNode.velocity,
         )
         val byteArray = Cbor.encodeToByteArray(GrenadeEntitySpawnData.serializer(), data)
         buffer.writeByteArray(byteArray)
     }
 
-    override fun addAdditionalSaveData(pCompound: CompoundTag) {
-    }
-
-    override fun readAdditionalSaveData(pCompound: CompoundTag) {
-    }
-   /**Should be called before adding to the world
-    * */
-    private fun initializeMovement(position: Vec3,velocity:Vec3){
-       this.trajectory.replaceNode(0, Trajectory.TrajectoryNode(0, position, velocity, 0.0))
+    /**Should be called before adding to the world
+     * */
+    private fun initializeMovement(position: Vec3, velocity: Vec3) {
+        this.trajectory.replaceNode(0, Trajectory.TrajectoryNode(0, position, velocity, 0.0))
     }
 }
 
 @Serializable
 private data class GrenadeEntitySpawnData(
     @Serializable(with = UUIDSerializer::class) val ownerUuid: UUID,
-    @Serializable(with= Vec3Serializer::class) val position:Vec3,
-    @Serializable(with= Vec3Serializer::class) val velocity:Vec3,
+    @Serializable(with = Vec3Serializer::class) val position: Vec3,
+    @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
 )
 
 
@@ -199,7 +157,7 @@ private data class GrenadeEntitySpawnData(
  * @param delay Grenade will activate after this amount of delay (in tick)
  * */
 abstract class ActivateAfterLandingGrenadeEntity(
-    pEntityType: EntityType<out ThrowableItemProjectile>,
+    pEntityType: EntityType<out ActivateAfterLandingGrenadeEntity>,
     pLevel: Level,
     grenadeType: GrenadeType,
     val delay: Int,
@@ -246,7 +204,7 @@ abstract class ActivateAfterLandingGrenadeEntity(
  * @param fuseTime Grenade will activate after this amount of delay (in tick)
  * */
 abstract class SetTimeActivateGrenadeEntity(
-    pEntityType: EntityType<out ThrowableItemProjectile>,
+    pEntityType: EntityType<out SetTimeActivateGrenadeEntity>,
     pLevel: Level,
     grenadeType: GrenadeType,
     val fuseTime: Int,
