@@ -15,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
-import net.minecraft.world.item.Item
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
@@ -51,15 +50,13 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
         }
     }
 
-    override fun getDefaultItem(): Item = ModItems.HEGRENADE_ITEM.get()
-
     fun doDamage() {
         val level = this.level() as ServerLevel
         val registryAccess = this.level().registryAccess()
         val damageRange = ModConfig.HEGrenade.DAMAGE_RADIUS.get()
         val baseDamageSource = DamageSource(
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION),
-            this.owner,
+            this.ownerUuid,
         )
         val selfDamageSource = DamageSource(
             registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_EXPLOSION_SELF),
@@ -77,7 +74,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
                     val originalKnockBackResistance = entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue ?: 0.0
                     entity.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
 
-                    if (entity == this.owner) {
+                    if (entity == this.ownerUuid) {
                         when (ModConfig.HEGrenade.CAUSE_DAMAGE_TO_OWNER.get()) {
                             ModConfig.SelfDamageSetting.NEVER -> {
                                 /* Do nothing */
@@ -139,10 +136,10 @@ class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLev
     override fun getHitDamageSource(hitEntity: LivingEntity): DamageSource {
         val registryAccess = this.level().registryAccess()
         val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.HEGRENADE_HIT)
-        return if (hitEntity == this.owner) {
+        return if (hitEntity == this.ownerUuid) {
             DamageSource(damageTypeHolder, this)
         } else {
-            DamageSource(damageTypeHolder, this, this.owner)
+            DamageSource(damageTypeHolder, this, this.ownerUuid)
         }
     }
 }

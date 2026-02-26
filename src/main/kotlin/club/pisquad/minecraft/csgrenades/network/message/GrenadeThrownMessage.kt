@@ -5,12 +5,8 @@ import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.RotationSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
-import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import kotlinx.serialization.Serializable
 import net.minecraft.core.Rotations
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
 import java.util.*

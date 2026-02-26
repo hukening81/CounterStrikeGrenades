@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
-import club.pisquad.minecraft.csgrenades.network.serializer.*
+import club.pisquad.minecraft.csgrenades.network.serializer.BlockPosSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer

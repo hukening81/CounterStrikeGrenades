@@ -77,7 +77,7 @@ object UpdateObjectives {
     fun onPlayerDied(event: LivingDeathEvent) {
         if (event.entity is Player && event.source.entity is CounterStrikeGrenadeEntity) {
             val server = event.entity.server ?: return
-            val attackerName = (event.source.entity as CounterStrikeGrenadeEntity).owner?.name?.string ?: return
+            val attackerName = (event.source.entity as CounterStrikeGrenadeEntity).ownerUuid?.name?.string ?: return
             val commandSource = server.createCommandSourceStack().withSuppressedOutput()
 
             val objective = when (event.source.entity) {

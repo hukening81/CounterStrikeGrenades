@@ -1,6 +1,5 @@
-package club.pisquad.minecraft.csgrenades.util
+package club.pisquad.minecraft.csgrenades.util.trajectory
 
-import club.pisquad.minecraft.csgrenades.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.minus
 import club.pisquad.minecraft.csgrenades.minusLength
 import club.pisquad.minecraft.csgrenades.toVec3
@@ -10,58 +9,58 @@ import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import kotlin.math.absoluteValue
-import kotlin.time.Clock
-import kotlin.time.Instant
 
-class GrenadeTrajectoryHelper(val level: Level, val grenade: CounterStrikeGrenadeEntity) {
-    val trajectory: Trajectory = Trajectory()
+object TrajectoryHelper {
+    const val MAX_STEP_COUNT = 1000
 
-    val position: Vec3
-        get() {
-            return trajectory.last().position
-        }
-    val velocity: Vec3
-        get() {
-            return trajectory.last().velocity
-        }
-
-    fun init(position: Vec3, velocity: Vec3) {
-        trajectory.init(position, velocity)
-    }
-
-    fun step() {
-        var currentPosition = position
-        var currentVelocity = velocity
+    fun step(level: Level, trajectory: Trajectory): Boolean {
+        var currentPosition = trajectory.lastNode().position
+        var currentVelocity = trajectory.lastNode().velocity
         var partialTick: Double = 0.0
         while (partialTick < 1) {
-            val (newPos, newVel, newPt) = tryTravelInDirection(currentPosition, currentVelocity, partialTick)
-            trajectory.addNode(newPos, newVel)
+            val (newPos, newVel, newPt) = tryTravelInDirection(level, currentPosition, currentVelocity, partialTick)
+            trajectory.addNode(newPos, newVel, newPt)
             currentPosition = newPos
             currentVelocity = newVel
             partialTick = newPt
         }
+        trajectory.tickComplete()
+        return false
     }
 
-    private fun tryTravelInDirection(position: Vec3, velocity: Vec3, partialTick: Double): Triple<Vec3, Vec3, Double> {
+    fun stepUntilComplete(level: Level, trajectory: Trajectory) {
+        var counter = 0
+        while (counter < MAX_STEP_COUNT) {
+            if (step(level, trajectory)) return
+            counter++
+        }
+    }
+
+
+    private fun tryTravelInDirection(level: Level, position: Vec3, velocity: Vec3, partialTick: Double): Triple<Vec3, Vec3, Double> {
         val obstructingBlocks = getBlockPosInPath(
             position,
             velocity.scale(1 - partialTick),
         )
-            .filter { shouldBounceOnBlock(it) }
-            .sortedBy { it.center.distanceToSqr(position) }
+            .filter { shouldBounceOnBlock(level, it) }
+//            .sortedBy { it.center.distanceToSqr(position) }
 
 //
         for (blockPos in obstructingBlocks) {
-            val collidingResult = testCollision(position, velocity, blockPos) ?: continue
+            val collidingResult = testCollision(level, position, velocity, blockPos) ?: continue
             val partialTickDelta = collidingResult.collidingPoint.distanceTo(position).div(velocity.length())
             val newVelocity = getVelocityAfterBounce(applyPhysics(velocity, partialTickDelta), collidingResult.direction)
-            println(newVelocity)
+//            println("${this.level.isClientSide},bounce! $newVelocity")
+//            println("is inside ${BlockPos.containing(position) == blockPos}")
+
             return Triple(collidingResult.collidingPoint, newVelocity, partialTick + partialTickDelta)
+
         }
+//        println("${this.level.isClientSide}, no bounce")
         return Triple(position.add(velocity.scale(1 - partialTick)), applyPhysics(velocity), 2.0)
     }
 
-    private fun testCollision(position: Vec3, velocity: Vec3, blockPos: BlockPos): CollidingResult? {
+    private fun testCollision(level: Level, position: Vec3, velocity: Vec3, blockPos: BlockPos): CollidingResult? {
         val relativePos = position.minus(blockPos.toVec3())
         val blockState = level.getBlockState(blockPos)
         val box = blockState.getCollisionShape(level, blockPos).bounds()
@@ -162,13 +161,14 @@ class GrenadeTrajectoryHelper(val level: Level, val grenade: CounterStrikeGrenad
     }
 
     private fun getBlockPosInPath(begin: Vec3, displacement: Vec3): List<BlockPos> {
+
         val result: MutableSet<BlockPos> = mutableSetOf()
+        result.add(BlockPos.containing(begin))
         var v = displacement
         while (v.length() > 1) {
             result.add(BlockPos.containing(begin.add(v)))
             v = v.minusLength(1.0)
         }
-        result.add(BlockPos.containing(begin))
         return result.toList().sortedBy { it.center.distanceTo(begin) }
     }
 
@@ -178,31 +178,8 @@ class GrenadeTrajectoryHelper(val level: Level, val grenade: CounterStrikeGrenad
         return velocity
     }
 
-    private fun shouldBounceOnBlock(blockPos: BlockPos): Boolean = !level.getBlockState(blockPos).isAir
+    private fun shouldBounceOnBlock(level: Level, blockPos: BlockPos): Boolean = !level.getBlockState(blockPos).isAir
 
-    class Trajectory {
-        var beginTime: Instant = Clock.System.now()
-        val nodes: MutableList<TrajectoryNode> = mutableListOf()
-
-        fun init(position: Vec3, velocity: Vec3) {
-            beginTime = Clock.System.now()
-            addNode(position, velocity)
-        }
-
-        fun addNode(position: Vec3, velocity: Vec3, partialTick: Double = 0.0): Trajectory {
-            val time = Clock.System.now().minus(beginTime).inWholeMilliseconds.div(1000.0) + partialTick
-            this.nodes.add(TrajectoryNode(position, velocity, time))
-            return this
-        }
-
-        fun last(): TrajectoryNode = nodes.last()
-    }
-
-    class TrajectoryNode(
-        val position: Vec3,
-        val velocity: Vec3,
-        val time: Double,
-    )
 
     class CollidingResult(
         val direction: Direction,

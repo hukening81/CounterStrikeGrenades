@@ -1,15 +1,14 @@
 package club.pisquad.minecraft.csgrenades.registry
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.particle.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.particle.SmokeParticleFactory
 import net.minecraft.client.particle.SpriteSet
 import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 
-@OnlyIn(Dist.CLIENT)
+
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = [Dist.CLIENT])
 object ModParticleFactories {
     @JvmStatic

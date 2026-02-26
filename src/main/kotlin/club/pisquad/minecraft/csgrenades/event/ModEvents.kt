@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.event
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.api.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod

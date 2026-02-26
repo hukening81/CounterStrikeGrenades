@@ -1,9 +1,10 @@
 package club.pisquad.minecraft.csgrenades.network.message.hegrenade
 
-import club.pisquad.minecraft.csgrenades.client.render.hegrenade.*
-import club.pisquad.minecraft.csgrenades.entity.hegrenade.*
-import club.pisquad.minecraft.csgrenades.network.*
-import club.pisquad.minecraft.csgrenades.network.serializer.*
+import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeExplosionData
+import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeRenderManager
+import club.pisquad.minecraft.csgrenades.entity.hegrenade.HEGrenadeHelper
+import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.Vec3
@@ -19,7 +20,7 @@ import java.util.function.Supplier
 class HEGrenadeActivatedMessage(
     @Serializable(with = Vec3Serializer::class) val position: Vec3,
 
-) {
+    ) {
     companion object : CsGrenadeMessageHandler<HEGrenadeActivatedMessage>(HEGrenadeActivatedMessage::class) {
 //        override fun encoder(message: HEGrenadeActivatedMessage, buffer: FriendlyByteBuf) {
 //            buffer.writeUtf(Json.encodeToString(message))

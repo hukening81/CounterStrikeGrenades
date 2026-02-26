@@ -232,18 +232,18 @@ abstract class AbstractFireGrenadeEntity(
 
         entitiesInRange.forEach { entity ->
 
-            val finalDamageSource = if (entity == this.owner) {
+            val finalDamageSource = if (entity == this.ownerUuid) {
                 when (ModConfig.FireGrenade.CAUSE_DAMAGE_TO_OWNER.get()) {
                     ModConfig.SelfDamageSetting.NEVER -> null
 
                     // Skip damage
-                    ModConfig.SelfDamageSetting.NOT_IN_TEAM -> DamageSource(damageTypeHolder, this, this.owner)
+                    ModConfig.SelfDamageSetting.NOT_IN_TEAM -> DamageSource(damageTypeHolder, this, this.ownerUuid)
 
                     // Vanilla team check
                     ModConfig.SelfDamageSetting.ALWAYS -> DamageSource(selfDamageTypeHolder) // Bypass team check
                 }
             } else {
-                DamageSource(damageTypeHolder, this, this.owner) // Attributed damage for others
+                DamageSource(damageTypeHolder, this, this.ownerUuid) // Attributed damage for others
             }
 
             if (finalDamageSource == null) {

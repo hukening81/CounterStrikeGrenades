@@ -1,9 +1,10 @@
 package club.pisquad.minecraft.csgrenades.network.message.firegrenade
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.network.*
-import club.pisquad.minecraft.csgrenades.network.serializer.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.SoundTypes
+import club.pisquad.minecraft.csgrenades.SoundUtils
+import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance

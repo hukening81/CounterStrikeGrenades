@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.registry
 
-import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraftforge.eventbus.api.IEventBus

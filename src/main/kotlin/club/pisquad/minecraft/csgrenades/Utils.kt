@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec2
@@ -131,3 +132,26 @@ fun BlockPos.horizontalDistanceTo(other: BlockPos): Double = sqrt(
 )
 
 fun Double.toTick(): Long = this.times(20).toLong()
+fun Double.toMetersPerTick(): Double {
+    return this.div(20)
+}
+
+fun Vec3.toMetersPerTick(): Vec3 {
+    return Vec3(this.x.toMetersPerTick(), this.y.toMetersPerTick(), this.z.toMetersPerTick())
+}
+
+fun renderTestParticleAtPosition(level: Level, position: Vec3) {
+    level.addParticle(
+        ParticleTypes.ASH,
+        position.x,
+        position.y,
+        position.z,
+        0.0,
+        0.0,
+        0.0,
+    )
+}
+
+fun Vec3.minusEntityOffest(): Vec3 {
+    return this.minus(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
+}

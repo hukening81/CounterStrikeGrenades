@@ -22,10 +22,10 @@ class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLe
     override fun getHitDamageSource(hitEntity: LivingEntity): DamageSource {
         val registryAccess = this.level().registryAccess()
         val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ModDamageType.INCENDIARY_HIT)
-        return if (hitEntity == this.owner) {
+        return if (hitEntity == this.ownerUuid) {
             DamageSource(damageTypeHolder, this)
         } else {
-            DamageSource(damageTypeHolder, this, this.owner)
+            DamageSource(damageTypeHolder, this, this.ownerUuid)
         }
     }
 }

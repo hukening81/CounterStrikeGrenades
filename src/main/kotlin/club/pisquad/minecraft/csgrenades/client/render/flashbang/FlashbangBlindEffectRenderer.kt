@@ -1,9 +1,11 @@
 package club.pisquad.minecraft.csgrenades.client.render.flashbang
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.network.message.*
-import club.pisquad.minecraft.csgrenades.registry.*
-import club.pisquad.minecraft.csgrenades.sound.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.SoundTypes
+import club.pisquad.minecraft.csgrenades.SoundUtils
+import club.pisquad.minecraft.csgrenades.network.message.FlashbangEffectData
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.sound.FlashbangRingSound
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferUploader
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
@@ -15,7 +17,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.sounds.SoundEvents
 import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.client.event.RenderLevelStageEvent
 import net.minecraftforge.client.event.sound.PlaySoundEvent
 import net.minecraftforge.common.MinecraftForge
@@ -33,7 +34,7 @@ private enum class RenderState {
     DecayStage,
 }
 
-@OnlyIn(Dist.CLIENT)
+
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object FlashbangBlindEffectRenderer {
     private var effectAttack: Int = 0

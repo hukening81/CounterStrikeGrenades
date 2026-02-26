@@ -8,16 +8,18 @@ object ModConfig {
     val SPEC: ForgeConfigSpec
 
     var IGNORE_BARRIER_BLOCK: ForgeConfigSpec.BooleanValue
-    var GRENADE_THROW_COOLDOWN: ForgeConfigSpec.IntValue
-    var THROW_SPEED_STRONG: ForgeConfigSpec.DoubleValue
-    var THROW_SPEED_WEAK: ForgeConfigSpec.DoubleValue
-    var THROW_SPEED_MODERATE: ForgeConfigSpec.DoubleValue
-    var PLAYER_SPEED_FACTOR_STRONG: ForgeConfigSpec.DoubleValue
-    var PLAYER_SPEED_FACTOR_WEAK: ForgeConfigSpec.DoubleValue
-    var THROW_TYPE_TRANSIENT_TIME: ForgeConfigSpec.IntValue
+
     var FOV_EFFECT_AMOUNT: ForgeConfigSpec.DoubleValue
     var DAMAGE_NON_PLAYER_ENTITY: ForgeConfigSpec.BooleanValue
     var TRAJECTORY_PREVIEW_COLOR: ForgeConfigSpec.ConfigValue<String>
+
+    object Throw {
+        lateinit var COOLDOWN: ForgeConfigSpec.DoubleValue
+        lateinit var THROW_SPEED_WEAK: ForgeConfigSpec.DoubleValue
+        lateinit var THROW_SPEED_MEDIUM: ForgeConfigSpec.DoubleValue
+        lateinit var THROW_SPEED_STRONG: ForgeConfigSpec.DoubleValue
+        lateinit var THROW_STRENGTH_TRANSITION_TIME: ForgeConfigSpec.DoubleValue
+    }
 
     object SmokeGrenade {
         lateinit var SMOKE_RADIUS: ForgeConfigSpec.IntValue
@@ -56,6 +58,7 @@ object ModConfig {
         lateinit var MIN_DURATION: ForgeConfigSpec.DoubleValue
         lateinit var DISTANCE_DECAY_EXPONENT: ForgeConfigSpec.DoubleValue
     }
+
     object Decoy {
         lateinit var FUSE_TIME_AFTER_LANDING: ForgeConfigSpec.DoubleValue
     }
@@ -69,7 +72,7 @@ object ModConfig {
     init {
         val builder = ForgeConfigSpec.Builder()
         builder.comment("Configs for Counter Strike Grenade")
-        builder.comment("Configs are separated into different scopes based on the type of grenade")
+//        builder.comment("Configs are separated into different scopes based on the type of grenade")
 
 //      Common configs
         builder.comment("Should grenade entities fly through barrier block?")
@@ -77,21 +80,21 @@ object ModConfig {
         builder.comment("The color of the grenade trajectory preview line, in #RRGGBB hex format.")
         TRAJECTORY_PREVIEW_COLOR = builder.define("trajectory_preview_color", "#FFFFFF")
 //      GRENADE_ENTITY_SIZE = builder.defineInRange("grenade_entity_size", 0.3, 0.1, 10.0)
-        builder.comment("Throw cooldown, in milliseconds")
-        GRENADE_THROW_COOLDOWN = builder.defineInRange("grenade_throw_cooldown", 1000, 0, 60 * 1000)
-        builder.comment("Throw speed when using primary button (left click by default)")
-        THROW_SPEED_STRONG = builder.defineInRange("throw_speed_strong", 1.3, 0.0, 10.0)
-        builder.comment("Throw speed when using secondary button (right click by default)")
-        THROW_SPEED_WEAK = builder.defineInRange("throw_speed_weak", 0.4, 0.0, 10.0)
-        builder.comment("Throw speed when using holding both button at the same time")
-        THROW_SPEED_MODERATE = builder.defineInRange("throw_speed_moderate", 1.0, 0.0, 10.0)
-        PLAYER_SPEED_FACTOR_STRONG = builder.defineInRange("player_speed_factor_strong", 1.3, 0.0, 10.0)
-        PLAYER_SPEED_FACTOR_WEAK = builder.defineInRange("player_speed_factor_weak", 0.5, 0.0, 10.0)
-        builder.comment("Transient time for throw type, in milliseconds")
-        THROW_TYPE_TRANSIENT_TIME = builder.defineInRange("throw_type_transient_time", 1000, 0, 60 * 1000)
         FOV_EFFECT_AMOUNT = builder.defineInRange("fov_effect_amount", 0.12, 0.0, 1.0)
         builder.comment("Damage living entities other than player")
         DAMAGE_NON_PLAYER_ENTITY = builder.define("damage_non_player_entity", true)
+
+        builder.push("Throw")
+        builder.comment("Throw cooldown")
+        Throw.COOLDOWN = builder.defineInRange("grenade_throw_cooldown", 1.0, 0.1, 10.0)
+        builder.comment("Throw speed when using primary button (left click by default)")
+        Throw.THROW_SPEED_STRONG = builder.defineInRange("throw_speed_strong", 25.0, 1.0, 100.0)
+        Throw.THROW_SPEED_MEDIUM = builder.defineInRange("throw_speed_medium", 20.0, 0.1, 100.0)
+        builder.comment("Throw speed when using secondary button (right click by default)")
+        Throw.THROW_SPEED_WEAK = builder.defineInRange("throw_speed_weak", 15.0, 0.1, 100.0)
+        builder.comment("Transition time for throw speed")
+        Throw.THROW_STRENGTH_TRANSITION_TIME = builder.defineInRange("throw_strength_transition_time", 1.0, 0.1, 10.0)
+        builder.pop()
 
         builder.push("SmokeGrenade")
         builder.comment("Smoke radius, in block")

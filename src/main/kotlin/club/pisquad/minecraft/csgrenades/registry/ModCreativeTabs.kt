@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.registry
 
-import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.CreativeModeTab

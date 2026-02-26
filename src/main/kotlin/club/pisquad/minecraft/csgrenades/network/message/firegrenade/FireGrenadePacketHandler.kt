@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.network.message.firegrenade
 
-import club.pisquad.minecraft.csgrenades.network.*
+import club.pisquad.minecraft.csgrenades.network.CsGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import net.minecraftforge.network.NetworkDirection
 import java.util.*
 

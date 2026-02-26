@@ -2,7 +2,6 @@ package club.pisquad.minecraft.csgrenades.client.input
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.linearInterpolate
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage

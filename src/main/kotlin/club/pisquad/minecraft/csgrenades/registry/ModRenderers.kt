@@ -1,15 +1,14 @@
 package club.pisquad.minecraft.csgrenades.registry
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.client.render.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.client.render.GrenadeRenderer
 import net.minecraft.client.renderer.entity.EntityRenderers
 import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.client.event.EntityRenderersEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 
-@OnlyIn(Dist.CLIENT)
+
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = [Dist.CLIENT])
 object ModRenderers {
     @JvmStatic
@@ -20,6 +19,6 @@ object ModRenderers {
         EntityRenderers.register(ModEntities.HEGRENADE_ENTITY.get(), ::GrenadeRenderer)
         EntityRenderers.register(ModEntities.INCENDIARY_ENTITY.get(), ::GrenadeRenderer)
         EntityRenderers.register(ModEntities.MOLOTOV_ENTITY.get(), ::GrenadeRenderer)
-        EntityRenderers.register(ModEntities.DECOY_GRENADE_ENTITY.get(), ::GrenadeRenderer)
+        EntityRenderers.register(ModEntities.DECOY_ENTITY.get(), ::GrenadeRenderer)
     }
 }

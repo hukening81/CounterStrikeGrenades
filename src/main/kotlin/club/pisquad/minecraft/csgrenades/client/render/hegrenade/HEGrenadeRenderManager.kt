@@ -1,7 +1,10 @@
 package club.pisquad.minecraft.csgrenades.client.render.hegrenade
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.SoundTypes
+import club.pisquad.minecraft.csgrenades.SoundUtils
+import club.pisquad.minecraft.csgrenades.getRandomLocationFromSphere
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance

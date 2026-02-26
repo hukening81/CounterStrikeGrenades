@@ -19,18 +19,18 @@ object InputHandler {
     private var readyForInput: Boolean = false
 
     val buttonState: ButtonState
-        get(){
+        get() {
             val handle = Minecraft.getInstance().window.window
             val primary = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS
             val secondary = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS
             return ButtonState(primary, secondary)
         }
     val screenState: Boolean
-        get(){
+        get() {
             return Minecraft.getInstance().screen != null
         }
     val selectedSlot: Int
-        get(){
+        get() {
             return Minecraft.getInstance().player!!.inventory.selected
         }
 

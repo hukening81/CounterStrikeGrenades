@@ -6,7 +6,6 @@ import club.pisquad.minecraft.csgrenades.enums.toModEntity
 import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
-import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.server.level.ServerPlayer
@@ -18,46 +17,44 @@ import java.util.function.Supplier
 @Serializable
 class ClientGrenadeThrowMessage(
     @Serializable(with = Vec3Serializer::class) val position: Vec3,
-    @Serializable(with=Vec3Serializer::class) val velocity:Vec3,
-    val grenadeType: GrenadeType
+    @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
+    val grenadeType: GrenadeType,
 ) {
-    companion object: CsGrenadeMessageHandler<ClientGrenadeThrowMessage>(ClientGrenadeThrowMessage::class) {
+    companion object : CsGrenadeMessageHandler<ClientGrenadeThrowMessage>(ClientGrenadeThrowMessage::class) {
         override fun handler(msg: ClientGrenadeThrowMessage, ctx: Supplier<NetworkEvent.Context>) {
             println("Client Grenade Throw Message")
             val context = ctx.get()
-            val player = context.sender?:return
+            val player = context.sender ?: return
 
-            if (!player.isCreative){
-                removeGrenadeFromInventory(player,msg.grenadeType)
+            if (!player.isCreative) {
+                removeGrenadeFromInventory(player, msg.grenadeType)
             }
-            spawnGrenadeEntity(player.level(),msg)
-
+            spawnGrenadeEntity(player.level(), msg)
         }
 
-        private fun removeGrenadeFromInventory(player: ServerPlayer,grenadeType: GrenadeType){
+        private fun removeGrenadeFromInventory(player: ServerPlayer, grenadeType: GrenadeType) {
             val item = player.mainHandItem.item
-            if (item is CounterStrikeGrenadeItem && item.grenadeType == grenadeType){
+            if (item is CounterStrikeGrenadeItem && item.grenadeType == grenadeType) {
                 player.mainHandItem.count--
-            }else{
-                player.inventory.items.forEach{
+            } else {
+                player.inventory.items.forEach {
                     val item = it.item
-                    if (item is CounterStrikeGrenadeItem && item.grenadeType == grenadeType){
+                    if (item is CounterStrikeGrenadeItem && item.grenadeType == grenadeType) {
                         it.count--
                         return
                     }
                 }
-                return
             }
         }
-        private fun spawnGrenadeEntity(level: Level, msg: ClientGrenadeThrowMessage){
+
+        private fun spawnGrenadeEntity(level: Level, msg: ClientGrenadeThrowMessage) {
             val entityType = msg.grenadeType.toModEntity()
-            val entity = entityType.create(level)?:return
-            entity.center = msg.position
-            entity.deltaMovement = msg.velocity
+            val entity = entityType.create(level) ?: return
 
             level.addFreshEntity(entity)
 
         }
+
         fun fromInputState(): ClientGrenadeThrowMessage? {
             val player = Minecraft.getInstance().player ?: return null
             val velocity = player.deltaMovement.add(calculateGrenadeSpeed() ?: return null)

@@ -1,15 +1,18 @@
 package club.pisquad.minecraft.csgrenades.client.render.firegrenade
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.config.*
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
+import club.pisquad.minecraft.csgrenades.INCENDIARY_PARTICLE_DENSITY
+import club.pisquad.minecraft.csgrenades.INCENDIARY_PARTICLE_LIFETIME
+import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.AbstractFireGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
+import club.pisquad.minecraft.csgrenades.getRandomLocationFromBlockSurface
+import club.pisquad.minecraft.csgrenades.isPositionInSmoke
+import club.pisquad.minecraft.csgrenades.linearInterpolate
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
 
 fun getLifetimeFromDistance(distance: Double): Int = linearInterpolate(
     INCENDIARY_PARTICLE_LIFETIME.toDouble(),
@@ -17,7 +20,7 @@ fun getLifetimeFromDistance(distance: Double): Int = linearInterpolate(
     distance.div(ModConfig.FireGrenade.FIRE_RANGE.get()),
 ).div(50).toInt()
 
-@OnlyIn(Dist.CLIENT)
+
 object FireGrenadeRenderer {
     private val randomSource = RandomSource.createNewThreadLocalInstance()
 

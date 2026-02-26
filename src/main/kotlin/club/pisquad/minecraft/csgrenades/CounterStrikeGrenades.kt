@@ -1,8 +1,12 @@
 package club.pisquad.minecraft.csgrenades
 
-import club.pisquad.minecraft.csgrenades.config.*
-import club.pisquad.minecraft.csgrenades.network.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.registry.ModCreativeTabs
+import club.pisquad.minecraft.csgrenades.registry.ModEntities
+import club.pisquad.minecraft.csgrenades.registry.ModItems
+import club.pisquad.minecraft.csgrenades.registry.ModParticles
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -31,7 +35,6 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
         val modBus = context.modEventBus
         modEventBus = modBus
         modLoadingContext = context
-
         ModItems.register(modEventBus)
         ModEntities.register(modEventBus)
         ModParticles.register(modEventBus)

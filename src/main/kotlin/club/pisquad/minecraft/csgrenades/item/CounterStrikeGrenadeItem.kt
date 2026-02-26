@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.item
 
-import club.pisquad.minecraft.csgrenades.enums.*
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import net.minecraft.core.BlockPos

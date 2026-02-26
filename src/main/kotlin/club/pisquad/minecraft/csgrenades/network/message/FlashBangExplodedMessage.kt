@@ -1,12 +1,15 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.api.*
-import club.pisquad.minecraft.csgrenades.client.render.flashbang.*
-import club.pisquad.minecraft.csgrenades.config.*
-import club.pisquad.minecraft.csgrenades.network.*
-import club.pisquad.minecraft.csgrenades.network.serializer.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.SoundTypes
+import club.pisquad.minecraft.csgrenades.SoundUtils
+import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
+import club.pisquad.minecraft.csgrenades.client.render.flashbang.FlashbangBlindEffectRenderer
+import club.pisquad.minecraft.csgrenades.client.render.flashbang.FlashbangParticleEffectRenderer
+import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
+import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
@@ -20,7 +23,11 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
 import java.util.*
 import java.util.function.Supplier
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.acos
+import kotlin.math.max
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 @Serializable
 data class FlashbangEffectData(

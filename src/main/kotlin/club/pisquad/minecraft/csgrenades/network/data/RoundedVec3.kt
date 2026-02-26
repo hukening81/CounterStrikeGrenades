@@ -2,7 +2,8 @@ package club.pisquad.minecraft.csgrenades.network.data
 
 import kotlinx.serialization.Serializable
 import net.minecraft.world.phys.Vec3
-import kotlin.math.*
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 @Serializable
 class RoundedDouble(val value: Long) {
