@@ -86,7 +86,7 @@ object UpdateObjectives {
 
                 is SmokeGrenadeEntity -> ModObjectives.KILLCOUNT_SMOKEGRENADE
 
-                is HEGrenadeEntity -> ModObjectives.KILLCOUNT_HEGRENADE
+                is HEByFuseGrenadeEntity -> ModObjectives.KILLCOUNT_HEGRENADE
 
                 is IncendiaryEntity -> ModObjectives.KILLCOUNT_INCENDIARY
 

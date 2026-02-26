@@ -7,7 +7,7 @@ import net.minecraft.sounds.SoundSource
 import kotlin.random.Random
 
 object FireGrenadeHelper {
-    fun playExtinguishSound(grenade: AbstractFireGrenadeEntity) {
+    fun playExtinguishSound(grenade: FireGrenadeEntity) {
         val extinguishSoundInstance = EntityBoundSoundInstance(
             ModSoundEvents.INCENDIARY_POP.get(),
             SoundSource.AMBIENT,
@@ -19,6 +19,6 @@ object FireGrenadeHelper {
         Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
     }
 
-    fun playFireSound(grenade: AbstractFireGrenadeEntity) {
+    fun playFireSound(grenade: FireGrenadeEntity) {
     }
 }

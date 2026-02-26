@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.hegrenade
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.entity.core.SetTimeActivateGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.core.ActivateByFuseGrenadeEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadeActivatedMessage
@@ -22,8 +22,8 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import kotlin.math.max
 
-class HEGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
-    SetTimeActivateGrenadeEntity(
+class HEByFuseGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
+    ActivateByFuseGrenadeEntity(
         pEntityType,
         pLevel,
         GrenadeType.HE_GRENADE,

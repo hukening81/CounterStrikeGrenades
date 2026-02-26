@@ -4,13 +4,16 @@ import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
 
+
+/**Helper class that implements custom physics required by grenades
+ * It updates vanilla `position` and `deltaMovement`, alongside the provided `center` and `velocity`
+ * */
 abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajectoryEntity>, pLevel: Level) : Entity(pEntityType, pLevel),
     IEntityAdditionalSpawnData {
 

@@ -2,7 +2,6 @@ package club.pisquad.minecraft.csgrenades.entity.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.config.*
-import club.pisquad.minecraft.csgrenades.entity.*
 import club.pisquad.minecraft.csgrenades.entity.core.ActivateAfterLandingGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
 import club.pisquad.minecraft.csgrenades.enums.*
@@ -10,7 +9,6 @@ import club.pisquad.minecraft.csgrenades.network.*
 import club.pisquad.minecraft.csgrenades.network.data.*
 import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.*
 import club.pisquad.minecraft.csgrenades.registry.*
-import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -19,16 +17,14 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import java.time.Duration
 import java.time.Instant
 
-class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) :
+class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel: Level) :
     ActivateAfterLandingGrenadeEntity(
         pEntityType,
         pLevel,
@@ -86,21 +82,21 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         lastPos = this.position().toVec3i()
     }
 
-    override fun onHitBlock(result: BlockHitResult) {
-        // If the smoke hit the ground with in any incendiary's range, it will emit right away
-        super.onHitBlock(result)
-        if (result.direction == Direction.UP) {
-            if (this.extinguishNearbyFires() > 0) {
-//                this.entityData.set(isLandedAccessor, true)
-                if (this.level() is ServerLevel && result.isInside) {
-                    this.setPos(Vec3(this.position().x, result.blockPos.y + 1.0, this.position().z))
-                }
-            }
-        }
-    }
+//    override fun onHitBlock(result: BlockHitResult) {
+//        // If the smoke hit the ground with in any incendiary's range, it will emit right away
+//        super.onHitBlock(result)
+//        if (result.direction == Direction.UP) {
+//            if (this.extinguishNearbyFires() > 0) {
+////                this.entityData.set(isLandedAccessor, true)
+//                if (this.level() is ServerLevel && result.isInside) {
+//                    this.setPos(Vec3(this.position().x, result.blockPos.y + 1.0, this.position().z))
+//                }
+//            }
+//        }
+//    }
 
     private fun extinguishNearbyFires(): Int {
-        val extinguishedFires: List<AbstractFireGrenadeEntity>
+        val extinguishedFires: List<FireGrenadeEntity>
         val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get()
         val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()
         if (this.entityData.get(isActivatedAccessor)) {
@@ -111,7 +107,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
             )
 
             extinguishedFires = this.level().getEntitiesOfClass(
-                AbstractFireGrenadeEntity::class.java,
+                FireGrenadeEntity::class.java,
                 bb,
             ) {
                 it.entityData.get(isActivatedAccessor) && canDistinguishFire(it.position())
@@ -119,7 +115,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out ThrowableItemProjectile>, p
         } else {
             val bb = AABB(this.blockPosition()).inflate(ModConfig.FireGrenade.FIRE_RANGE.get().toDouble())
             extinguishedFires = this.level().getEntitiesOfClass(
-                AbstractFireGrenadeEntity::class.java,
+                FireGrenadeEntity::class.java,
                 bb,
             ) {
                 it.entityData.get(isActivatedAccessor) && it.getSpreadBlocks()

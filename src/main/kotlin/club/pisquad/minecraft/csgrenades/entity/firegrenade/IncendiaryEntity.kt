@@ -1,23 +1,19 @@
 package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
-import club.pisquad.minecraft.csgrenades.enums.*
-import club.pisquad.minecraft.csgrenades.registry.*
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.registry.ModDamageType
 import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceKey
 import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.damagesource.DamageType
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile
-import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 
-class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : AbstractFireGrenadeEntity(pEntityType, pLevel, GrenadeType.INCENDIARY) {
-    override fun getDefaultItem(): Item = ModItems.INCENDIARY_ITEM.get()
+class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLevel: Level) : FireGrenadeEntity(pEntityType, pLevel, GrenadeType.INCENDIARY) {
 
-    override fun getFireDamageType(): ResourceKey<DamageType> = ModDamageType.INCENDIARY_FIRE
-
-    override fun getSelfFireDamageType(): ResourceKey<DamageType> = ModDamageType.INCENDIARY_FIRE_SELF
+//    override fun getFireDamageType(): ResourceKey<DamageType> = ModDamageType.INCENDIARY_FIRE
+//
+//    override fun getSelfFireDamageType(): ResourceKey<DamageType> = ModDamageType.INCENDIARY_FIRE_SELF
 
     override fun getHitDamageSource(hitEntity: LivingEntity): DamageSource {
         val registryAccess = this.level().registryAccess()
@@ -25,7 +21,8 @@ class IncendiaryEntity(pEntityType: EntityType<out ThrowableItemProjectile>, pLe
         return if (hitEntity == this.ownerUuid) {
             DamageSource(damageTypeHolder, this)
         } else {
-            DamageSource(damageTypeHolder, this, this.ownerUuid)
+            DamageSource(damageTypeHolder, this, null)
+//            DamageSource(damageTypeHolder, this, this.ownerUuid)
         }
     }
 }
