@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.item.DecoyGrenadeItem
 import club.pisquad.minecraft.csgrenades.item.FlashBangItem
 import club.pisquad.minecraft.csgrenades.item.HEGrenadeItem
@@ -16,18 +17,18 @@ import net.minecraftforge.registries.RegistryObject
 object ModItems {
     val ITEMS: DeferredRegister<Item> = DeferredRegister.create(ForgeRegistries.ITEMS, CounterStrikeGrenades.ID)
 
-    val FLASH_BANG_ITEM: RegistryObject<Item> = ITEMS.register("flashbang") { FlashBangItem(Item.Properties()) }
+    val FLASH_BANG_ITEM: RegistryObject<Item> = ITEMS.register(GrenadeType.FLASH_BANG.resourceKey) { FlashBangItem(Item.Properties()) }
 
     val SMOKE_GRENADE_ITEM: RegistryObject<Item> =
-        ITEMS.register("smokegrenade") { SmokeGrenadeItem(Item.Properties()) }
+        ITEMS.register(GrenadeType.SMOKE_GRENADE.resourceKey) { SmokeGrenadeItem(Item.Properties()) }
 
-    val HEGRENADE_ITEM: RegistryObject<Item> = ITEMS.register("hegrenade") { HEGrenadeItem(Item.Properties()) }
+    val HEGRENADE_ITEM: RegistryObject<Item> = ITEMS.register(GrenadeType.HE_GRENADE.resourceKey) { HEGrenadeItem(Item.Properties()) }
 
-    val INCENDIARY_ITEM: RegistryObject<Item> = ITEMS.register("incendiary") { IncendiaryItem(Item.Properties()) }
+    val INCENDIARY_ITEM: RegistryObject<Item> = ITEMS.register(GrenadeType.INCENDIARY.resourceKey) { IncendiaryItem(Item.Properties()) }
 
-    val MOLOTOV_ITEM: RegistryObject<Item> = ITEMS.register("molotov") { MolotovItem(Item.Properties()) }
+    val MOLOTOV_ITEM: RegistryObject<Item> = ITEMS.register(GrenadeType.MOLOTOV.resourceKey) { MolotovItem(Item.Properties()) }
 
-    val DECOY_GRENADE_ITEM: RegistryObject<Item> = ITEMS.register("decoy") { DecoyGrenadeItem(Item.Properties()) }
+    val DECOY_GRENADE_ITEM: RegistryObject<Item> = ITEMS.register(GrenadeType.DECOY.resourceKey) { DecoyGrenadeItem(Item.Properties()) }
 
     fun register(bus: IEventBus) {
         ITEMS.register(CounterStrikeGrenades.modEventBus)
