@@ -61,4 +61,14 @@ abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajecto
         TODO("Not yet implemented")
     }
 
+    override fun onAddedToWorld() {
+        super.onAddedToWorld()
+
+        // Check if movement state is properly initialized
+        val firstNode = trajectory.getNode(0)
+        if (firstNode.position == Vec3.ZERO && firstNode.velocity == Vec3.ZERO) {
+            throw Exception("Grenade's Movement state is not initialized")
+        }
+    }
+
 }

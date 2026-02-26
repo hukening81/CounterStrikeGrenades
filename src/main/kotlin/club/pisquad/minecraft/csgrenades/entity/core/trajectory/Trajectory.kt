@@ -51,6 +51,10 @@ class Trajectory(position: Vec3, velocity: Vec3) {
         return nodes.last()
     }
 
+    fun getNode(index: Int): TrajectoryNode {
+        return nodes[index]
+    }
+
     fun replaceNode(index: Int, node: TrajectoryNode) {
         nodes[index] = node
     }
