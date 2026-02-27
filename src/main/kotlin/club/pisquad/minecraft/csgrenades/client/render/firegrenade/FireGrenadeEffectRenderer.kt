@@ -17,7 +17,7 @@ import net.minecraft.world.phys.Vec3
 fun getLifetimeFromDistance(distance: Double): Int = linearInterpolate(
     INCENDIARY_PARTICLE_LIFETIME.toDouble(),
     0.0,
-    distance.div(ModConfig.FireGrenade.FIRE_RANGE.get()),
+    distance.div(ModConfig.incendiary.FIRE_RANGE.get()),
 ).div(50).toInt()
 
 

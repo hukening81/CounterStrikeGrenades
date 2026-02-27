@@ -1,15 +1,13 @@
 package club.pisquad.minecraft.csgrenades.entity.core
 
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectoryEntity
-import club.pisquad.minecraft.csgrenades.entity.core.trajectory.TrajectoryHelper
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
-import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -19,7 +17,7 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
@@ -35,8 +33,15 @@ abstract class CounterStrikeGrenadeEntity(
     CustomTrajectoryEntity(pEntityType, pLevel), IEntityAdditionalSpawnData {
     lateinit var ownerUuid: UUID
 
-    var hitBlockSound = ModSoundEvents.GRENADE_HIT.get()
-    var throwSound = ModSoundEvents.GRENADE_THROW.get()
+    abstract val sounds: GrenadeEntitySoundEvents
+
+//    var hitBlockSound = ModSoundEvents.GRENADE_HIT.get()
+//    var throwSound = ModSoundEvents.GRENADE_THROW.get()
+
+    val owner: Player?
+        get() {
+            return level().players().find { it.uuid == this.ownerUuid }
+        }
 
 
     init {
@@ -70,42 +75,31 @@ abstract class CounterStrikeGrenadeEntity(
 
     fun isActivated(): Boolean = this.entityData.get(isActivatedAccessor)
 
-    override fun tick() {
+//    override fun tick() {
 //        super.tick()
-        super.baseTick()
-//        if (level().isClientSide) {
-//            // EMPTY
-//        } else {
-        if (this.level().isClientSide) {
-            println("current ${this.x}\t${this.y}${this.z}")
-            println("old ${this.xOld}\t${this.yOld}${this.zOld}")
-        }
-        TrajectoryHelper.step(level(), trajectory)
-        this.moveTo(trajectory.position.minusGrenadeSizeOffset())
-    }
+////        TrajectoryHelper.step(level(), trajectory)
+////        this.moveTo(trajectory.position.minusGrenadeSizeOffset())
+//    }
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
         assert(ownerUuid.toString().isNotEmpty())
 
-        this.playSound(this.throwSound, 0.2f, 1f)
+        this.playSound(this.metadata.spawnSoundEvent, 0.2f, 1f)
     }
 
     override fun isOnFire(): Boolean = false
 
     override fun shouldBeSaved(): Boolean = false
 
-    abstract fun getHitDamageSource(hitEntity: LivingEntity): DamageSource
+//    abstract fun getHitDamageSource(hitEntity: LivingEntity): DamageSource
 
     open fun activate() {
-        this.deltaMovement = Vec3.ZERO
-        this.isNoGravity = true
-
         this.entityData.set(isActivatedAccessor, true)
         if (this.level().isClientSide) {
             // EMPTY
         } else {
-            println("Firing grenade activate event ${this.grenadeType}")
+//            println("Firing grenade activate event ${this.grenadeType}")
             MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
         }
     }
@@ -137,4 +131,15 @@ abstract class CounterStrikeGrenadeEntity(
 
     }
 
+    private fun getHitDamageSource(): DamageSource {
+        val registryAccess = this.level().registryAccess()
+        val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(metadata.hitDamageType)
+        return DamageSource(damageTypeHolder, this, this.owner)
+    }
+
+    private fun getMainDamageSource(): DamageSource {
+        val registryAccess = this.level().registryAccess()
+        val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(metadata.mainDamageType)
+        return DamageSource(damageTypeHolder, this, this.owner)
+    }
 }

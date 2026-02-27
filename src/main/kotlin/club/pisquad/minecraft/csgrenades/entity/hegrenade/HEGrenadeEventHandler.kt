@@ -13,7 +13,7 @@ object HEGrenadeEventHandler {
     @JvmStatic
     @SubscribeEvent
     fun handler(event: GrenadeActivateEvent) {
-        if (event.entity !is HEByFuseGrenadeEntity) {
+        if (event.entity !is HEGrenadeEntity) {
             return
         }
     }

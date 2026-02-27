@@ -6,8 +6,8 @@ import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.decoy.DecoyGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.MolotovEntity
-import club.pisquad.minecraft.csgrenades.entity.hegrenade.FlashBangEntity
-import club.pisquad.minecraft.csgrenades.entity.hegrenade.HEByFuseGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.flashbang.FlashBangEntity
+import club.pisquad.minecraft.csgrenades.entity.hegrenade.HEGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
@@ -47,7 +47,7 @@ object ModEntities {
 //        ).sized(ENTITY_SIZE, ENTITY_SIZE).updateInterval( Int.MAX_VALUE)
 //            .build(ResourceLocation(CounterStrikeGrenades.ID, "hegrenade").toString())
 //    }
-    val HEGRENADE_ENTITY = registerGrenade("hegrenade", ::HEByFuseGrenadeEntity)
+    val HEGRENADE_ENTITY = registerGrenade("hegrenade", ::HEGrenadeEntity)
     val INCENDIARY_ENTITY = registerGrenade("incendiary", ::IncendiaryEntity)
 
 //    val INCENDIARY_ENTITY: RegistryObject<EntityType<IncendiaryEntity>> = ENTITIES.register("incendiary") {

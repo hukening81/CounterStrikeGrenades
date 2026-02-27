@@ -84,7 +84,7 @@
       }
     ]
   },
-  "flashbang.hit": {
+  "flashbang.bounce": {
     "category": "player",
     "sounds": [
       "csgrenades:flashbang/grenade_hit1"
@@ -152,12 +152,6 @@
     "category": "player",
     "sounds": [
       "csgrenades:hegrenade/he_bounce-1"
-    ]
-  },
-  "hegrenade.hit_block": {
-    "category": "player",
-    "sounds": [
-      "csgrenades:hegrenade/hit_block"
     ]
   },
   "hegrenade.pinpull": {
@@ -291,7 +285,7 @@
       "csgrenades:molotov/smash_04"
     ]
   },
-  "smokegrenade.can_bounce": {
+  "smokegrenade.can": {
     "category": "player",
     "sounds": [
       "csgrenades:smokegrenade/can_01",
@@ -304,7 +298,7 @@
       "csgrenades:smokegrenade/draw"
     ]
   },
-  "smokegrenade.hit": {
+  "smokegrenade.bounce": {
     "category": "player",
     "sounds": [
       "csgrenades:smokegrenade/grenade_hit1"

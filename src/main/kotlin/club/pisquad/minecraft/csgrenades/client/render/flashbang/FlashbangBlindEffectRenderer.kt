@@ -4,7 +4,7 @@ import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.SoundTypes
 import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.network.message.FlashbangEffectData
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 import club.pisquad.minecraft.csgrenades.sound.FlashbangRingSound
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferUploader

@@ -1,11 +1,12 @@
 package club.pisquad.minecraft.csgrenades.compat
 
-import club.pisquad.minecraft.csgrenades.*
-import club.pisquad.minecraft.csgrenades.entity.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.*
-import club.pisquad.minecraft.csgrenades.entity.hegrenade.*
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
+import club.pisquad.minecraft.csgrenades.entity.firegrenade.MolotovEntity
+import club.pisquad.minecraft.csgrenades.entity.flashbang.FlashBangEntity
+import club.pisquad.minecraft.csgrenades.entity.hegrenade.HEGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
 import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.world.entity.player.Player
@@ -78,7 +79,7 @@ object UpdateObjectives {
     fun onPlayerDied(event: LivingDeathEvent) {
         if (event.entity is Player && event.source.entity is CounterStrikeGrenadeEntity) {
             val server = event.entity.server ?: return
-            val attackerName = (event.source.entity as CounterStrikeGrenadeEntity).ownerUuid?.name?.string ?: return
+            val attackerName = (event.source.entity as CounterStrikeGrenadeEntity).owner?.name?.string ?: return
             val commandSource = server.createCommandSourceStack().withSuppressedOutput()
 
             val objective = when (event.source.entity) {
@@ -86,7 +87,7 @@ object UpdateObjectives {
 
                 is SmokeGrenadeEntity -> ModObjectives.KILLCOUNT_SMOKEGRENADE
 
-                is HEByFuseGrenadeEntity -> ModObjectives.KILLCOUNT_HEGRENADE
+                is HEGrenadeEntity -> ModObjectives.KILLCOUNT_HEGRENADE
 
                 is IncendiaryEntity -> ModObjectives.KILLCOUNT_INCENDIARY
 

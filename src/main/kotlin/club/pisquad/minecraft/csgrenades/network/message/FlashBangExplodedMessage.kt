@@ -9,7 +9,7 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance

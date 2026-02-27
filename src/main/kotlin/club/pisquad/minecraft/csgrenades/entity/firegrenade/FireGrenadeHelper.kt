@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
-import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance
 import net.minecraft.sounds.SoundSource

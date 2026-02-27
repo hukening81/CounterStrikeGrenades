@@ -145,7 +145,7 @@ object InputState {
                 max(
                     0.0,
                     tickSinceStageChange.toDouble().div(
-                        ModConfig.Throw.THROW_STRENGTH_TRANSITION_TIME.get().toTick(),
+                        ModConfig.throwConfig.strength_transition_time.get().toTick(),
                     ),
                 ),
             ),
@@ -160,19 +160,19 @@ object InputState {
         if (strength <= StrengthTarget.WEAK.strength) {
             speed = linearInterpolate(
                 0.0,
-                ModConfig.Throw.THROW_SPEED_WEAK.get(),
+                ModConfig.throwConfig.speed_weak.get(),
                 (strength - StrengthTarget.NONE.strength).div(StrengthTarget.WEAK.strength - StrengthTarget.NONE.strength),
             )
         } else if (strength <= StrengthTarget.MEDIUM.strength) {
             speed = linearInterpolate(
                 0.0,
-                ModConfig.Throw.THROW_SPEED_MEDIUM.get(),
+                ModConfig.throwConfig.speed_medium.get(),
                 (strength - StrengthTarget.WEAK.strength).div(StrengthTarget.MEDIUM.strength - StrengthTarget.WEAK.strength),
             )
         } else {
             speed = linearInterpolate(
                 0.0,
-                ModConfig.Throw.THROW_SPEED_STRONG.get(),
+                ModConfig.throwConfig.speed_strong.get(),
                 (strength - StrengthTarget.MEDIUM.strength).div(StrengthTarget.STRONG.strength - StrengthTarget.MEDIUM.strength),
             )
         }

@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -63,7 +62,7 @@ object GrenadeRenderCacheHelper {
 
 class GrenadeRenderer<T>(
     context: EntityRendererProvider.Context,
-) : EntityRenderer<T>(context) where T : Entity, T : ICounterStrikeGrenadeEntity {
+) : EntityRenderer<T>(context) where T : CounterStrikeGrenadeEntity {
 
     private val itemRenderer: ItemRenderer = context.itemRenderer
 
