@@ -12,4 +12,5 @@ object MolotovSoundEvents {
     val fireFadeout = ModSoundEvents.registerSoundEvent("molotov.fire_fadeout")
     val throwSound = ModSoundEvents.registerSoundEvent("molotov.throw")
     val smash = ModSoundEvents.registerSoundEvent("molotov.smash")
+    val bounce = ModSoundEvents.registerSoundEvent("molotov.bounce")
 }

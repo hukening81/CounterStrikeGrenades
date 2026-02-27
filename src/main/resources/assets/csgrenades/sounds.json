@@ -175,8 +175,7 @@
   "incendiary.bounce": {
     "category": "player",
     "sounds": [
-      "csgrenades:incendiary/bounce",
-      "csgrenades:incendiary/bounce_m"
+      "csgrenades:incendiary/bounce"
     ]
   },
   "incendiary.detonate": {
@@ -251,6 +250,12 @@
     "category": "player",
     "sounds": [
       "csgrenades:molotov/draw"
+    ]
+  },
+  "molotov.bounce": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:molotov/bounce"
     ]
   },
   "molotov.extinguish": {
