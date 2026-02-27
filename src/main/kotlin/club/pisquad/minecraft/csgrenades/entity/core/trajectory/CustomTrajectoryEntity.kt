@@ -10,6 +10,8 @@ import kotlinx.serialization.cbor.Cbor
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
@@ -17,6 +19,8 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
 
+const val POSITION_ERROR_TOLERANCE: Double = 0.5
+const val VELOCITY_ERROR_TOLERANCE: Double = 0.5
 
 /**Helper class that implements custom physics required by grenades
  * It updates vanilla `position` and `deltaMovement`, alongside the provided `center` and `velocity`
@@ -61,8 +65,21 @@ abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajecto
         @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
     )
 
+    companion object {
+        val trajectoryNodeUpdateAccessor: EntityDataAccessor<TrajectoryNode.TickNode> =
+            SynchedEntityData.defineId(CustomTrajectoryEntity::class.java, TrajectoryNode.TickNode.TickNodeEntityDataSerializer())
+    }
+
     override fun defineSynchedData() {
-        TODO("Not yet implemented")
+        this.entityData.define(trajectoryNodeUpdateAccessor, TrajectoryNode.TickNode.empty())
+    }
+
+    override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
+        super.onSyncedDataUpdated(key)
+        if (key == trajectoryNodeUpdateAccessor) {
+            val serverNode = this.entityData.get(key) as TrajectoryNode.TickNode
+            val clientNode = trajectory.getNode(serverNode)
+        }
     }
 
 //    override fun readAdditionalSaveData(pCompound: CompoundTag?) {
@@ -104,6 +121,6 @@ abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajecto
     }
 
     fun initializeMovementState(position: Vec3, velocity: Vec3) {
-        trajectory.replaceNode(0, Trajectory.TrajectoryNode(0, position, velocity, 0.0))
+        trajectory.replaceNode(0, Trajectory.TrajectoryNode(position, velocity, 0.0))
     }
 }

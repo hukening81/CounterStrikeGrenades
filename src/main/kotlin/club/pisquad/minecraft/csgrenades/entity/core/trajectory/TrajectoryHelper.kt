@@ -1,9 +1,9 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
+import club.pisquad.minecraft.csgrenades.isBetween
 import club.pisquad.minecraft.csgrenades.minus
 import club.pisquad.minecraft.csgrenades.minusLength
 import club.pisquad.minecraft.csgrenades.toVec3
-import club.pisquad.minecraft.csgrenades.util.EntityBounceHelper.between
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
@@ -84,7 +84,7 @@ object TrajectoryHelper {
                 val v = velocity.scale(c)
                 val l = v.length()
                 val p = relativePos.add(v)
-                if (p.y.between(box.minY, box.maxY) && p.z.between(box.minZ, box.maxZ)) {
+                if (p.y.isBetween(box.minY, box.maxY) && p.z.isBetween(box.minZ, box.maxZ)) {
                     candidateResult = CollidingResult(direction, l, p.add(blockPos.toVec3()))
                 }
             }

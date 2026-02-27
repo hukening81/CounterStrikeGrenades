@@ -159,3 +159,8 @@ fun Vec3.minusGrenadeSizeOffset(): Vec3 {
 fun Vec3.addGrenadeSizeOffset(): Vec3 {
     return this.add(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
 }
+
+fun Double.isBetween(value1: Double, value2: Double): Boolean {
+    return (value1 <= value2 && this >= value1 && this <= value2) || (value1 >= value2 && this <= value1 && this >= value2)
+
+}

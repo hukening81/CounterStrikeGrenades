@@ -14,5 +14,4 @@ class FireGrenadeCommonConfig(
         builder.defineInRange("spread_radius", defaultSpreadRadius, 1.0, 10.0)
         builder.defineInRange("max_damage_per_tick", defaultMaxDamagePerTick, 0.0, 10.0)
     }
-
 }
