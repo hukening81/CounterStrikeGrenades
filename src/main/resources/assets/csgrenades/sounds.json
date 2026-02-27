@@ -1,128 +1,341 @@
 {
-  "grenade.hit": {
+  "common.hit_entity": {
     "category": "player",
     "sounds": [
-      "csgrenades:common/grenade_hit"
+      "csgrenades:common/kevlar1",
+      "csgrenades:common/kevlar2",
+      "csgrenades:common/kevlar3",
+      "csgrenades:common/kevlar4",
+      "csgrenades:common/kevlar5"
     ]
   },
-  "grenade.throw": {
+  "common.burn_damage": {
     "category": "player",
     "sounds": [
-      "csgrenades:common/grenade_throw"
+      "csgrenades:common/burn_damage1",
+      "csgrenades:common/burn_damage2",
+      "csgrenades:common/burn_damage3",
+      "csgrenades:common/burn_damage4",
+      "csgrenades:common/burn_damage5"
+    ]
+  },
+  "common.throw": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:common/throw"
     ]
   },
   "decoy.draw": {
     "category": "player",
     "sounds": [
-      "csgrenades:decoy/decoy_draw"
+      "csgrenades:decoy/draw"
+    ]
+  },
+  "decoy.throw": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:decoy/throw"
+    ]
+  },
+  "decoy.pinpull": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:decoy/pinpull"
+    ]
+  },
+  "decoy.pinpull_start": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:decoy/pinpull_start"
     ]
   },
   "flashbang.draw": {
     "category": "player",
     "sounds": [
-      "csgrenades:flashbang/flashbang_draw"
+      "csgrenades:flashbang/draw"
     ]
   },
   "flashbang.explode": {
-    "category": "ambient",
+    "category": "player",
     "sounds": [
-      "csgrenades:flashbang/flashbang_explode"
+      "csgrenades:flashbang/explode1",
+      "csgrenades:flashbang/explode2"
     ]
   },
   "flashbang.explode_distant": {
-    "category": "ambient",
+    "category": "player",
     "sounds": [
-      "csgrenades:flashbang/flashbang_explode_distant"
+      "csgrenades:flashbang/explode1_distant",
+      "csgrenades:flashbang/explode2_distant"
     ]
   },
-  "flashbang.explosion_ring": {
-    "category": "ambient",
+  "flashbang.ring": {
+    "category": "player",
     "sounds": [
       "csgrenades:flashbang/explosion_ring"
     ]
   },
-  "smokegrenade.draw": {
+  "flashbang.ring_loop": {
     "category": "player",
     "sounds": [
-      "csgrenades:smokegrenade/smokegrenade_draw"
+      {
+        "name": "csgrenades:flashbang/explosion_ring_loop",
+        "stream": true
+      }
     ]
   },
-  "smokegrenade.smoke_emmit": {
-    "category": "ambient",
+  "flashbang.hit": {
+    "category": "player",
     "sounds": [
-      "csgrenades:smokegrenade/smoke_emit"
+      "csgrenades:flashbang/grenade_hit1"
     ]
   },
-  "smokegrenade.smoke_explode_distant": {
-    "category": "ambient",
+  "flashbang.throw": {
+    "category": "player",
     "sounds": [
-      "csgrenades:smokegrenade/smokegrenade_explode_distant"
+      "csgrenades:flashbang/grenade_throw"
+    ]
+  },
+  "flashbang.pinpull": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:flashbang/pinpull"
+    ]
+  },
+  "flashbang.pinpull_start": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:flashbang/pinpull_start"
+    ]
+  },
+  "hegrenade.detonate": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:hegrenade/detonate_02",
+      "csgrenades:hegrenade/detonate_03"
+    ]
+  },
+  "hegrenade.detonate_distant": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:hegrenade/distant_detonate_01",
+      "csgrenades:hegrenade/distant_detonate_02",
+      "csgrenades:hegrenade/distant_detonate_03"
     ]
   },
   "hegrenade.draw": {
     "category": "player",
     "sounds": [
-      "csgrenades:hegrenade/hegrenade_draw"
+      "csgrenades:hegrenade/draw",
+      "csgrenades:hegrenade/he_draw"
+    ]
+  },
+  "hegrenade.explode": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:hegrenade/explode"
+    ]
+  },
+  "hegrenade.explode_distant": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:hegrenade/explode_distant"
+    ]
+  },
+  "hegrenade.throw": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:hegrenade/grenade_throw"
     ]
   },
   "hegrenade.bounce": {
     "category": "player",
     "sounds": [
-      "csgrenades:hegrenade/hegrenade_bounce"
+      "csgrenades:hegrenade/he_bounce-1"
     ]
   },
-  "hegrenade.explode": {
-    "category": "ambient",
+  "hegrenade.hit_block": {
+    "category": "player",
     "sounds": [
-      "csgrenades:hegrenade/hegrenade_explode"
+      "csgrenades:hegrenade/hit_block"
     ]
   },
-  "hegrenade.explode_distant": {
-    "category": "ambient",
+  "hegrenade.pinpull": {
+    "category": "player",
     "sounds": [
-      "csgrenades:hegrenade/hegrenade_explode_distant"
+      "csgrenades:hegrenade/pinpull"
+    ]
+  },
+  "hegrenade.pinpull_start": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:hegrenade/pinpull_start"
+    ]
+  },
+  "incendiary.bounce": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:incendiary/bounce",
+      "csgrenades:incendiary/bounce_m"
+    ]
+  },
+  "incendiary.detonate": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:incendiary/detonate_1",
+      "csgrenades:incendiary/detonate_2",
+      "csgrenades:incendiary/detonate_3"
+    ]
+  },
+  "incendiary.detonate_distant": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:incendiary/detonate_1_distant",
+      "csgrenades:incendiary/detonate_2_distant",
+      "csgrenades:incendiary/detonate_3_distant"
+    ]
+  },
+  "incendiary.detonate_air": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:incendiary/detonate_air_01"
     ]
   },
   "incendiary.draw": {
     "category": "player",
     "sounds": [
-      "csgrenades:incendiary/incendiary_draw"
+      "csgrenades:incendiary/draw"
+    ]
+  },
+  "incendiary.pinpull": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:incendiary/pinpull"
+    ]
+  },
+  "incendiary.pinpull_start": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:incendiary/pinpull_start"
+    ]
+  },
+  "incendiary.pop": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:incendiary/pop_03"
     ]
   },
   "incendiary.throw": {
     "category": "player",
     "sounds": [
-      "csgrenades:incendiary/incendiary_throw"
+      "csgrenades:incendiary/throw"
     ]
   },
-  "incendiary.explode": {
-    "category": "ambient",
+  "molotov.detonate": {
+    "category": "player",
     "sounds": [
-      "csgrenades:incendiary/incendiary_explode"
+      "csgrenades:molotov/detonate_1",
+      "csgrenades:molotov/detonate_2",
+      "csgrenades:molotov/detonate_3"
     ]
   },
-  "incendiary.explode_distant": {
-    "category": "ambient",
+  "molotov.detonate_distant": {
+    "category": "player",
     "sounds": [
-      "csgrenades:incendiary/incendiary_explode_distant"
+      "csgrenades:molotov/detonate_1_distant",
+      "csgrenades:molotov/detonate_2_distant",
+      "csgrenades:molotov/detonate_3_distant"
     ]
   },
-  "incendiary.explode_air": {
-    "category": "ambient",
+  "molotov.draw": {
+    "category": "player",
     "sounds": [
-      "csgrenades:incendiary/incendiary_explode_air"
+      "csgrenades:molotov/draw"
     ]
   },
-  "incendiary.bounce": {
-    "category": "ambient",
+  "molotov.extinguish": {
+    "category": "player",
     "sounds": [
-      "csgrenades:incendiary/incendiary_bounce"
+      "csgrenades:molotov/extinguish"
     ]
   },
-  "incendiary.pop": {
-    "category": "ambient",
+  "molotov.fire_idle": {
+    "category": "player",
     "sounds": [
-      "csgrenades:incendiary/incendiary_pop"
+      {
+        "name": "csgrenades:molotov/fire_idle_loop_1",
+        "stream": true
+      }
+    ]
+  },
+  "molotov.ignite": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:molotov/fire_ignite_1",
+      "csgrenades:molotov/fire_ignite_2",
+      "csgrenades:molotov/fire_ignite_4",
+      "csgrenades:molotov/fire_ignite_5"
+    ]
+  },
+  "molotov.smash": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:molotov/smash_01",
+      "csgrenades:molotov/smash_02",
+      "csgrenades:molotov/smash_03",
+      "csgrenades:molotov/smash_04"
+    ]
+  },
+  "smokegrenade.can_bounce": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:smokegrenade/can_01",
+      "csgrenades:smokegrenade/can_02"
+    ]
+  },
+  "smokegrenade.draw": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:smokegrenade/draw"
+    ]
+  },
+  "smokegrenade.hit": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:smokegrenade/grenade_hit1"
+    ]
+  },
+  "smokegrenade.throw": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:smokegrenade/grenade_throw"
+    ]
+  },
+  "smokegrenade.pinpull": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:smokegrenade/pinpull"
+    ]
+  },
+  "smokegrenade.pinpull_start": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:smokegrenade/pinpull_start"
+    ]
+  },
+  "smokegrenade.explode_distant": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:smokegrenade/sg_explode_distant"
+    ]
+  },
+  "smokegrenade.emit": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "csgrenades:smokegrenade/smoke_emit",
+        "stream": true
+      }
     ]
   }
 }
