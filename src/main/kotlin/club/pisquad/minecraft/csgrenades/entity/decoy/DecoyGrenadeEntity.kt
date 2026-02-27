@@ -7,6 +7,8 @@ import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.sounds.DecoySoundEvents
 import club.pisquad.minecraft.csgrenades.registry.sounds.FlashbangSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -23,6 +25,14 @@ class DecoyGrenadeEntity(
         DecoySoundEvents.throwSound.get(),
         FlashbangSoundEvents.bounce.get(),
     )
+
+    override fun getHitDamageSource(entity: Entity): DamageSource {
+        TODO("Not yet implemented")
+    }
+
+    override fun getMainDamageSource(entity: Entity): DamageSource {
+        TODO("Not yet implemented")
+    }
 
 //    override fun getDefaultItem(): Item = ModItems.DECOY_GRENADE_ITEM.get()
 }

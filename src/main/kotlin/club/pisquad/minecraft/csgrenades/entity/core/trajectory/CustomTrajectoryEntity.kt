@@ -25,7 +25,10 @@ const val VELOCITY_ERROR_TOLERANCE: Double = 0.5
 /**Helper class that implements custom physics required by grenades
  * It updates vanilla `position` and `deltaMovement`, alongside the provided `center` and `velocity`
  * */
-abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajectoryEntity>, pLevel: Level) : Entity(pEntityType, pLevel), IEntityAdditionalSpawnData {
+abstract class CustomTrajectoryEntity(
+    pEntityType: EntityType<out CustomTrajectoryEntity>,
+    pLevel: Level,
+) : Entity(pEntityType, pLevel), IEntityAdditionalSpawnData {
 
     var center: Vec3
         get() {
@@ -78,7 +81,7 @@ abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajecto
         super.onSyncedDataUpdated(key)
         if (key == trajectoryNodeUpdateAccessor) {
             val serverNode = this.entityData.get(key) as TrajectoryNode.TickNode
-            val clientNode = trajectory.getNode(serverNode)
+            trajectory.getNode(serverNode)
         }
     }
 
@@ -123,4 +126,11 @@ abstract class CustomTrajectoryEntity(pEntityType: EntityType<out CustomTrajecto
     fun initializeMovementState(position: Vec3, velocity: Vec3) {
         trajectory.replaceNode(0, Trajectory.TrajectoryNode(position, velocity, 0.0))
     }
+
+
+    /**Provide basic hook for playing sound events
+     * */
+    abstract fun onHitBlock()
+
+    abstract fun onHitEntity(entity: Entity)
 }

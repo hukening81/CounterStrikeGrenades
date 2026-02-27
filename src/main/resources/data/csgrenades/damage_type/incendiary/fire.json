@@ -1,5 +1,5 @@
 {
-  "message_id": "csgrenades.incendiary_fire",
+  "message_id": "csgrenades.incendiary.fire",
   "scaling": "never",
   "exhaustion": 0.1,
   "effects": "burning",

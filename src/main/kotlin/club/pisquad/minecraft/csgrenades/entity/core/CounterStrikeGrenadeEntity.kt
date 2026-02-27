@@ -7,7 +7,6 @@ import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
-import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -16,6 +15,7 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -25,12 +25,17 @@ import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
 
+interface GrenadeEntityDamageSourceGetter {
+    fun getHitDamageSource(entity: Entity): DamageSource
+    fun getMainDamageSource(entity: Entity): DamageSource
+}
+
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out CounterStrikeGrenadeEntity>,
     pLevel: Level,
     val grenadeType: GrenadeType,
 ) :
-    CustomTrajectoryEntity(pEntityType, pLevel), IEntityAdditionalSpawnData {
+    CustomTrajectoryEntity(pEntityType, pLevel), IEntityAdditionalSpawnData, GrenadeEntityDamageSourceGetter {
     lateinit var ownerUuid: UUID
 
     abstract val sounds: GrenadeEntitySoundEvents
@@ -61,7 +66,6 @@ abstract class CounterStrikeGrenadeEntity(
         @Serializable(with = UUIDSerializer::class) val ownerUuid: UUID,
     )
 
-
     override fun defineSynchedData() {
         this.entityData.define(speedAccessor, 0f)
         this.entityData.define(isActivatedAccessor, false)
@@ -84,8 +88,6 @@ abstract class CounterStrikeGrenadeEntity(
     override fun onAddedToWorld() {
         super.onAddedToWorld()
         assert(ownerUuid.toString().isNotEmpty())
-
-        this.playSound(this.metadata.spawnSoundEvent, 0.2f, 1f)
     }
 
     override fun isOnFire(): Boolean = false
@@ -129,17 +131,5 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun readAdditionalSaveData(pCompound: CompoundTag?) {
 
-    }
-
-    private fun getHitDamageSource(): DamageSource {
-        val registryAccess = this.level().registryAccess()
-        val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(metadata.hitDamageType)
-        return DamageSource(damageTypeHolder, this, this.owner)
-    }
-
-    private fun getMainDamageSource(): DamageSource {
-        val registryAccess = this.level().registryAccess()
-        val damageTypeHolder = registryAccess.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(metadata.mainDamageType)
-        return DamageSource(damageTypeHolder, this, this.owner)
     }
 }
