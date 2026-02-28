@@ -150,6 +150,7 @@ class GrenadeRenderer<T>(
     override fun render(entity: T, entityYaw: Float, partialTick: Float, poseStack: PoseStack, bufferSouce: MultiBufferSource, pPackedLight: Int) {
         entity as CounterStrikeGrenadeEntity
         poseStack.pushPose()
+        itemRenderer.renderModelLists()
     }
 
     // 这个方法必须重写，对于物品模型渲染，通常返回这个默认值

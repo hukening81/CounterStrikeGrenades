@@ -1,11 +1,9 @@
-package club.pisquad.minecraft.csgrenades.item
+package club.pisquad.minecraft.csgrenades.item.core
 
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import net.minecraft.core.BlockPos
-import net.minecraft.sounds.SoundEvent
-import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
@@ -20,19 +18,16 @@ import net.minecraft.world.level.block.state.BlockState
 
 private var drawSoundPlayedSlot: Int = -1
 
-open class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(2)) {
-
-    lateinit var grenadeType: GrenadeType
+abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(2)) {
     val defaultModifiers: ImmutableMultimap<Attribute, AttributeModifier>
+    abstract val sounds: GrenadeItemSoundEvents
+    abstract val grenadeType: GrenadeType
 
     init {
         val builder = ImmutableMultimap.builder<Attribute, AttributeModifier>()
         builder.put(Attributes.ATTACK_SPEED, AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", 1000.0, AttributeModifier.Operation.ADDITION))
         this.defaultModifiers = builder.build()
     }
-
-    // Sounds
-    var drawSound: SoundEvent = SoundEvents.EMPTY
 
     override fun getAttributeModifiers(
         slot: EquipmentSlot,

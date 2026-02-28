@@ -132,4 +132,28 @@ abstract class CounterStrikeGrenadeEntity(
     override fun readAdditionalSaveData(pCompound: CompoundTag?) {
 
     }
+
+    override fun onHitBlock() {
+        if (this.level().isClientSide) {
+            // EMPTY
+        } else {
+            playServerBounceSound()
+        }
+    }
+
+    override fun onHitEntity(entity: Entity) {
+        if (this.level().isClientSide) {
+            // EMPTY
+        } else {
+            playServerHitEntitySound()
+        }
+    }
+
+    fun playServerBounceSound() {
+
+    }
+
+    fun playServerHitEntitySound() {
+
+    }
 }

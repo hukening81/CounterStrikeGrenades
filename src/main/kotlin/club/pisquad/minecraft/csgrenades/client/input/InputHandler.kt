@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.client.input
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.item.CounterStrikeGrenadeItem
+import club.pisquad.minecraft.csgrenades.item.core.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.client.Minecraft
 import net.minecraftforge.event.TickEvent

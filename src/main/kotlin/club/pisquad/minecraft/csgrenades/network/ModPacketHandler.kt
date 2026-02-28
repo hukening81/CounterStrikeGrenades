@@ -4,8 +4,6 @@ package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
-import club.pisquad.minecraft.csgrenades.network.message.FlashBangExplodedMessage
-import club.pisquad.minecraft.csgrenades.network.message.GrenadeThrownMessage
 import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.SmokeGrenadePacketHandler
@@ -63,22 +61,14 @@ object ModPacketHandler {
     )
 
     fun register() {
-        INSTANCE.registerMessage(
-            messageTypeCount,
-            GrenadeThrownMessage::class.java,
-            GrenadeThrownMessage::encoder,
-            GrenadeThrownMessage::decoder,
-            GrenadeThrownMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_SERVER),
-        )
-        INSTANCE.registerMessage(
-            messageTypeCount,
-            FlashBangExplodedMessage::class.java,
-            FlashBangExplodedMessage::encoder,
-            FlashBangExplodedMessage::decoder,
-            FlashBangExplodedMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
-        )
+//        INSTANCE.registerMessage(
+//            messageTypeCount,
+//            FlashBangExplodedMessage::class.java,
+//            FlashBangExplodedMessage::encoder,
+//            FlashBangExplodedMessage::decoder,
+//            FlashBangExplodedMessage::handler,
+//            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
+//        )
         INSTANCE.registerMessage(
             messageTypeCount,
             ClientGrenadeThrowMessage::class.java,

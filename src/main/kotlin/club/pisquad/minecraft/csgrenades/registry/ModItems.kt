@@ -2,12 +2,12 @@ package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.item.DecoyGrenadeItem
-import club.pisquad.minecraft.csgrenades.item.FlashBangItem
-import club.pisquad.minecraft.csgrenades.item.HEGrenadeItem
-import club.pisquad.minecraft.csgrenades.item.IncendiaryItem
-import club.pisquad.minecraft.csgrenades.item.MolotovItem
-import club.pisquad.minecraft.csgrenades.item.SmokeGrenadeItem
+import club.pisquad.minecraft.csgrenades.item.decoy.DecoyGrenadeItem
+import club.pisquad.minecraft.csgrenades.item.flashbang.FlashBangItem
+import club.pisquad.minecraft.csgrenades.item.hegrenade.HEGrenadeItem
+import club.pisquad.minecraft.csgrenades.item.incendiary.IncendiaryItem
+import club.pisquad.minecraft.csgrenades.item.molotov.MolotovItem
+import club.pisquad.minecraft.csgrenades.item.smokegrenade.SmokeGrenadeItem
 import net.minecraft.world.item.Item
 import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.registries.DeferredRegister
