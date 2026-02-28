@@ -1,8 +1,10 @@
 package club.pisquad.minecraft.csgrenades.entity.firegrenade
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntitySoundEvents
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.registry.damage.ModDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.sounds.IncendiarySoundEvents
 import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
@@ -16,5 +18,9 @@ class IncendiaryEntity(pEntityType: EntityType<out IncendiaryEntity>, pLevel: Le
     override val sounds = GrenadeEntitySoundEvents(
         IncendiarySoundEvents.throwSound.get(),
         ModSoundEvents.incendiary.bounce.get(),
+    )
+    override val damageTypes = GrenadeEntityDamageTypes(
+        ModDamageTypes.incendiary.hit,
+        ModDamageTypes.incendiary.fire,
     )
 }

@@ -2,10 +2,12 @@ package club.pisquad.minecraft.csgrenades.entity.hegrenade
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.core.ActivateByFuseGrenadeEntity
+import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntitySoundEvents
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadeActivatedMessage
+import club.pisquad.minecraft.csgrenades.registry.damage.ModDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.sounds.HEGrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.world.entity.EntityType
@@ -21,6 +23,10 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
     override val sounds = GrenadeEntitySoundEvents(
         HEGrenadeSoundEvents.throwSound.get(),
         HEGrenadeSoundEvents.bounce.get(),
+    )
+    override val damageTypes = GrenadeEntityDamageTypes(
+        ModDamageTypes.hegrenade.hit,
+        ModDamageTypes.hegrenade.explosion,
     )
 
 
