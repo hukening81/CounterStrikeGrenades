@@ -25,7 +25,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
 
@@ -35,7 +34,7 @@ abstract class CounterStrikeGrenadeEntity(
     pLevel: Level,
     val grenadeType: GrenadeType,
 ) :
-    CustomTrajectoryEntity(pEntityType, pLevel), IEntityAdditionalSpawnData {
+    CustomTrajectoryEntity(pEntityType, pLevel) {
     lateinit var ownerUuid: UUID
 
     abstract val sounds: GrenadeEntitySoundEvents
@@ -77,15 +76,14 @@ abstract class CounterStrikeGrenadeEntity(
 
     fun isActivated(): Boolean = this.entityData.get(isActivatedAccessor)
 
-//    override fun tick() {
+    override fun tick() {
 //        super.tick()
-////        TrajectoryHelper.step(level(), trajectory)
-////        this.moveTo(trajectory.position.minusGrenadeSizeOffset())
-//    }
+//        TrajectoryHelper.step(level(), trajectory)
+//        this.moveTo(trajectory.position.minusGrenadeSizeOffset())
+    }
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
-        assert(ownerUuid.toString().isNotEmpty())
     }
 
     override fun isOnFire(): Boolean = false
@@ -104,11 +102,6 @@ abstract class CounterStrikeGrenadeEntity(
         }
     }
 
-    override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
-        // This still calls the methods below automatically
-        return NetworkHooks.getEntitySpawningPacket(this)
-    }
-
     @OptIn(ExperimentalSerializationApi::class)
     override fun readSpawnData(additionalData: FriendlyByteBuf) {
         super.readSpawnData(additionalData)
@@ -121,6 +114,10 @@ abstract class CounterStrikeGrenadeEntity(
         super.writeSpawnData(buffer)
         val spawnData = SpawnData(ownerUuid)
         buffer.writeByteArray(Cbor.encodeToByteArray(SpawnData.serializer(), spawnData))
+    }
+
+    override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
+        return NetworkHooks.getEntitySpawningPacket(this)
     }
 
     override fun addAdditionalSaveData(pCompound: CompoundTag?) {

@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
@@ -8,6 +9,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
@@ -80,27 +82,23 @@ abstract class CustomTrajectoryEntity(
         if (this.level().isClientSide) {
             if (key == trajectoryNodeUpdateAccessor) {
                 val serverNode = this.entityData.get(key) as TrajectoryNode.TickNode
-                trajectory.syncServerNode(serverNode, this.level() as ClientLevel)
+                if (serverNode.position == Vec3.ZERO && serverNode.velocity == Vec3.ZERO) {
+                    println("Somehow the serve sent a empty node?")
+                } else {
+                    trajectory.syncServerNode(serverNode, this.level() as ClientLevel)
+                }
             }
         }
     }
 
-//    override fun readAdditionalSaveData(pCompound: CompoundTag?) {
-//        TODO("Not yet implemented")
-//    }
-//
-//    override fun addAdditionalSaveData(pCompound: CompoundTag?) {
-//        TODO("Not yet implemented")
-//    }
+    override fun readAdditionalSaveData(pCompound: CompoundTag?) {
 
-    override fun onAddedToWorld() {
-        super.onAddedToWorld()
-
-        // Check if movement state is properly initialized
-        if (!trajectory.initialized) {
-            throw Exception("Grenade's Movement state is not initialized")
-        }
     }
+
+    override fun addAdditionalSaveData(pCompound: CompoundTag?) {
+
+    }
+
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun readSpawnData(additionalData: FriendlyByteBuf) {
@@ -127,8 +125,14 @@ abstract class CustomTrajectoryEntity(
     }
 
     override fun tick() {
-        this.trajectory.tick(this.level())
-
+        val node = this.trajectory.tick(this.level())
+        if (this.level().isClientSide) {
+            if (trajectory.initialized) {
+                CounterStrikeGrenades.Logger.warn("Client trajectory not initialized")
+            }
+        } else {
+            this.entityData.set(trajectoryNodeUpdateAccessor, node)
+        }
     }
 
 

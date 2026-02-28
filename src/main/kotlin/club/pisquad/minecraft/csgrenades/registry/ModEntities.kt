@@ -71,7 +71,7 @@ object ModEntities {
             EntityType.Builder.of(
                 factory,
                 MobCategory.MISC,
-            ).sized(ENTITY_SIZE, ENTITY_SIZE).updateInterval(Int.MAX_VALUE).setShouldReceiveVelocityUpdates(false)
+            ).sized(ENTITY_SIZE, ENTITY_SIZE).updateInterval(1).setShouldReceiveVelocityUpdates(false)
                 .build(ResourceLocation(CounterStrikeGrenades.ID, name).toString())
         }
     }

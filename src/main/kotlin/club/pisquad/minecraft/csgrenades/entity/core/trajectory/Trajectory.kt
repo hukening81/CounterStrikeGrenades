@@ -54,14 +54,6 @@ class Trajectory {
         }
     }
 
-    fun lastNode(): TrajectoryNode.TickNode {
-        // provided that there is always one node available
-        val size = nodes.size
-        if (size > 1) {
-            return nodes[size - 2]
-        }
-        return nodes.last()
-    }
 
     fun getNode(index: Int): TrajectoryNode.TickNode? {
         return nodes.getOrNull(index)
@@ -73,8 +65,11 @@ class Trajectory {
 //    }
 
     fun tick(level: Level): TrajectoryNode.TickNode {
-        this.nodes.add(lastNode().processTick(level))
-        return lastNode()
+        if (!this.initialized) {
+            throw Exception("Use before initialization")
+        }
+        this.nodes.add(this.nodes.last().processTick(level))
+        return this.nodes.last()
     }
 
     fun tickUntilComplete(level: Level): Int {
