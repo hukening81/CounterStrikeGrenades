@@ -1,15 +1,10 @@
 package club.pisquad.minecraft.csgrenades.network.message.firegrenade
 
-import club.pisquad.minecraft.csgrenades.SoundTypes
-import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
-import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
@@ -58,35 +53,35 @@ class FireGrenadeActivatedMessage(
 }
 
 private fun playGroundExplodedSound(position: Vec3) {
-    val distance = position.distanceTo(Minecraft.getInstance().player!!.position())
-    val randomSource = RandomSource.createNewThreadLocalInstance()
-    val extinguishSoundInstance = SimpleSoundInstance(
-        ModSoundEvents.INCENDIARY_EXPLODE.get(),
-        SoundSource.AMBIENT,
-        SoundUtils.getVolumeFromDistance(distance, SoundTypes.INCENDIARY_EXPLODE).toFloat(),
-        1f,
-        randomSource,
-        position.x,
-        position.y,
-        position.z,
-    )
-    Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
+//    val distance = position.distanceTo(Minecraft.getInstance().player!!.position())
+//    val randomSource = RandomSource.createNewThreadLocalInstance()
+//    val extinguishSoundInstance = SimpleSoundInstance(
+//        ModSoundEvents.INCENDIARY_EXPLODE.get(),
+//        SoundSource.AMBIENT,
+//        SoundUtils.getVolumeFromDistance(distance, SoundTypes.INCENDIARY_EXPLODE).toFloat(),
+//        1f,
+//        randomSource,
+//        position.x,
+//        position.y,
+//        position.z,
+//    )
+//    Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
 }
 
 private fun playAirExplodedSound(position: Vec3) {
-    val distance = position.distanceTo(Minecraft.getInstance().player!!.position())
-    val randomSource = RandomSource.createNewThreadLocalInstance()
-    val extinguishSoundInstance = SimpleSoundInstance(
-        ModSoundEvents.INCENDIARY_EXPLODE_AIR.get(),
-        SoundSource.AMBIENT,
-        SoundUtils.getVolumeFromDistance(distance, SoundTypes.INCENDIARY_EXPLODE_AIR).toFloat(),
-        1f,
-        randomSource,
-        position.x,
-        position.y,
-        position.z,
-    )
-    Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
+//    val distance = position.distanceTo(Minecraft.getInstance().player!!.position())
+//    val randomSource = RandomSource.createNewThreadLocalInstance()
+//    val extinguishSoundInstance = SimpleSoundInstance(
+//        ModSoundEvents.INCENDIARY_EXPLODE_AIR.get(),
+//        SoundSource.AMBIENT,
+//        SoundUtils.getVolumeFromDistance(distance, SoundTypes.INCENDIARY_EXPLODE_AIR).toFloat(),
+//        1f,
+//        randomSource,
+//        position.x,
+//        position.y,
+//        position.z,
+//    )
+//    Minecraft.getInstance().soundManager.play(extinguishSoundInstance)
 }
 
 private fun playAirExplodedAnimation(position: Vec3) {

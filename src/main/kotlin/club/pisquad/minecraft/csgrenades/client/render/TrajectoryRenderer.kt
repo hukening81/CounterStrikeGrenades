@@ -3,7 +3,6 @@ package club.pisquad.minecraft.csgrenades.client.render
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.client.input.InputState
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.Trajectory
-import club.pisquad.minecraft.csgrenades.entity.core.trajectory.TrajectoryHelper
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
 import club.pisquad.minecraft.csgrenades.renderTestParticleAtPosition
 import net.minecraft.client.Minecraft
@@ -38,8 +37,9 @@ object TrajectoryRenderer {
         }
 
         val message = ClientGrenadeThrowMessage.fromInputState() ?: return
-        val trajectory = Trajectory(message.position, message.velocity)
-        TrajectoryHelper.stepUntilComplete(event.player.level(), trajectory)
+        val trajectory = Trajectory()
+        trajectory.initialize(message.position, message.velocity)
+        trajectory.tickUntilComplete(event.player.level())
         nodes.update { extractNodesFromTrajectory(trajectory) }
 
         // DEBUG

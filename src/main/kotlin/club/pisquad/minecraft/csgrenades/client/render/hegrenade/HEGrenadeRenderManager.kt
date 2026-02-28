@@ -1,15 +1,10 @@
 package club.pisquad.minecraft.csgrenades.client.render.hegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.SoundTypes
-import club.pisquad.minecraft.csgrenades.SoundUtils
 import club.pisquad.minecraft.csgrenades.getRandomLocationFromSphere
-import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
@@ -56,21 +51,21 @@ class HEGrenadeRenderer(
         val player = Minecraft.getInstance().player!!
         val distance = player.position().distanceTo(data.position)
 
-        val soundEvent =
-            if (distance > 15) ModSoundEvents.HEGRENADE_EXPLODE_DISTANT.get() else ModSoundEvents.HEGRENADE_EXPLODE.get()
-        val soundType = if (distance > 15) SoundTypes.HEGRENADE_EXPLODE_DISTANT else SoundTypes.HEGRENADE_EXPLODE
+//        val soundEvent =
+//            if (distance > 15) ModSoundEvents.HEGRENADE_EXPLODE_DISTANT.get() else ModSoundEvents.HEGRENADE_EXPLODE.get()
+//        val soundType = if (distance > 15) SoundTypes.HEGRENADE_EXPLODE_DISTANT else SoundTypes.HEGRENADE_EXPLODE
 
-        this.soundInstance = SimpleSoundInstance(
-            soundEvent,
-            SoundSource.AMBIENT,
-            SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
-            1f,
-            RandomSource.createNewThreadLocalInstance(),
-            data.position.x,
-            data.position.y,
-            data.position.z,
-        )
-        Minecraft.getInstance().soundManager.play(this.soundInstance!!)
+//        this.soundInstance = SimpleSoundInstance(
+//            soundEvent,
+//            SoundSource.AMBIENT,
+//            SoundUtils.getVolumeFromDistance(distance, soundType).toFloat(),
+//            1f,
+//            RandomSource.createNewThreadLocalInstance(),
+//            data.position.x,
+//            data.position.y,
+//            data.position.z,
+//        )
+//        Minecraft.getInstance().soundManager.play(this.soundInstance!!)
 
         val particleEngine = Minecraft.getInstance().particleEngine
         val randomSource = RandomSource.createNewThreadLocalInstance()

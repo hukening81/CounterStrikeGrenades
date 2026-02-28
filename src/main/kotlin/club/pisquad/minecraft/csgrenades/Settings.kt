@@ -12,3 +12,6 @@ const val BOUNCE_FRICTION: Double = 0.5
 
 const val AIR_DRAG_CONSTANT = 0.3
 const val GRAVITY_CONSTANT = 0.05
+
+const val POSITION_ERROR_TOLERANCE: Double = 0.5
+const val VELOCITY_ERROR_TOLERANCE: Double = 0.5

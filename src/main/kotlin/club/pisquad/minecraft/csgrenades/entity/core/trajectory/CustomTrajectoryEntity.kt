@@ -7,6 +7,7 @@ import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
@@ -18,9 +19,6 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
-
-const val POSITION_ERROR_TOLERANCE: Double = 0.5
-const val VELOCITY_ERROR_TOLERANCE: Double = 0.5
 
 /**Helper class that implements custom physics required by grenades
  * It updates vanilla `position` and `deltaMovement`, alongside the provided `center` and `velocity`
@@ -60,7 +58,7 @@ abstract class CustomTrajectoryEntity(
             return trajectory.velocity
         }
 
-    var trajectory: Trajectory = Trajectory(Vec3.ZERO, Vec3.ZERO)
+    var trajectory: Trajectory = Trajectory()
 
     @Serializable
     private data class SpawnData(
@@ -79,9 +77,11 @@ abstract class CustomTrajectoryEntity(
 
     override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
         super.onSyncedDataUpdated(key)
-        if (key == trajectoryNodeUpdateAccessor) {
-            val serverNode = this.entityData.get(key) as TrajectoryNode.TickNode
-            trajectory.getNode(serverNode)
+        if (this.level().isClientSide) {
+            if (key == trajectoryNodeUpdateAccessor) {
+                val serverNode = this.entityData.get(key) as TrajectoryNode.TickNode
+                trajectory.syncServerNode(serverNode, this.level() as ClientLevel)
+            }
         }
     }
 
@@ -97,8 +97,7 @@ abstract class CustomTrajectoryEntity(
         super.onAddedToWorld()
 
         // Check if movement state is properly initialized
-        val firstNode = trajectory.getNode(0)
-        if ((firstNode.position == Vec3.ZERO && firstNode.velocity == Vec3.ZERO) || trajectory.nodes.size != 1) {
+        if (!trajectory.initialized) {
             throw Exception("Grenade's Movement state is not initialized")
         }
     }
@@ -124,7 +123,12 @@ abstract class CustomTrajectoryEntity(
     }
 
     fun initializeMovementState(position: Vec3, velocity: Vec3) {
-        trajectory.replaceNode(0, Trajectory.TrajectoryNode(position, velocity, 0.0))
+        trajectory.initialize(position, velocity)
+    }
+
+    override fun tick() {
+        this.trajectory.tick(this.level())
+
     }
 
 

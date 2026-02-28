@@ -42,7 +42,7 @@ abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(propertie
         if (!level.isClientSide) return
         if (entity !is Player) return
         if (isSelected && drawSoundPlayedSlot != slotId) {
-            entity.playSound(drawSound, 0.2f, 1.0f)
+//            entity.playSound(drawSound, 0.2f, 1.0f)
             drawSoundPlayedSlot = slotId
         }
         if (entity.inventory.selected != drawSoundPlayedSlot) {

@@ -11,8 +11,6 @@ import club.pisquad.minecraft.csgrenades.registry.sounds.SmokeGrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -44,9 +42,4 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel
 
 
     fun getSmokeDataPoints(): Set<SmokeDataPoint> = this.entityData.get(smokeDataPointsAccessor)
-
-    override fun getHitDamageSource(entity: Entity): DamageSource {
-        return this.getDamageSource(entity, ModDamageTypes.smokegrenade.hit)
-    }
-
 }

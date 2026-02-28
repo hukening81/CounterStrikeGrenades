@@ -1,70 +1,64 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.registry.ModEntityModels
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
-import net.minecraft.client.renderer.entity.ItemRenderer
+import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.phys.Vec3
-import net.minecraftforge.event.TickEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.LogicalSide
-import net.minecraftforge.fml.common.Mod
-import kotlin.concurrent.atomics.AtomicReference
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import net.minecraftforge.client.model.data.ModelData
 
-@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-object GrenadeRenderCacheHelper {
-    data class RenderCache(
-        val grenadeId: Int,
-        val nodes: List<Pair<Double, Vec3>>,
-    ) {
-        companion object {
-            fun create(grenade: CounterStrikeGrenadeEntity): RenderCache {
-                val trajectory = grenade.trajectory
-                val nodes = trajectory.nodesBetweenTick(trajectory.currentTick - 1.toDouble(), trajectory.currentTick.toDouble())
-                return RenderCache(grenade.id, nodes.map { Pair(it.tick - trajectory.currentTick + 1, it.position) })
-            }
-        }
-    }
-
-    @OptIn(ExperimentalAtomicApi::class)
-    val cache: AtomicReference<Map<Int, RenderCache>> = AtomicReference(mapOf())
-
-    @OptIn(ExperimentalAtomicApi::class)
-    @JvmStatic
-    @SubscribeEvent
-    fun onLevelTick(event: TickEvent.PlayerTickEvent) {
-        if (event.side == LogicalSide.SERVER) return
-        if (event.phase == TickEvent.Phase.START) {
-            return
-        }
-
-        val radius = Minecraft.getInstance().options.renderDistance().get().times(16)
-        val player = Minecraft.getInstance().player!!
-        val level = player.level() as ClientLevel
-
-        val entities = level.getEntitiesOfClass(CounterStrikeGrenadeEntity::class.java, player.boundingBox.inflate(radius.toDouble()))
-        cache.store(entities.associate { Pair(it.id, RenderCache.create(it)) })
-    }
-
-    @OptIn(ExperimentalAtomicApi::class)
-    fun get(id: Int): RenderCache? {
-        return cache.load().getOrDefault(id, null)
-    }
-}
+//@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+//object GrenadeRenderCacheHelper {
+//    data class RenderCache(
+//        val grenadeId: Int,
+//        val nodes: List<Pair<Double, Vec3>>,
+//    ) {
+//        companion object {
+//            fun create(grenade: CounterStrikeGrenadeEntity): RenderCache {
+//                val trajectory = grenade.trajectory
+//                val nodes = trajectory.nodesBetweenTick(trajectory.currentTick - 1.toDouble(), trajectory.currentTick.toDouble())
+//                return RenderCache(grenade.id, nodes.map { Pair(it.tick - trajectory.currentTick + 1, it.position) })
+//            }
+//        }
+//    }
+//
+//    @OptIn(ExperimentalAtomicApi::class)
+//    val cache: AtomicReference<Map<Int, RenderCache>> = AtomicReference(mapOf())
+//
+//    @OptIn(ExperimentalAtomicApi::class)
+//    @JvmStatic
+//    @SubscribeEvent
+//    fun onLevelTick(event: TickEvent.PlayerTickEvent) {
+//        if (event.side == LogicalSide.SERVER) return
+//        if (event.phase == TickEvent.Phase.START) {
+//            return
+//        }
+//
+//        val radius = Minecraft.getInstance().options.renderDistance().get().times(16)
+//        val player = Minecraft.getInstance().player!!
+//        val level = player.level() as ClientLevel
+//
+//        val entities = level.getEntitiesOfClass(CounterStrikeGrenadeEntity::class.java, player.boundingBox.inflate(radius.toDouble()))
+//        cache.store(entities.associate { Pair(it.id, RenderCache.create(it)) })
+//    }
+//
+//    @OptIn(ExperimentalAtomicApi::class)
+//    fun get(id: Int): RenderCache? {
+//        return cache.load().getOrDefault(id, null)
+//    }
+//}
 
 class GrenadeRenderer<T>(
     context: EntityRendererProvider.Context,
 ) : EntityRenderer<T>(context) where T : CounterStrikeGrenadeEntity {
 
-    private val itemRenderer: ItemRenderer = context.itemRenderer
+//    private val itemRenderer: ItemRenderer = context.itemRenderer
 
     //    override fun render(
 //        entity: T,
@@ -147,10 +141,27 @@ class GrenadeRenderer<T>(
 //        poseStack.popPose()
 //        // super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight) // 移除super调用以消除阴影和“扭头”效果
 //    }
-    override fun render(entity: T, entityYaw: Float, partialTick: Float, poseStack: PoseStack, bufferSouce: MultiBufferSource, pPackedLight: Int) {
+    override fun render(entity: T, entityYaw: Float, partialTick: Float, poseStack: PoseStack, bufferSouce: MultiBufferSource, packedLight: Int) {
         entity as CounterStrikeGrenadeEntity
         poseStack.pushPose()
-        itemRenderer.renderModelLists()
+
+        val model = ModEntityModels.getModel(entity.grenadeType)
+        val renderType = RenderType.cutout()
+        val buffer = bufferSouce.getBuffer(renderType)
+        val overlayTexture = OverlayTexture.NO_OVERLAY
+
+        Minecraft.getInstance().blockRenderer.modelRenderer.renderModel(
+            poseStack.last(),
+            buffer,
+            null,
+            model,
+            1.0f, 1.0f, 1.0f,
+            packedLight,
+            overlayTexture,
+            ModelData.EMPTY,
+            renderType,
+        )
+        poseStack.popPose()
     }
 
     // 这个方法必须重写，对于物品模型渲染，通常返回这个默认值

@@ -1,13 +1,22 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.POSITION_ERROR_TOLERANCE
+import club.pisquad.minecraft.csgrenades.VELOCITY_ERROR_TOLERANCE
+import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-class Trajectory(position: Vec3, velocity: Vec3) {
+class Trajectory {
     var beginTime: Instant = Clock.System.now()
-    var currentTick: Int = 0
+    var initialized: Boolean = false
     var completed: Boolean = false
+    val currentTick: Int
+        get() {
+            return nodes.last().tick
+        }
     private var _tickCounter: Int = -1
     private val tickCounter: Int
         get() {
@@ -28,19 +37,24 @@ class Trajectory(position: Vec3, velocity: Vec3) {
 
     init {
         beginTime = Clock.System.now()
-        addNode(position, velocity, 0.0)
     }
 
-    fun tickComplete() {
-        currentTick++
+    fun initialize(position: Vec3, velocity: Vec3) {
+        initialized = true
+        this.nodes.add(TrajectoryNode.TickNode(0, position, velocity))
     }
 
-    fun addNode(position: Vec3, velocity: Vec3, partialTick: Double): Trajectory {
-        this.nodes.add(TrajectoryNode(position, velocity, currentTick.toDouble() + partialTick))
-        return this
+    fun addNode(node: TrajectoryNode.TickNode): Boolean {
+        return if (this.nodes.findLast { it.tick == node.tick } != null) {
+            CounterStrikeGrenades.Logger.warn("Trajectory node already exits")
+            false
+        } else {
+            this.nodes.add(node)
+            true
+        }
     }
 
-    fun lastNode(): TrajectoryNode {
+    fun lastNode(): TrajectoryNode.TickNode {
         // provided that there is always one node available
         val size = nodes.size
         if (size > 1) {
@@ -49,17 +63,57 @@ class Trajectory(position: Vec3, velocity: Vec3) {
         return nodes.last()
     }
 
-    fun getNode(index: Int): TrajectoryNode {
-        return nodes[index]
+    fun getNode(index: Int): TrajectoryNode.TickNode? {
+        return nodes.getOrNull(index)
     }
 
-    fun replaceNode(index: Int, node: TrajectoryNode) {
-        nodes[index] = node
+//    fun nodesBetweenTick(begin: Double, end: Double): List<TrajectoryNode> {
+//        val result = nodes.filter { it.tick in begin..end }
+//        return result.sortedBy { it.tick }
+//    }
+
+    fun tick(level: Level): TrajectoryNode.TickNode {
+        this.nodes.add(lastNode().processTick(level))
+        return lastNode()
     }
 
-    fun nodesBetweenTick(begin: Double, end: Double): List<TrajectoryNode> {
-        val result = nodes.filter { it.tick in begin..end }
-        return result.sortedBy { it.tick }
+    fun tickUntilComplete(level: Level): Int {
+        repeat(500) {
+            this.tick(level)
+        }
+        return this.currentTick
+    }
+
+    /**Replace specific node with server's node and update nodes since
+     * should only be call on client side
+     * */
+    fun syncServerNode(node: TrajectoryNode.TickNode, level: ClientLevel): Int {
+        // Server is ahead
+        val clientNode = this.getNode(node.tick)
+        if (clientNode == null) {
+            var counter = 1
+            while (currentTick >= node.tick - 1) {
+                counter++
+                this.tick(level)
+            }
+            this.addNode(node)
+            return counter
+        } else if (
+            clientNode.position.distanceTo(node.position) > POSITION_ERROR_TOLERANCE
+            || clientNode.velocity.distanceTo(node.velocity) > VELOCITY_ERROR_TOLERANCE
+        ) {
+            var lastNode = node
+            var counter = 0
+            while (lastNode.tick == currentTick) {
+                this.nodes[lastNode.tick] = lastNode
+                lastNode = lastNode.processTick(level)
+                counter++
+            }
+            this.nodes[lastNode.tick] = lastNode
+            return counter
+        } else {
+            return 0
+        }
     }
 
 //    @Serializable
