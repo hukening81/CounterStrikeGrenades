@@ -2,7 +2,7 @@ import net.minecraftforge.gradle.userdev.UserDevExtension
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 val modVersion: String by project
 val modGroupId: String by project
@@ -41,6 +41,12 @@ group = modGroupId
 
 base {
     archivesName = modId
+}
+idea {
+    module {
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
