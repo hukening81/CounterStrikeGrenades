@@ -13,19 +13,17 @@ import kotlin.time.Instant
 class Trajectory(
     val bounceCB: Function2<Vec3, Direction, Unit>,
     val hitEntityCB: Function3<Vec3, Direction, Entity, Unit>,
+    val completeCB: Function0<Unit>,
 ) {
     var beginTime: Instant = Clock.System.now()
     var initialized: Boolean = false
-    var completed: Boolean = false
+    val completed: Boolean
+        get() {
+            return nodes.last().completed
+        }
     val currentTick: Int
         get() {
             return nodes.last().tick
-        }
-    private var _tickCounter: Int = -1
-    private val tickCounter: Int
-        get() {
-            _tickCounter += 1
-            return _tickCounter
         }
 
     val nodes: MutableList<TrajectoryNode.TickNode> = mutableListOf()
@@ -72,7 +70,13 @@ class Trajectory(
         if (!this.initialized) {
             throw Exception("Use before initialization")
         }
-        this.nodes.add(this.nodes.last().processTick(level, this.bounceCB, this.hitEntityCB))
+        if (!this.completed) {
+            this.nodes.add(this.nodes.last().processTick(level, this.bounceCB, this.hitEntityCB))
+            if (nodes.last().completed) {
+                this.completeCB()
+            }
+        }
+
         return this.nodes.last()
     }
 

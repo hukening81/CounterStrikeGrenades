@@ -38,7 +38,7 @@ object TrajectoryRenderer {
         }
 
         val message = ClientGrenadeThrowMessage.fromInputState() ?: return
-        val trajectory = Trajectory({ _, _ -> }, { _, _, _ -> })
+        val trajectory = Trajectory({ _, _ -> }, { _, _, _ -> }, {})
         trajectory.initialize(message.position, message.velocity)
         trajectory.tickUntilComplete(player.level())
         nodes.update { extractNodesFromTrajectory(trajectory) }

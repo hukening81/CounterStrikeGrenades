@@ -65,6 +65,7 @@ abstract class CustomTrajectoryEntity(
     var trajectory: Trajectory = Trajectory(
         this::onHitBlock,
         this::onHitEntity,
+        this::onTrajectoryComplete,
     )
 
     @Serializable
@@ -74,11 +75,11 @@ abstract class CustomTrajectoryEntity(
     )
 
 
-    override fun readAdditionalSaveData(pCompound: CompoundTag?) {
+    override fun readAdditionalSaveData(pCompound: CompoundTag) {
 
     }
 
-    override fun addAdditionalSaveData(pCompound: CompoundTag?) {
+    override fun addAdditionalSaveData(pCompound: CompoundTag) {
 
     }
 
@@ -151,4 +152,6 @@ abstract class CustomTrajectoryEntity(
     abstract fun onHitBlock(position: Vec3, direction: Direction)
 
     abstract fun onHitEntity(position: Vec3, direction: Direction, entity: Entity)
+
+    fun onTrajectoryComplete() {}
 }

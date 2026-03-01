@@ -121,11 +121,11 @@ abstract class CounterStrikeGrenadeEntity(
         return NetworkHooks.getEntitySpawningPacket(this)
     }
 
-    override fun addAdditionalSaveData(pCompound: CompoundTag?) {
+    override fun addAdditionalSaveData(pCompound: CompoundTag) {
 
     }
 
-    override fun readAdditionalSaveData(pCompound: CompoundTag?) {
+    override fun readAdditionalSaveData(pCompound: CompoundTag) {
 
     }
 

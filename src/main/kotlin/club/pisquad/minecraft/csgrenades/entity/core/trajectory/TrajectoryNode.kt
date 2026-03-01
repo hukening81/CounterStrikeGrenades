@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
+import club.pisquad.minecraft.csgrenades.MINIMUM_VELOCITY_AFTER_BOUNCE
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.PhysicsHelper.getBlocksInPath
 import club.pisquad.minecraft.csgrenades.math.Segment
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
@@ -24,6 +25,7 @@ interface TrajectoryNode {
         val tick: Int,
         @Serializable(with = Vec3Serializer::class) override val position: Vec3,
         @Serializable(with = Vec3Serializer::class) override val velocity: Vec3,
+        val completed: Boolean = false,
         @Transient val subtickNodes: MutableList<SubtickNode> = mutableListOf(),
     ) : TrajectoryNode {
         class TickNodeEntityDataSerializer : EntityDataSerializer<TickNode> {
@@ -60,7 +62,10 @@ interface TrajectoryNode {
                 if (lastNode.partialTick.minus(partialTick).absoluteValue < 0.001) {
                     // Somehow we stuck here?
                     // Grenade keep bouncing between two adjacent surfaces
-                    return TickNode(this.tick + 1, lastNode.velocity, Vec3.ZERO)
+                    return TickNode(this.tick + 1, lastNode.velocity, Vec3.ZERO, true)
+                }
+                if (lastNode.velocity.length() < MINIMUM_VELOCITY_AFTER_BOUNCE) {
+                    return TickNode(this.tick + 1, lastNode.velocity, Vec3.ZERO, true)
                 }
                 partialTick = lastNode.partialTick
                 if (partialTick > 1) {
