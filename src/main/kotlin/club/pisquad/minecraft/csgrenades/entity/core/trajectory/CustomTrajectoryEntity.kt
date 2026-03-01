@@ -111,10 +111,10 @@ abstract class CustomTrajectoryEntity(
     fun updateMovementState(position: Vec3, velocity: Vec3) {
         this.centerOld = this.center
         this.center = position
-        this.deltaMovement = velocity
     }
 
     override fun tick() {
+        super.baseTick()
         val node = this.trajectory.tick(this.level())
         updateMovementState(node.position, node.velocity)
         if (this.level().isClientSide) {

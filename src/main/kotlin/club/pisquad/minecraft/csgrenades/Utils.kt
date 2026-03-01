@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec2
@@ -37,12 +36,11 @@ fun Vec3i.toVec3(): Vec3 = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
 fun getTimeFromTickCount(tickCount: Double): Double = tickCount / 20.0
 
 fun getRandomLocationFromSphere(center: Vec3, radius: Double): Vec3 {
-    val randomSource = RandomSource.createNewThreadLocalInstance()
     while (true) {
         val posDelta = Vec3(
-            randomSource.nextDouble() * radius * 2 - radius,
-            randomSource.nextDouble() * radius * 2 - radius,
-            randomSource.nextDouble() * radius * 2 - radius,
+            Random.nextDouble() * radius * 2 - radius,
+            Random.nextDouble() * radius * 2 - radius,
+            Random.nextDouble() * radius * 2 - radius,
         )
         if (posDelta.length() < radius) {
             return center.add(posDelta)
@@ -51,11 +49,10 @@ fun getRandomLocationFromSphere(center: Vec3, radius: Double): Vec3 {
 }
 
 fun getRandomLocationFromCircle(center: Vec2, radius: Double): Vec2 {
-    val randomSource = RandomSource.createNewThreadLocalInstance()
     while (true) {
         val posDelta = Vec2(
-            (randomSource.nextDouble() * radius * 2 - radius).toFloat(),
-            (randomSource.nextDouble() * radius * 2 - radius).toFloat(),
+            (Random.nextDouble() * radius * 2 - radius).toFloat(),
+            (Random.nextDouble() * radius * 2 - radius).toFloat(),
         )
         if (posDelta.length() < radius) {
             return center.add(posDelta)

@@ -180,10 +180,16 @@ dependencies {
         exclude(group = "org.jetbrains", module = "annotations")
     }
 
+    testImplementation(kotlin("test"))
+
 //    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
 //        exclude(group = "org.jetbrains", module = "annotations")
 //    }
 }
+tasks.test {
+    useJUnitPlatform()
+}
+
 
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.

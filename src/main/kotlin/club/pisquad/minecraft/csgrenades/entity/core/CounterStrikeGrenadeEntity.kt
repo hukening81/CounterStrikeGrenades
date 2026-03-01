@@ -130,12 +130,12 @@ abstract class CounterStrikeGrenadeEntity(
     }
 
     override fun onHitBlock(position: Vec3, direction: Direction) {
-        if (this.level().isClientSide) {
-            println("Client Bounce")
-            playClientBounceSound()
-        } else {
-            println("Server Bounce")
-        }
+//        if (this.level().isClientSide) {
+//            println("Client Bounce")
+//            playClientBounceSound()
+//        } else {
+//            println("Server Bounce")
+//        }
     }
 
     override fun onHitEntity(position: Vec3, direction: Direction, entity: Entity) {

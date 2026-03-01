@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.PhysicsHelper.getBlocksInPath
+import club.pisquad.minecraft.csgrenades.math.Segment
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -87,9 +88,9 @@ interface TrajectoryNode {
         }
 
         private fun tryTravelInDirection(level: Level, position: Vec3, velocity: Vec3, partialTick: Double, bounceCB: (Vec3, Direction) -> Unit, hitEntityCB: (Vec3, Direction, Entity) -> Unit): SubtickNode {
-            val deltaMovement = velocity.normalize().scale(1 - partialTick)
+            val deltaMovement = velocity.scale(1 - partialTick)
             val blocksInPath = getBlocksInPath(
-                PhysicsHelper.Segment(
+                Segment(
                     position, position.add(deltaMovement),
                 ),
             ).filter { BounceHelper.shouldBounceOnBlock(level, it) }
@@ -107,7 +108,7 @@ interface TrajectoryNode {
                     )
                 }
             }
-            return SubtickNode(position.add(deltaMovement), velocity, Double.MAX_VALUE)
+            return SubtickNode(position.add(deltaMovement), PhysicsHelper.applyVelocityPhysics(velocity, 1.0), Double.MAX_VALUE)
 
         }
 
