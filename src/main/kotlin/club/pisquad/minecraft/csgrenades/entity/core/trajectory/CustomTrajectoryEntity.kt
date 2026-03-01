@@ -11,6 +11,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -61,7 +62,10 @@ abstract class CustomTrajectoryEntity(
             return trajectory.velocity
         }
 
-    var trajectory: Trajectory = Trajectory()
+    var trajectory: Trajectory = Trajectory(
+        this::onHitBlock,
+        this::onHitEntity,
+    )
 
     @Serializable
     private data class SpawnData(
@@ -100,11 +104,6 @@ abstract class CustomTrajectoryEntity(
     }
 
     fun initializeMovementState(position: Vec3, velocity: Vec3) {
-        if (this.level().isClientSide) {
-            println("Client movement state $position \t $velocity")
-        } else {
-            println("Server movement state $position \t $velocity")
-        }
         updateMovementState(position, velocity)
         trajectory.initialize(position, velocity)
     }
@@ -149,7 +148,7 @@ abstract class CustomTrajectoryEntity(
 
     /**Provide basic hook for playing sound events
      * */
-    abstract fun onHitBlock()
+    abstract fun onHitBlock(position: Vec3, direction: Direction)
 
-    abstract fun onHitEntity(entity: Entity)
+    abstract fun onHitEntity(position: Vec3, direction: Direction, entity: Entity)
 }

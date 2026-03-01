@@ -26,7 +26,6 @@ class ClientGrenadeThrowMessage(
 ) {
     companion object : CsGrenadeMessageHandler<ClientGrenadeThrowMessage>(ClientGrenadeThrowMessage::class) {
         override fun handler(msg: ClientGrenadeThrowMessage, ctx: Supplier<NetworkEvent.Context>) {
-            println("Client Grenade Throw Message")
             val context = ctx.get()
             val player = context.sender ?: return
 

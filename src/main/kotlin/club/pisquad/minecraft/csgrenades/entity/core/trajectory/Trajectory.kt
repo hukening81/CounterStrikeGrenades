@@ -4,12 +4,17 @@ import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.POSITION_ERROR_TOLERANCE
 import club.pisquad.minecraft.csgrenades.VELOCITY_ERROR_TOLERANCE
 import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.core.Direction
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-class Trajectory {
+class Trajectory(
+    val bounceCB: Function2<Vec3, Direction, Unit>,
+    val hitEntityCB: Function3<Vec3, Direction, Entity, Unit>,
+) {
     var beginTime: Instant = Clock.System.now()
     var initialized: Boolean = false
     var completed: Boolean = false
@@ -68,17 +73,17 @@ class Trajectory {
         if (!this.initialized) {
             throw Exception("Use before initialization")
         }
-        this.nodes.add(this.nodes.last().processTick(level))
+        this.nodes.add(this.nodes.last().processTick(level, this.bounceCB, this.hitEntityCB))
         return this.nodes.last()
     }
 
     // Minecraft can't handle this!!!
-//    fun tickUntilComplete(level: Level): Int {
-//        repeat(20) {
-//            this.tick(level)
-//        }
-//        return this.currentTick
-//    }
+    fun tickUntilComplete(level: Level): Int {
+        repeat(10) {
+            this.tick(level)
+        }
+        return this.currentTick
+    }
 
     /**Replace specific node with server's node and update nodes since
      * should only be call on client side
@@ -102,10 +107,9 @@ class Trajectory {
             var counter = 0
             while (lastNode.tick == currentTick) {
                 this.nodes[lastNode.tick] = lastNode
-                lastNode = lastNode.processTick(level)
+                lastNode = lastNode.processTick(level, this.bounceCB, this.hitEntityCB)
                 counter++
             }
-            println(lastNode.tick)
             this.nodes[lastNode.tick] = lastNode
             return counter
         } else {

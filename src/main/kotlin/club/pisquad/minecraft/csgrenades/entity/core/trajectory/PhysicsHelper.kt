@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
+import club.pisquad.minecraft.csgrenades.div
 import club.pisquad.minecraft.csgrenades.isBetween
 import club.pisquad.minecraft.csgrenades.isPointWithinPlaneRange
 import club.pisquad.minecraft.csgrenades.minus
@@ -260,7 +261,7 @@ object PhysicsHelper {
         }
 
         fun midPoint(): Vec3 {
-            return getPointByAxis(Direction.Axis.X, (this.begin.x + this.end.x).div(2.0))
+            return this.begin.add(this.end).div(2.0)
         }
     }
 

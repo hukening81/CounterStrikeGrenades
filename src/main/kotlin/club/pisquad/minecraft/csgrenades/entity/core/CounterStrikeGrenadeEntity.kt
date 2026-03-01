@@ -7,6 +7,7 @@ import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
+import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
@@ -128,13 +129,16 @@ abstract class CounterStrikeGrenadeEntity(
 
     }
 
-    override fun onHitBlock() {
+    override fun onHitBlock(position: Vec3, direction: Direction) {
         if (this.level().isClientSide) {
+            println("Client Bounce")
             playClientBounceSound()
+        } else {
+            println("Server Bounce")
         }
     }
 
-    override fun onHitEntity(entity: Entity) {
+    override fun onHitEntity(position: Vec3, direction: Direction, entity: Entity) {
         if (this.level().isClientSide) {
             playClientHitEntitySound()
         }

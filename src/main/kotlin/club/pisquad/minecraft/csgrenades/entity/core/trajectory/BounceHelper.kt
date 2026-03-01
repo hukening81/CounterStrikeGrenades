@@ -11,6 +11,7 @@ object BounceHelper {
     enum class BounceResultTypes {
         THROUGH,
         BOUNCE,
+        HIT_ENTITY,
     }
 
     data class BounceResult(
@@ -23,7 +24,7 @@ object BounceHelper {
 
     fun tryBounce(level: Level, blockPos: BlockPos, position: Vec3, deltaMovement: Vec3, velocity: Vec3): BounceResult {
         val blockState = level.getBlockState(blockPos)
-        val (box, point, direction) = getFirstCollision(
+        val (_, point, direction) = getFirstCollision(
             blockState.getCollisionShape(level, blockPos).toAabbs().map { it.move(blockPos.toVec3()) },
             position,
             deltaMovement,
