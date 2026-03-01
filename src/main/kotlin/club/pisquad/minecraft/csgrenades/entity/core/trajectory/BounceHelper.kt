@@ -60,9 +60,6 @@ object BounceHelper {
         }
         candidates.sortBy { it.second.distanceTo(position) }
         val result = candidates.getOrNull(0)
-        if (result != null && result.second.distanceTo(position) > deltaMovement.length()) {
-            println("ddddd")
-        }
         return result
     }
 }

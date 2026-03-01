@@ -50,9 +50,10 @@ class Segment(
                     return@run point.isPointWithinPlaneRange(Direction.Axis.X, aabb)
                 }
             ) {
+                val point = getPointByAxis(Direction.Axis.X, aabb.maxX)
                 candidates.add(
                     Pair(
-                        getPointByAxis(Direction.Axis.X, aabb.maxX),
+                        point,
                         Direction.EAST,
                     ),
                 )
@@ -64,9 +65,10 @@ class Segment(
                     return@run point.isPointWithinPlaneRange(Direction.Axis.X, aabb)
                 }
             ) {
+                val point = getPointByAxis(Direction.Axis.X, aabb.minX)
                 candidates.add(
                     Pair(
-                        getPointByAxis(Direction.Axis.X, aabb.minX),
+                        point,
                         Direction.WEST,
                     ),
                 )
@@ -79,9 +81,10 @@ class Segment(
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Y, aabb)
                 }
             ) {
+                val point = getPointByAxis(Direction.Axis.Y, aabb.maxY)
                 candidates.add(
                     Pair(
-                        getPointByAxis(Direction.Axis.Y, aabb.maxY),
+                        point,
                         Direction.UP,
                     ),
                 )
@@ -93,9 +96,10 @@ class Segment(
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Y, aabb)
                 }
             ) {
+                val point = getPointByAxis(Direction.Axis.Y, aabb.minY)
                 candidates.add(
                     Pair(
-                        getPointByAxis(Direction.Axis.Y, aabb.minY),
+                        point,
                         Direction.DOWN,
                     ),
                 )
@@ -108,9 +112,10 @@ class Segment(
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Z, aabb)
                 }
             ) {
+                val point = getPointByAxis(Direction.Axis.Z, aabb.maxZ)
                 candidates.add(
                     Pair(
-                        getPointByAxis(Direction.Axis.Z, aabb.maxZ),
+                        point,
                         Direction.SOUTH,
                     ),
                 )
@@ -122,9 +127,10 @@ class Segment(
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Z, aabb)
                 }
             ) {
+                val point = getPointByAxis(Direction.Axis.Z, aabb.minZ)
                 candidates.add(
                     Pair(
-                        getPointByAxis(Direction.Axis.Z, aabb.minZ),
+                        point,
                         Direction.NORTH,
                     ),
                 )
@@ -190,33 +196,25 @@ class Segment(
             Direction.Axis.X -> {
                 if (position.isBetween(this.begin.x, this.end.x)) {
                     val c = (position - this.begin.x).div(this.end.x - this.begin.x)
-                    return this.begin.add(this.direction().scale(length()).scale(c))
-                } else {
-//                    throw Exception("Invalid position")
-                    return this.begin
+                    return this.begin.add(this.end.minus(this.begin).scale(c))
                 }
             }
 
             Direction.Axis.Y -> {
                 if (position.isBetween(this.begin.y, this.end.y)) {
                     val c = (position - this.begin.y).div(this.end.y - this.begin.y)
-                    return this.begin.add(this.direction().scale(c))
-                } else {
-//                    throw Exception("Invalid position")
-                    return this.begin
+                    return this.begin.add(this.direction().scale(this.length()).scale(c))
                 }
             }
 
             Direction.Axis.Z -> {
                 if (position.isBetween(this.begin.z, this.end.z)) {
                     val c = (position - this.begin.z).div(this.end.z - this.begin.z)
-                    return this.begin.add(this.direction().scale(c))
-                } else {
-//                    throw Exception("Invalid position")
-                    return this.begin
+                    return this.begin.add(this.direction().scale(this.length()).scale(c))
                 }
             }
         }
+        return this.midPoint()
     }
 
     fun direction(): Vec3 {
