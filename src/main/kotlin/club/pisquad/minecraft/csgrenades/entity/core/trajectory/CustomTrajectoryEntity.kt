@@ -4,6 +4,8 @@ import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -13,14 +15,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
-import net.minecraft.network.syncher.EntityDataAccessor
-import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
+import net.minecraftforge.network.PacketDistributor
 
 /**Helper class that implements custom physics required by grenades
  * It updates vanilla `position` and `deltaMovement`, alongside the provided `center` and `velocity`
@@ -68,28 +69,6 @@ abstract class CustomTrajectoryEntity(
         @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
     )
 
-    companion object {
-        val trajectoryNodeUpdateAccessor: EntityDataAccessor<TrajectoryNode.TickNode> =
-            SynchedEntityData.defineId(CustomTrajectoryEntity::class.java, TrajectoryNode.TickNode.TickNodeEntityDataSerializer())
-    }
-
-    override fun defineSynchedData() {
-        this.entityData.define(trajectoryNodeUpdateAccessor, TrajectoryNode.TickNode.empty())
-    }
-
-    override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
-        super.onSyncedDataUpdated(key)
-        if (this.level().isClientSide) {
-            if (key == trajectoryNodeUpdateAccessor) {
-                val serverNode = this.entityData.get(key) as TrajectoryNode.TickNode
-                if (serverNode.position == Vec3.ZERO && serverNode.velocity == Vec3.ZERO) {
-                    println("Somehow the serve sent a empty node?")
-                } else {
-                    trajectory.syncServerNode(serverNode, this.level() as ClientLevel)
-                }
-            }
-        }
-    }
 
     override fun readAdditionalSaveData(pCompound: CompoundTag?) {
 
@@ -121,18 +100,50 @@ abstract class CustomTrajectoryEntity(
     }
 
     fun initializeMovementState(position: Vec3, velocity: Vec3) {
+        if (this.level().isClientSide) {
+            println("Client movement state $position \t $velocity")
+        } else {
+            println("Server movement state $position \t $velocity")
+        }
+        updateMovementState(position, velocity)
         trajectory.initialize(position, velocity)
+    }
+
+    fun updateMovementState(position: Vec3, velocity: Vec3) {
+        this.centerOld = this.center
+        this.center = position
+        this.deltaMovement = velocity
     }
 
     override fun tick() {
         val node = this.trajectory.tick(this.level())
+        updateMovementState(node.position, node.velocity)
         if (this.level().isClientSide) {
-            if (trajectory.initialized) {
+            if (!trajectory.initialized) {
                 CounterStrikeGrenades.Logger.warn("Client trajectory not initialized")
             }
         } else {
-            this.entityData.set(trajectoryNodeUpdateAccessor, node)
+            val radius = this.level().server!!.playerList.viewDistance.times(16).toDouble()
+            ModPacketHandler.INSTANCE.send(
+                PacketDistributor.NEAR.with {
+                    PacketDistributor.TargetPoint(
+                        this.x,
+                        this.y,
+                        this.z,
+                        radius,
+                        this.level().dimension(),
+                    )
+                },
+                ServerGrenadeMovementSyncMessage(
+                    this.id,
+                    node,
+                ),
+            )
         }
+    }
+
+    fun syncServerMovement(node: TrajectoryNode.TickNode) {
+        this.trajectory.syncServerNode(node, this.level() as ClientLevel)
     }
 
 

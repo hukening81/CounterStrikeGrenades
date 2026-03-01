@@ -133,7 +133,11 @@ object InputState {
 
     fun doThrow() {
         val message = ClientGrenadeThrowMessage.fromInputState()
-        ModPacketHandler.INSTANCE.sendToServer(message)
+        if (message == null) {
+            CounterStrikeGrenades.Logger.warn("Failed to create ClientGrenadeThrowMessage")
+        } else {
+            ModPacketHandler.INSTANCE.sendToServer(message)
+        }
     }
 
     fun calculateStrength(): Double {

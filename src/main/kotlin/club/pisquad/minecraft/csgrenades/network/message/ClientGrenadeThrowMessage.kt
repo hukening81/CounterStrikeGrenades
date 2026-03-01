@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades.network.message
 import club.pisquad.minecraft.csgrenades.client.input.InputState.calculateGrenadeSpeed
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.enums.toModEntity
+import club.pisquad.minecraft.csgrenades.getShootOrigin
 import club.pisquad.minecraft.csgrenades.item.core.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
@@ -60,7 +61,7 @@ class ClientGrenadeThrowMessage(
         fun fromInputState(): ClientGrenadeThrowMessage? {
             val player = Minecraft.getInstance().player ?: return null
             val velocity = player.deltaMovement.add(calculateGrenadeSpeed() ?: return null)
-            val position = player.eyePosition.add(0.3, 0.0, 0.0)
+            val position = player.getShootOrigin()
             val item = player.mainHandItem.item
             if (item !is CounterStrikeGrenadeItem) return null
             val grenadeType = item.grenadeType

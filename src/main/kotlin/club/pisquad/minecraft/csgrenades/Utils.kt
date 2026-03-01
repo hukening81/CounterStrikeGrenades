@@ -5,6 +5,7 @@ import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -162,5 +163,8 @@ fun Vec3.addGrenadeSizeOffset(): Vec3 {
 
 fun Double.isBetween(value1: Double, value2: Double): Boolean {
     return (value1 <= value2 && this >= value1 && this <= value2) || (value1 >= value2 && this <= value1 && this >= value2)
+}
 
+fun Player.getShootOrigin(): Vec3 {
+    return this.eyePosition
 }

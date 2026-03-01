@@ -5,12 +5,12 @@ import club.pisquad.minecraft.csgrenades.getRandomLocationFromSphere
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
+import kotlin.random.Random
 
 data class HEGrenadeExplosionData(
     var position: Vec3,
@@ -68,7 +68,6 @@ class HEGrenadeRenderer(
 //        Minecraft.getInstance().soundManager.play(this.soundInstance!!)
 
         val particleEngine = Minecraft.getInstance().particleEngine
-        val randomSource = RandomSource.createNewThreadLocalInstance()
 
         for (i in 1..500) {
             particleEngine.createParticle(
@@ -76,9 +75,9 @@ class HEGrenadeRenderer(
                 data.position.x,
                 data.position.y,
                 data.position.z,
-                randomSource.nextDouble().times(1.4) - 0.7,
-                randomSource.nextDouble().times(1.4) - 0.7,
-                randomSource.nextDouble().times(1.4) - 0.7,
+                Random.nextDouble().times(1.4) - 0.7,
+                Random.nextDouble().times(1.4) - 0.7,
+                Random.nextDouble().times(1.4) - 0.7,
             )?.lifetime = 10
         }
         for (i in 1..100) {

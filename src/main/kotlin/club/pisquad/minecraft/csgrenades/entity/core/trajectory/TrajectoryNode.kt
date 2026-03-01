@@ -10,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import kotlin.math.absoluteValue
 
 interface TrajectoryNode {
     val position: Vec3
@@ -25,12 +26,12 @@ interface TrajectoryNode {
         class TickNodeEntityDataSerializer : EntityDataSerializer<TickNode> {
             @OptIn(ExperimentalSerializationApi::class)
             override fun write(buffer: FriendlyByteBuf, value: TickNode) {
-                buffer.writeByteArray(Cbor.encodeToByteArray(TickNode.serializer(), value))
+                buffer.writeByteArray(Cbor.encodeToByteArray(serializer(), value))
             }
 
             @OptIn(ExperimentalSerializationApi::class)
             override fun read(buffer: FriendlyByteBuf): TickNode {
-                return Cbor.decodeFromByteArray(TickNode.serializer(), buffer.readByteArray())
+                return Cbor.decodeFromByteArray(serializer(), buffer.readByteArray())
             }
 
             override fun copy(value: TickNode): TickNode {
@@ -52,7 +53,15 @@ interface TrajectoryNode {
             var lastNode: SubtickNode = this.toSubtickNode()
             while (true) {
                 lastNode = tryTravelInDirection(level, lastNode.position, lastNode.velocity, partialTick)
+                if (lastNode.partialTick.minus(partialTick).absoluteValue < 0.05) {
+                    // Somehow we stuck here?
+                    // Grenade keep bouncing between two adjacent surfaces
+                    return TickNode(this.tick + 1, lastNode.velocity, lastNode.velocity)
+                }
                 partialTick = lastNode.partialTick
+                if (!level.isClientSide) {
+                    println(partialTick)
+                }
                 if (partialTick > 1) {
                     return TickNode(
                         this.tick + 1,
@@ -97,7 +106,7 @@ interface TrajectoryNode {
                     partialTick + bounceResult.tickDelta,
                 )
             }
-            return SubtickNode(position, position.add(deltaMovement), Double.MAX_VALUE)
+            return SubtickNode(position.add(deltaMovement), velocity, Double.MAX_VALUE)
 
         }
 
@@ -108,5 +117,5 @@ interface TrajectoryNode {
         override val position: Vec3,
         override val velocity: Vec3,
         val partialTick: Double,
-    ) : TrajectoryNode {}
+    ) : TrajectoryNode
 }

@@ -77,7 +77,7 @@ abstract class CounterStrikeGrenadeEntity(
     fun isActivated(): Boolean = this.entityData.get(isActivatedAccessor)
 
     override fun tick() {
-//        super.tick()
+        super.tick()
 //        TrajectoryHelper.step(level(), trajectory)
 //        this.moveTo(trajectory.position.minusGrenadeSizeOffset())
     }

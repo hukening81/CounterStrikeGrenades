@@ -4,6 +4,7 @@ package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.SmokeGrenadePacketHandler
@@ -69,13 +70,19 @@ object ModPacketHandler {
 //            FlashBangExplodedMessage::handler,
 //            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
 //        )
-        INSTANCE.registerMessage(
-            messageTypeCount,
+        registerMessage(
             ClientGrenadeThrowMessage::class.java,
             ClientGrenadeThrowMessage::encoder,
             ClientGrenadeThrowMessage::decoder,
             ClientGrenadeThrowMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_SERVER),
+        )
+        registerMessage(
+            ServerGrenadeMovementSyncMessage::class.java,
+            ServerGrenadeMovementSyncMessage::encoder,
+            ServerGrenadeMovementSyncMessage::decoder,
+            ServerGrenadeMovementSyncMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
 
         HEGrenadePacketHandler.registerMessages(this)

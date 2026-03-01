@@ -1,8 +1,5 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
-data class FlashBangExplodedMessage(
-    val dd: Double,
-)
 //
 //import club.pisquad.minecraft.csgrenades.SoundTypes
 //import club.pisquad.minecraft.csgrenades.SoundUtils

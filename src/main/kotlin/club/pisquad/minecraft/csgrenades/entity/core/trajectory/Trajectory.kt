@@ -72,12 +72,13 @@ class Trajectory {
         return this.nodes.last()
     }
 
-    fun tickUntilComplete(level: Level): Int {
-        repeat(500) {
-            this.tick(level)
-        }
-        return this.currentTick
-    }
+    // Minecraft can't handle this!!!
+//    fun tickUntilComplete(level: Level): Int {
+//        repeat(20) {
+//            this.tick(level)
+//        }
+//        return this.currentTick
+//    }
 
     /**Replace specific node with server's node and update nodes since
      * should only be call on client side
@@ -87,7 +88,7 @@ class Trajectory {
         val clientNode = this.getNode(node.tick)
         if (clientNode == null) {
             var counter = 1
-            while (currentTick >= node.tick - 1) {
+            while (currentTick <= node.tick - 1) {
                 counter++
                 this.tick(level)
             }
@@ -104,6 +105,7 @@ class Trajectory {
                 lastNode = lastNode.processTick(level)
                 counter++
             }
+            println(lastNode.tick)
             this.nodes[lastNode.tick] = lastNode
             return counter
         } else {

@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 import net.minecraftforge.client.model.data.ModelData
 
 //@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -54,7 +55,7 @@ import net.minecraftforge.client.model.data.ModelData
 //    }
 //}
 
-class GrenadeRenderer<T>(
+class GrenadeEntityRenderer<T>(
     context: EntityRendererProvider.Context,
 ) : EntityRenderer<T>(context) where T : CounterStrikeGrenadeEntity {
 
@@ -144,6 +145,14 @@ class GrenadeRenderer<T>(
     override fun render(entity: T, entityYaw: Float, partialTick: Float, poseStack: PoseStack, bufferSouce: MultiBufferSource, packedLight: Int) {
         entity as CounterStrikeGrenadeEntity
         poseStack.pushPose()
+        val centerOld = entity.centerOld
+        val center = entity.center
+        val x = Mth.lerp(partialTick.toDouble(), centerOld.x, center.x)
+        val y = Mth.lerp(partialTick.toDouble(), centerOld.y, center.y)
+        val z = Mth.lerp(partialTick.toDouble(), centerOld.z, center.z)
+
+
+        poseStack.translate(x, y, z)
 
         val model = ModEntityModels.getModel(entity.grenadeType)
         val renderType = RenderType.cutout()
