@@ -2,7 +2,6 @@ package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.POSITION_ERROR_TOLERANCE
-import club.pisquad.minecraft.csgrenades.VELOCITY_ERROR_TOLERANCE
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.Entity
@@ -101,7 +100,6 @@ class Trajectory(
             return counter
         } else if (
             clientNode.position.distanceTo(node.position) > POSITION_ERROR_TOLERANCE
-            || clientNode.velocity.distanceTo(node.velocity) > VELOCITY_ERROR_TOLERANCE
         ) {
             var lastNode = node
             var counter = 0
