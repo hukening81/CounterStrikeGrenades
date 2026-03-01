@@ -75,7 +75,7 @@ class Segment(
             }
         }
         if (this.begin.y > this.end.y) {
-            if (this.maxY.isBetween(this.begin.y, this.end.y) &&
+            if (aabb.maxY.isBetween(this.begin.y, this.end.y) &&
                 run {
                     val point = getPointByAxis(Direction.Axis.Y, aabb.maxY)
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Y, aabb)
@@ -197,6 +197,20 @@ class Segment(
                 if (position.isBetween(this.begin.x, this.end.x)) {
                     val c = (position - this.begin.x).div(this.end.x - this.begin.x)
                     return this.begin.add(this.end.minus(this.begin).scale(c))
+                } else {
+                    return if (position > this.maxX) {
+                        if (this.begin.x > this.end.x) {
+                            this.begin
+                        } else {
+                            this.end
+                        }
+                    } else {
+                        if (this.begin.x < this.end.x) {
+                            this.begin
+                        } else {
+                            this.end
+                        }
+                    }
                 }
             }
 
@@ -204,6 +218,20 @@ class Segment(
                 if (position.isBetween(this.begin.y, this.end.y)) {
                     val c = (position - this.begin.y).div(this.end.y - this.begin.y)
                     return this.begin.add(this.direction().scale(this.length()).scale(c))
+                } else {
+                    return if (position < this.minY) {
+                        if (this.begin.y < this.end.y) {
+                            this.begin
+                        } else {
+                            this.end
+                        }
+                    } else {
+                        if (this.begin.y > this.end.y) {
+                            this.begin
+                        } else {
+                            this.end
+                        }
+                    }
                 }
             }
 
@@ -211,10 +239,23 @@ class Segment(
                 if (position.isBetween(this.begin.z, this.end.z)) {
                     val c = (position - this.begin.z).div(this.end.z - this.begin.z)
                     return this.begin.add(this.direction().scale(this.length()).scale(c))
+                } else {
+                    return if (position < this.minZ) {
+                        if (this.begin.z < this.end.z) {
+                            this.begin
+                        } else {
+                            this.end
+                        }
+                    } else {
+                        if (this.begin.z > this.end.z) {
+                            this.begin
+                        } else {
+                            this.end
+                        }
+                    }
                 }
             }
         }
-        return this.midPoint()
     }
 
     fun direction(): Vec3 {
