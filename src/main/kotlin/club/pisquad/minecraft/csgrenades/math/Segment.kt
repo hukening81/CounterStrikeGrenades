@@ -44,7 +44,7 @@ class Segment(
     fun intersectAabb(aabb: AABB): Pair<Vec3, Direction>? {
         val candidates: MutableList<Pair<Vec3, Direction>> = mutableListOf()
         if (this.begin.x > this.end.x) {
-            if (this.begin.x > aabb.maxX && this.end.x < aabb.maxX &&
+            if (aabb.maxX.isBetween(this.begin.x, this.end.x) &&
                 run {
                     val point = getPointByAxis(Direction.Axis.X, aabb.maxX)
                     return@run point.isPointWithinPlaneRange(Direction.Axis.X, aabb)
@@ -58,7 +58,7 @@ class Segment(
                 )
             }
         } else {
-            if (this.begin.x < aabb.minX && this.end.x > aabb.minX &&
+            if (aabb.minX.isBetween(this.begin.x, this.end.x) &&
                 run {
                     val point = getPointByAxis(Direction.Axis.X, aabb.minX)
                     return@run point.isPointWithinPlaneRange(Direction.Axis.X, aabb)
@@ -73,7 +73,7 @@ class Segment(
             }
         }
         if (this.begin.y > this.end.y) {
-            if (this.begin.y > aabb.maxY && this.end.y < aabb.maxY &&
+            if (this.maxY.isBetween(this.begin.y, this.end.y) &&
                 run {
                     val point = getPointByAxis(Direction.Axis.Y, aabb.maxY)
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Y, aabb)
@@ -87,7 +87,7 @@ class Segment(
                 )
             }
         } else {
-            if (this.begin.y < aabb.minY && this.end.y > aabb.minY &&
+            if (aabb.minY.isBetween(this.begin.y, this.end.y) &&
                 run {
                     val point = getPointByAxis(Direction.Axis.Y, aabb.minY)
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Y, aabb)
@@ -102,7 +102,7 @@ class Segment(
             }
         }
         if (this.begin.z > this.end.z) {
-            if (this.begin.z > aabb.maxZ && this.end.z < aabb.maxZ &&
+            if (aabb.maxZ.isBetween(this.begin.z, this.end.z) &&
                 run {
                     val point = getPointByAxis(Direction.Axis.Z, aabb.maxZ)
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Z, aabb)
@@ -116,7 +116,7 @@ class Segment(
                 )
             }
         } else {
-            if (this.begin.z < aabb.minZ && this.end.z > aabb.minZ &&
+            if (aabb.minZ.isBetween(this.begin.z, this.end.z) &&
                 run {
                     val point = getPointByAxis(Direction.Axis.Z, aabb.minZ)
                     return@run point.isPointWithinPlaneRange(Direction.Axis.Z, aabb)
@@ -192,7 +192,8 @@ class Segment(
                     val c = (position - this.begin.x).div(this.end.x - this.begin.x)
                     return this.begin.add(this.direction().scale(length()).scale(c))
                 } else {
-                    throw Exception("Invalid position")
+//                    throw Exception("Invalid position")
+                    return this.begin
                 }
             }
 
@@ -201,7 +202,8 @@ class Segment(
                     val c = (position - this.begin.y).div(this.end.y - this.begin.y)
                     return this.begin.add(this.direction().scale(c))
                 } else {
-                    throw Exception("Invalid position")
+//                    throw Exception("Invalid position")
+                    return this.begin
                 }
             }
 
@@ -210,7 +212,8 @@ class Segment(
                     val c = (position - this.begin.z).div(this.end.z - this.begin.z)
                     return this.begin.add(this.direction().scale(c))
                 } else {
-                    throw Exception("Invalid position")
+//                    throw Exception("Invalid position")
+                    return this.begin
                 }
             }
         }

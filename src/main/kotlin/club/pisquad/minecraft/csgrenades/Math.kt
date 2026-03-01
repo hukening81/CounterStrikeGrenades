@@ -20,9 +20,9 @@ fun Vec3.isPointWithinPlaneRange(
     minZ: Double, maxZ: Double,
 ): Boolean {
     return when (excludeAxis) {
-        Direction.Axis.X -> (this.y > minY && this.y < maxY && this.z > minZ && this.z < maxZ)
-        Direction.Axis.Y -> (this.x > minX && this.x < maxX && this.z > minZ && this.z < maxZ)
-        Direction.Axis.Z -> (this.y > minY && this.y < maxY && this.x > minX && this.x < maxX)
+        Direction.Axis.X -> (this.y.isBetween(minY, maxY) && this.z.isBetween(minZ, maxZ))
+        Direction.Axis.Y -> (this.x.isBetween(minX, maxX) && this.z.isBetween(minZ, maxZ))
+        Direction.Axis.Z -> (this.x.isBetween(minX, maxX) && this.y.isBetween(minY, maxY))
     }
 }
 

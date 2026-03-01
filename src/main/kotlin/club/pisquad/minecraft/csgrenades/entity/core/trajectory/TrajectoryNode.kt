@@ -89,6 +89,9 @@ interface TrajectoryNode {
 
         private fun tryTravelInDirection(level: Level, position: Vec3, velocity: Vec3, partialTick: Double, bounceCB: (Vec3, Direction) -> Unit, hitEntityCB: (Vec3, Direction, Entity) -> Unit): SubtickNode {
             val deltaMovement = velocity.scale(1 - partialTick)
+            if (deltaMovement.length() > velocity.length()) {
+                println("lll")
+            }
             val blocksInPath = getBlocksInPath(
                 Segment(
                     position, position.add(deltaMovement),

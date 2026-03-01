@@ -31,12 +31,12 @@ object BounceHelper {
             deltaMovement,
         ) ?: return BounceResult(BounceResultTypes.THROUGH)
         val tickDelta = position.distanceTo(point).div(velocity.length())
-        if (tickDelta > 1) {
-            println("dd")
-        }
-        if (direction != Direction.UP) {
-            println("uiu")
-        }
+//        if (tickDelta > 1) {
+//            println("dd")
+//        }
+//        if (direction != Direction.UP) {
+//            println("uiu")
+//        }
         return BounceResult(
             BounceResultTypes.BOUNCE,
             point,
@@ -61,7 +61,7 @@ object BounceHelper {
         candidates.sortBy { it.second.distanceTo(position) }
         val result = candidates.getOrNull(0)
         if (result != null && result.second.distanceTo(position) > deltaMovement.length()) {
-            println("dd")
+            println("ddddd")
         }
         return result
     }
