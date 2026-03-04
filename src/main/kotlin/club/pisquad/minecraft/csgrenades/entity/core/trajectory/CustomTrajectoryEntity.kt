@@ -3,6 +3,8 @@ package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
+import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectoryEntity.SpawnData
+import club.pisquad.minecraft.csgrenades.minus
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
@@ -38,7 +40,7 @@ abstract class CustomTrajectoryEntity(
         }
         set(newCenter) {
             val position = newCenter.minusGrenadeSizeOffset()
-            this.setPos(position)
+            this.moveTo(position)
         }
     var centerOld: Vec3
         get() {
@@ -112,6 +114,7 @@ abstract class CustomTrajectoryEntity(
     fun updateMovementState(position: Vec3, velocity: Vec3) {
         this.centerOld = this.center
         this.center = position
+        this.deltaMovement = this.center.minus(this.centerOld)
     }
 
     override fun tick() {

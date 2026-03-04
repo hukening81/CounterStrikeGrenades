@@ -24,8 +24,32 @@ object ModEntityModels {
     private val molotovEntityModel = create(MOLOTOV.resourceKey)
     private val incendiaryEntityModel = create(INCENDIARY.resourceKey)
 
+    object Textures {
+        private val hegrenade = createTexture(HE_GRENADE.resourceKey)
+        private val flashbang = createTexture(FLASH_BANG.resourceKey)
+        private val smokegrenade = createTexture(SMOKE_GRENADE.resourceKey)
+        private val molotov = createTexture(MOLOTOV.resourceKey)
+        private val incendiary = createTexture(INCENDIARY.resourceKey)
+        private val decoy = createTexture(DECOY.resourceKey)
+
+        private fun createTexture(key: String): ResourceLocation {
+            return ResourceLocation(CounterStrikeGrenades.ID, "textures/item/${key}_3d")
+        }
+
+        fun getTexture(grenadeType: GrenadeType): ResourceLocation {
+            return when (grenadeType) {
+                FLASH_BANG -> this.flashbang
+                SMOKE_GRENADE -> this.smokegrenade
+                HE_GRENADE -> this.hegrenade
+                INCENDIARY -> this.incendiary
+                MOLOTOV -> this.molotov
+                DECOY -> this.decoy
+            }
+        }
+    }
+
     private fun create(key: String): ResourceLocation {
-        return ResourceLocation(CounterStrikeGrenades.ID, "models/entity/$key")
+        return ResourceLocation(CounterStrikeGrenades.ID, "models/entity/${key}_3d.png")
     }
 
     @JvmStatic

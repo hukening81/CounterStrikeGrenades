@@ -1,18 +1,19 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
 import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.ModEntityModels
+import club.pisquad.minecraft.csgrenades.registry.ModItems
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
-import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
-import net.minecraftforge.client.model.data.ModelData
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
 
 //@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 //object GrenadeRenderCacheHelper {
@@ -59,7 +60,7 @@ class GrenadeEntityRenderer<T>(
     context: EntityRendererProvider.Context,
 ) : EntityRenderer<T>(context) where T : CounterStrikeGrenadeEntity {
 
-//    private val itemRenderer: ItemRenderer = context.itemRenderer
+    private val itemRenderer: ItemRenderer = context.itemRenderer
 
     //    override fun render(
 //        entity: T,
@@ -145,34 +146,44 @@ class GrenadeEntityRenderer<T>(
     override fun render(entity: T, entityYaw: Float, partialTick: Float, poseStack: PoseStack, bufferSouce: MultiBufferSource, packedLight: Int) {
         entity as CounterStrikeGrenadeEntity
         poseStack.pushPose()
-        val centerOld = entity.centerOld
-        val center = entity.center
-        val x = Mth.lerp(partialTick.toDouble(), centerOld.x, center.x)
-        val y = Mth.lerp(partialTick.toDouble(), centerOld.y, center.y)
-        val z = Mth.lerp(partialTick.toDouble(), centerOld.z, center.z)
+//        val centerOld = entity.centerOld
+//        val center = entity.center
+//        val d = entity.deltaMovement
+//
+//        val x = Mth.lerp(partialTick.toDouble(), 0.0, d.x)
+//        val y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
+//        val z = Mth.lerp(partialTick.toDouble(), 0.0, d.z)
 
+//        poseStack.translate(x, y, z)
 
-        poseStack.translate(x, y, z)
+        val itemStack = getItemStack(entity.grenadeType)
 
-        val model = ModEntityModels.getModel(entity.grenadeType)
-        val renderType = RenderType.cutout()
-        val buffer = bufferSouce.getBuffer(renderType)
-        val overlayTexture = OverlayTexture.NO_OVERLAY
-
-        Minecraft.getInstance().blockRenderer.modelRenderer.renderModel(
-            poseStack.last(),
-            buffer,
-            null,
-            model,
-            1.0f, 1.0f, 1.0f,
+        itemRenderer.renderStatic(
+            itemStack,
+            ItemDisplayContext.FIXED,
             packedLight,
-            overlayTexture,
-            ModelData.EMPTY,
-            renderType,
+            OverlayTexture.NO_OVERLAY,
+            poseStack,
+            bufferSouce,
+            entity.level(),
+            entity.id,
         )
         poseStack.popPose()
     }
 
-    // 这个方法必须重写，对于物品模型渲染，通常返回这个默认值
-    override fun getTextureLocation(entity: T): ResourceLocation = TextureAtlas.LOCATION_BLOCKS
+    override fun getTextureLocation(entity: T): ResourceLocation {
+        entity as CounterStrikeGrenadeEntity
+        return ModEntityModels.Textures.getTexture(entity.grenadeType)
+    }
+
+    private fun getItemStack(grenadeType: GrenadeType): ItemStack {
+        return when (grenadeType) {
+            GrenadeType.FLASH_BANG -> ItemStack(ModItems.FLASH_BANG_ITEM.get())
+            GrenadeType.SMOKE_GRENADE -> ItemStack(ModItems.SMOKE_GRENADE_ITEM.get())
+            GrenadeType.HE_GRENADE -> ItemStack(ModItems.HEGRENADE_ITEM.get())
+            GrenadeType.INCENDIARY -> ItemStack(ModItems.INCENDIARY_ITEM.get())
+            GrenadeType.MOLOTOV -> ItemStack(ModItems.MOLOTOV_ITEM.get())
+            GrenadeType.DECOY -> ItemStack(ModItems.DECOY_GRENADE_ITEM.get())
+        }
+    }
 }
