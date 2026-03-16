@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.ModEntityModels
@@ -14,6 +15,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import java.util.logging.Logger
 
 //@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 //object GrenadeRenderCacheHelper {
@@ -143,18 +145,27 @@ class GrenadeEntityRenderer<T>(
 //        poseStack.popPose()
 //        // super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight) // 移除super调用以消除阴影和“扭头”效果
 //    }
-    override fun render(entity: T, entityYaw: Float, partialTick: Float, poseStack: PoseStack, bufferSouce: MultiBufferSource, packedLight: Int) {
+    override fun render(
+        entity: T,
+        entityYaw: Float,
+        partialTick: Float,
+        poseStack: PoseStack,
+        bufferSouce: MultiBufferSource,
+        packedLight: Int
+    ) {
         entity as CounterStrikeGrenadeEntity
         poseStack.pushPose()
-//        val centerOld = entity.centerOld
-//        val center = entity.center
-//        val d = entity.deltaMovement
-//
-//        val x = Mth.lerp(partialTick.toDouble(), 0.0, d.x)
-//        val y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
-//        val z = Mth.lerp(partialTick.toDouble(), 0.0, d.z)
+        val centerOld = entity.centerOld
+        val center = entity.center
+        val d = entity.deltaMovement
 
-//        poseStack.translate(x, y, z)
+//        CounterStrikeGrenades.Logger.info("$d")
+//
+        val x = Mth.lerp(partialTick.toDouble(), 0.0, d.x)
+        val y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
+        val z = Mth.lerp(partialTick.toDouble(), 0.0, d.z)
+
+        poseStack.translate(x, y, z)
 
         val itemStack = getItemStack(entity.grenadeType)
 

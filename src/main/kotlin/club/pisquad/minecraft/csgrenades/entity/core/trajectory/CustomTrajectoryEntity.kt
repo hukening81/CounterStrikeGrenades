@@ -42,20 +42,11 @@ abstract class CustomTrajectoryEntity(
             val position = newCenter.minusGrenadeSizeOffset()
             this.moveTo(position)
         }
-    var centerOld: Vec3
+    val centerOld: Vec3
         get() {
             return Vec3(
                 this.xo, this.yo, this.zo,
-            ).add(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
-        }
-        set(newCenter) {
-            val offset = newCenter.minusGrenadeSizeOffset()
-            this.xOld = offset.x
-            this.yOld = offset.y
-            this.zOld = offset.z
-            this.xo = offset.x
-            this.yo = offset.y
-            this.zo = offset.z
+            ).addGrenadeSizeOffset()
         }
 
     // Velocity is different from deltaMovement, latter one is the displacement between ticks
@@ -107,20 +98,16 @@ abstract class CustomTrajectoryEntity(
     }
 
     fun initializeMovementState(position: Vec3, velocity: Vec3) {
-        updateMovementState(position, velocity)
+        this.moveTo(position.minusGrenadeSizeOffset())
         trajectory.initialize(position, velocity)
-    }
-
-    fun updateMovementState(position: Vec3, velocity: Vec3) {
-        this.centerOld = this.center
-        this.center = position
-        this.deltaMovement = this.center.minus(this.centerOld)
     }
 
     override fun tick() {
         super.baseTick()
+        val lastPos = this.trajectory.nodes.last().position
         val node = this.trajectory.tick(this.level())
-        updateMovementState(node.position, node.velocity)
+        this.moveTo(node.position.minusGrenadeSizeOffset())
+        this.deltaMovement = this.center.minus(lastPos)
         if (this.level().isClientSide) {
             if (!trajectory.initialized) {
                 CounterStrikeGrenades.Logger.warn("Client trajectory not initialized")

@@ -105,6 +105,13 @@ class Trajectory(
         } else if (
             clientNode.position.distanceTo(node.position) > POSITION_ERROR_TOLERANCE
         ) {
+            CounterStrikeGrenades.Logger.warn(
+                "Syncing server node because of error ${
+                    clientNode.position.distanceTo(
+                        node.position
+                    )
+                }"
+            )
             var lastNode = node
             var counter = 0
             while (lastNode.tick == currentTick) {
