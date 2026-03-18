@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core
 
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectoryEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
@@ -130,6 +131,7 @@ abstract class CounterStrikeGrenadeEntity(
     }
 
     override fun onHitBlock(position: Vec3, direction: Direction) {
+        CounterStrikeGrenades.Logger.debug("hit block")
 //        if (this.level().isClientSide) {
 //            println("Client Bounce")
 //            playClientBounceSound()

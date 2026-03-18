@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
 import club.pisquad.minecraft.csgrenades.MINIMUM_VELOCITY_AFTER_BOUNCE
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.PhysicsHelper.getBlocksInPath
+import club.pisquad.minecraft.csgrenades.isBetween
 import club.pisquad.minecraft.csgrenades.math.Segment
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -27,21 +28,22 @@ interface TrajectoryNode {
         @Serializable(with = Vec3Serializer::class) override val velocity: Vec3,
         val completed: Boolean = false,
         @Transient val subtickNodes: MutableList<SubtickNode> = mutableListOf(),
+
+        val bounces: List<BounceData>
     ) : TrajectoryNode {
-        class TickNodeEntityDataSerializer : EntityDataSerializer<TickNode> {
-            @OptIn(ExperimentalSerializationApi::class)
-            override fun write(buffer: FriendlyByteBuf, value: TickNode) {
-                buffer.writeByteArray(Cbor.encodeToByteArray(serializer(), value))
+
+        @Serializable
+        class BounceData(
+            @Serializable(with = Vec3Serializer::class) val position: Vec3,
+            @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
+            val direction: Direction,
+            val bounceType: BounceSurfaceType
+        ) {
+            enum class BounceSurfaceType {
+                Block,
+                Entity
             }
 
-            @OptIn(ExperimentalSerializationApi::class)
-            override fun read(buffer: FriendlyByteBuf): TickNode {
-                return Cbor.decodeFromByteArray(serializer(), buffer.readByteArray())
-            }
-
-            override fun copy(value: TickNode): TickNode {
-                return value
-            }
         }
 
         companion object {
@@ -53,11 +55,22 @@ interface TrajectoryNode {
         /**Calculates the subtick nodes within this tick
          * @return Next TickNode
          * */
-        fun processTick(level: Level, bounceCB: Function2<Vec3, Direction, Unit>, hitEntityCB: Function3<Vec3, Direction, Entity, Unit>): TickNode {
+        fun processTick(
+            level: Level,
+            bounceCB: Function2<Vec3, Direction, Unit>,
+            hitEntityCB: Function3<Vec3, Direction, Entity, Unit>
+        ): TickNode {
             var partialTick = 0.0
             var lastNode: SubtickNode = this.toSubtickNode()
             while (true) {
-                lastNode = tryTravelInDirection(level, lastNode.position, lastNode.velocity, partialTick, bounceCB, hitEntityCB)
+                lastNode = tryTravelInDirection(
+                    level,
+                    lastNode.position,
+                    lastNode.velocity,
+                    partialTick,
+                    bounceCB,
+                    hitEntityCB
+                )
 
                 if (lastNode.partialTick.minus(partialTick).absoluteValue < 0.001) {
                     // Somehow we stuck here?
@@ -92,8 +105,20 @@ interface TrajectoryNode {
             )
         }
 
-        private fun tryTravelInDirection(level: Level, position: Vec3, velocity: Vec3, partialTick: Double, bounceCB: (Vec3, Direction) -> Unit, hitEntityCB: (Vec3, Direction, Entity) -> Unit): SubtickNode {
+        private fun tryTravelInDirection(
+            level: Level,
+            position: Vec3,
+            velocity: Vec3,
+            partialTick: Double,
+            bounceCB: (Vec3, Direction) -> Unit,
+            hitEntityCB: (Vec3, Direction, Entity) -> Unit
+        ): SubtickNode {
+            assert((1 - partialTick).isBetween(0.0, 1.0))
+
             val deltaMovement = velocity.scale(1 - partialTick)
+            if (deltaMovement.lengthSqr() > 100) {
+                println()
+            }
             val blocksInPath = getBlocksInPath(
                 Segment(
                     position, position.add(deltaMovement),
@@ -113,7 +138,11 @@ interface TrajectoryNode {
                     )
                 }
             }
-            return SubtickNode(position.add(deltaMovement), PhysicsHelper.applyVelocityPhysics(velocity, 1.0), Double.MAX_VALUE)
+            return SubtickNode(
+                position.add(deltaMovement),
+                PhysicsHelper.applyVelocityPhysics(velocity, 1.0),
+                2.0
+            )
 
         }
 

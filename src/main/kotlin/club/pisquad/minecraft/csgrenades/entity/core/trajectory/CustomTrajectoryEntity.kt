@@ -108,6 +108,9 @@ abstract class CustomTrajectoryEntity(
         val node = this.trajectory.tick(this.level())
         this.moveTo(node.position.minusGrenadeSizeOffset())
         this.deltaMovement = this.center.minus(lastPos)
+        if (this.deltaMovement.lengthSqr() >100){
+            CounterStrikeGrenades.Logger.warn("Grenade entity moved ${this.deltaMovement} last tick")
+        }
         if (this.level().isClientSide) {
             if (!trajectory.initialized) {
                 CounterStrikeGrenades.Logger.warn("Client trajectory not initialized")

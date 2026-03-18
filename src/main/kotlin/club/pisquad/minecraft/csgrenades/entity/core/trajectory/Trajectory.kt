@@ -2,6 +2,8 @@ package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.POSITION_ERROR_TOLERANCE
+import club.pisquad.minecraft.csgrenades.SERVER_NODE_CACHE_MAX_SIZE
+import club.pisquad.minecraft.csgrenades.TRAJECTORY_NODE_MAX_DELAY
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.Entity
@@ -17,6 +19,7 @@ class Trajectory(
 ) {
     var beginTime: Instant = Clock.System.now()
     var initialized: Boolean = false
+    private val serverNodeCache: ServerNodeCache = ServerNodeCache()
     val completed: Boolean
         get() {
             return nodes.last().completed
@@ -46,21 +49,6 @@ class Trajectory(
         this.nodes.add(TrajectoryNode.TickNode(0, position, velocity))
     }
 
-    fun addNode(node: TrajectoryNode.TickNode): Boolean {
-        return if (this.nodes.findLast { it.tick == node.tick } != null) {
-            CounterStrikeGrenades.Logger.warn("Trajectory node already exits")
-            false
-        } else {
-            this.nodes.add(node)
-            true
-        }
-    }
-
-
-    fun getNode(index: Int): TrajectoryNode.TickNode? {
-        return nodes.getOrNull(index)
-    }
-
 //    fun nodesBetweenTick(begin: Double, end: Double): List<TrajectoryNode> {
 //        val result = nodes.filter { it.tick in begin..end }
 //        return result.sortedBy { it.tick }
@@ -70,11 +58,15 @@ class Trajectory(
         if (!this.initialized) {
             throw Exception("Use before initialization")
         }
-        if (!this.completed) {
-            this.nodes.add(this.nodes.last().processTick(level, this.bounceCB, this.hitEntityCB))
-            if (nodes.last().completed) {
-                this.completeCB()
-            }
+        if (this.completed) {
+            return this.nodes.last()
+        }
+
+
+        this.nodes.add(this.nodes.last().processTick(level, this.bounceCB, this.hitEntityCB))
+
+        if (nodes.last().completed) {
+            this.completeCB()
         }
 
         return this.nodes.last()
@@ -89,54 +81,33 @@ class Trajectory(
     }
 
     /**Replace specific node with server's node and update nodes since
-     * should only be call on client side
+     * should only be called on client side
+     *
+     * NOTE: on a single player setting, server is always ahead by one node, we have to compensate this
+     * by allowing the client to be behind a few node
      * */
-    fun syncServerNode(node: TrajectoryNode.TickNode, level: ClientLevel): Int {
-        // Server is ahead
-        val clientNode = this.getNode(node.tick)
-        if (clientNode == null) {
-            var counter = 1
-            while (currentTick <= node.tick - 1) {
-                counter++
-                this.tick(level)
-            }
-            this.addNode(node)
-            return counter
-        } else if (
-            clientNode.position.distanceTo(node.position) > POSITION_ERROR_TOLERANCE
-        ) {
-            CounterStrikeGrenades.Logger.warn(
-                "Syncing server node because of error ${
-                    clientNode.position.distanceTo(
-                        node.position
-                    )
-                }"
-            )
-            var lastNode = node
-            var counter = 0
-            while (lastNode.tick == currentTick) {
-                this.nodes[lastNode.tick] = lastNode
-                lastNode = lastNode.processTick(level, this.bounceCB, this.hitEntityCB)
-                counter++
-            }
-            this.nodes[lastNode.tick] = lastNode
-            return counter
-        } else {
-            return 0
-        }
+    fun syncServerNode(node: TrajectoryNode.TickNode) {
+        serverNodeCache.add(node)
     }
 
-//    @Serializable
-//    class TrajectoryNode(
-//        @Serializable(with = Vec3Serializer::class) val position: Vec3,
-//        @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
-//        val tick: Double,
-//    ) {
-//       companion object{
-//           fun empty(): TrajectoryNode {
-//               return TrajectoryNode(Vec3.ZERO, Vec3.ZERO, 0.0)
-//           }
-//       }
-//    }
+    private class ServerNodeCache {
+        // add from back and remove from front
+        private val queue: ArrayDeque<TrajectoryNode.TickNode> = ArrayDeque()
+
+        fun add(node: TrajectoryNode.TickNode) {
+            while (queue.size > SERVER_NODE_CACHE_MAX_SIZE) {
+                queue.removeFirst()
+            }
+            queue.addLast(node)
+        }
+
+        fun getOrNull(tick: Int): TrajectoryNode.TickNode? {
+            return queue.find { it.tick == tick }
+        }
+
+        fun getLast(): TrajectoryNode.TickNode? {
+            return queue.last()
+        }
+    }
 
 }

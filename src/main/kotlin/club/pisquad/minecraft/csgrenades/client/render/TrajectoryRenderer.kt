@@ -25,6 +25,7 @@ object TrajectoryRenderer {
     @JvmStatic
     @SubscribeEvent
     fun onPlayerTick(event: TickEvent.LevelTickEvent) {
+        return
         if (event.side == LogicalSide.SERVER) return
         if (InputState.idle) {
             nodes.update { emptyList() }

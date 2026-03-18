@@ -84,6 +84,7 @@ object ModConfig {
         flashbang.build(builder)
         smokegrenade.build(builder)
         incendiary.build(builder)
+        decoy.build(builder)
         molotov.build(builder)
 
 
