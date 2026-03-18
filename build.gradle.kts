@@ -73,9 +73,12 @@ configure<UserDevExtension> {
             property("mixin.env.refMapRemappingFile", "$projectDir/build/createSrgToMcp/output.srg")
 
             if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
-                // NOTE(hukening81): This is mainly for my use case, since native glfw has some issue under wayland what will crash the test instance.
+
+                // NOTE(hukening81): This is mainly for my use case, since native glfw has some issue under wayland that will crash the test instance.
                 println("Running on a linux machine, use custom glfw library")
                 jvmArg("-Dorg.lwjgl.glfw.libname=/usr/lib/libglfw.so")
+                // NOTE(hukening81): disable threaded optimization is recommended
+                environment("__GL_THREADED_OPTIMIZATIONS", "0")
             }
             lazyToken("minecraft_classpath") {
                 configurations.getByName("shade").files.joinToString(File.pathSeparator)
