@@ -31,8 +31,8 @@ plugins {
 //    id("org.jetbrains.kotlin.jvm").version("2.3.0")
     // OPTIONAL Kotlin Serialization plugin
 //    id("org.jetbrains.kotlin.plugin.serialization").version("2.3.0")
-    kotlin("plugin.serialization").version("2.3.0")
-    kotlin("jvm").version("2.3.0")
+    kotlin("jvm").version("2.3.20")
+    kotlin("plugin.serialization").version("2.3.20")
     id("com.gradleup.shadow").version("9.2.0")
 }
 
@@ -51,7 +51,13 @@ idea {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println("Java: ${System.getProperty("java.version")}, JVM: ${System.getProperty("java.vm.version")} (${System.getProperty("java.vendor")}), Arch: ${System.getProperty("os.arch")}")
+println(
+    "Java: ${System.getProperty("java.version")}, JVM: ${System.getProperty("java.vm.version")} (${
+        System.getProperty(
+            "java.vendor"
+        )
+    }), Arch: ${System.getProperty("os.arch")}"
+)
 configure<UserDevExtension> {
     // Change to your preferred mappings
     mappings(configMappingChannel, configMappingVersion)
@@ -125,7 +131,15 @@ configure<UserDevExtension> {
             workingDirectory(project.file("run"))
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "debug")
-            args("--mod", modId, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources"))
+            args(
+                "--mod",
+                modId,
+                "--all",
+                "--output",
+                file("src/generated/resources/"),
+                "--existing",
+                file("src/main/resources")
+            )
 
             mods {
                 create(modId) {
@@ -162,6 +176,7 @@ repositories {
     flatDir {
         dirs("libs")
     }
+//    mavenCentral()
 }
 
 configurations {
@@ -188,6 +203,7 @@ dependencies {
 //    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
 //        exclude(group = "org.jetbrains", module = "annotations")
 //    }
+//    implementation(kotlin("stdlib"))
 }
 tasks.test {
     useJUnitPlatform()
