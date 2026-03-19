@@ -1,11 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
-import club.pisquad.minecraft.csgrenades.AIR_DRAG_CONSTANT
-import club.pisquad.minecraft.csgrenades.BOUNCE_FRICTION
-import club.pisquad.minecraft.csgrenades.BOUNCE_RESTORATION_RATE
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.GRAVITY_CONSTANT
-import club.pisquad.minecraft.csgrenades.MINIMUM_VELOCITY_AFTER_BOUNCE
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.math.Segment
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -24,9 +19,10 @@ object PhysicsHelper {
         val z = Mth.lerp(partialTick, velocity.z, velocity.z.times(AIR_DRAG_CONSTANT))
 
         val v = Vec3(x, y, z).add(0.0, -GRAVITY_CONSTANT.times(partialTick), 0.0)
-        if (v.lengthSqr()>100){
-            CounterStrikeGrenades.Logger.warn("New velocity is more than 10 blocks per tick")
+        if (v.lengthSqr() > 100) {
+            ModLogger.warn("New velocity is more than 10 blocks per tick")
         }
+        println("original velocity $velocity, new velocity$v")
         return v
     }
 
@@ -35,18 +31,29 @@ object PhysicsHelper {
         val velocityAtBouncePoint = applyVelocityPhysics(velocity, partialTick)
         val v = when (direction.axis) {
             Direction.Axis.X -> {
-                Vec3(-velocityAtBouncePoint.x.times(BOUNCE_RESTORATION_RATE), velocityAtBouncePoint.y.times(1 - BOUNCE_FRICTION), velocityAtBouncePoint.z.times(1 - BOUNCE_FRICTION))
+                Vec3(
+                    -velocityAtBouncePoint.x.times(BOUNCE_RESTORATION_RATE),
+                    velocityAtBouncePoint.y.times(1 - BOUNCE_FRICTION),
+                    velocityAtBouncePoint.z.times(1 - BOUNCE_FRICTION)
+                )
             }
 
             Direction.Axis.Y -> {
-                Vec3(velocityAtBouncePoint.x.times(1 - BOUNCE_FRICTION), -velocityAtBouncePoint.y.times(BOUNCE_RESTORATION_RATE), velocityAtBouncePoint.z.times(1 - BOUNCE_FRICTION))
+                Vec3(
+                    velocityAtBouncePoint.x.times(1 - BOUNCE_FRICTION),
+                    -velocityAtBouncePoint.y.times(BOUNCE_RESTORATION_RATE),
+                    velocityAtBouncePoint.z.times(1 - BOUNCE_FRICTION)
+                )
             }
 
             Direction.Axis.Z -> {
-                Vec3(velocityAtBouncePoint.x.times(1 - BOUNCE_FRICTION), velocityAtBouncePoint.y.times(1 - BOUNCE_FRICTION), -velocityAtBouncePoint.z.times(BOUNCE_RESTORATION_RATE))
+                Vec3(
+                    velocityAtBouncePoint.x.times(1 - BOUNCE_FRICTION),
+                    velocityAtBouncePoint.y.times(1 - BOUNCE_FRICTION),
+                    -velocityAtBouncePoint.z.times(BOUNCE_RESTORATION_RATE)
+                )
             }
         }
-//        v = applyVelocityPhysics(v, 1 - partialTick)
         return if (v.length() < MINIMUM_VELOCITY_AFTER_BOUNCE) {
             Vec3.ZERO
         } else {
@@ -65,9 +72,9 @@ object PhysicsHelper {
             }
 
         // We will sort it just in case
-        return segments.map { it.midPoint() }.sortedBy { it.distanceToSqr(displacement.begin) }.map { BlockPos.containing(it) }
+        return segments.map { it.midPoint() }.sortedBy { it.distanceToSqr(displacement.begin) }
+            .map { BlockPos.containing(it) }
     }
-
 
 
 }

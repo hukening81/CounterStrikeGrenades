@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.SERVER_TRAJECTORY_NODE_CACHE_MAX_SIZE
 import net.minecraft.client.Minecraft
 import net.minecraft.world.level.Level
@@ -46,11 +47,6 @@ class Trajectory(
         this.nodes.add(TickNode(0, position, velocity))
     }
 
-//    fun nodesBetweenTick(begin: Double, end: Double): List<TrajectoryNode> {
-//        val result = nodes.filter { it.tick in begin..end }
-//        return result.sortedBy { it.tick }
-//    }
-
     fun tick(level: Level, invokeCB: Boolean = true): TickNode {
         if (!this.initialized) {
             throw Exception("Use before initialization")
@@ -94,15 +90,21 @@ class Trajectory(
      * NOTE: on a single player setting, server is always ahead by one node, we have to compensate this
      * by allowing the client to be behind a few node
      * */
-    fun syncServerNode(node: TickNode) {
+    fun syncServerNode(id: Int, node: TickNode) {
+        ModLogger.trace("Syncing server node: tick(${node.tick}) id($id)")
+
         // Cache future nodes
         val clientNode = this.nodes.find { it.tick == node.tick }
         if (clientNode == null) {
+            ModLogger.debug("Tick(${node.tick}) not found for $id, putting it in cache")
             serverNodeCaches.add(node)
         } else if (clientNode.compareServerNode(node)) {
             // Do error correction
             // This will not invoke any callbacks
             val count = this.nodes.last().tick - node.tick
+
+            ModLogger.debug("Tick(${node.tick} error for $id is too big, correcting $count nodes")
+
             this.nodes.dropLast(count)
 
             //TODO(hukenign81): Replace this with a safer approach
@@ -111,8 +113,6 @@ class Trajectory(
                 this.tick(level, false)
             }
         }
-
-
     }
 }
 

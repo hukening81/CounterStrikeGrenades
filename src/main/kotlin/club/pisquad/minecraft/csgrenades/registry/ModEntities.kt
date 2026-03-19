@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.decoy.DecoyGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.firegrenade.IncendiaryEntity
@@ -63,10 +64,14 @@ object ModEntities {
     val DECOY_ENTITY = registerGrenade("decoy", ::DecoyGrenadeEntity)
 
     fun register(bus: IEventBus) {
+        ModLogger.info("Registering entities")
         ENTITIES.register(bus)
     }
 
-    private fun <T : CounterStrikeGrenadeEntity> registerGrenade(name: String, factory: EntityType.EntityFactory<T>): RegistryObject<EntityType<T>> {
+    private fun <T : CounterStrikeGrenadeEntity> registerGrenade(
+        name: String,
+        factory: EntityType.EntityFactory<T>
+    ): RegistryObject<EntityType<T>> {
         return ENTITIES.register(name) {
             EntityType.Builder.of(
                 factory,

@@ -1,6 +1,5 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.ModEntityModels
@@ -15,7 +14,6 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
-import java.util.logging.Logger
 
 //@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 //object GrenadeRenderCacheHelper {
@@ -155,12 +153,9 @@ class GrenadeEntityRenderer<T>(
     ) {
         entity as CounterStrikeGrenadeEntity
         poseStack.pushPose()
-        val centerOld = entity.centerOld
-        val center = entity.center
         val d = entity.deltaMovement
 
-//        CounterStrikeGrenades.Logger.info("$d")
-//
+
         val x = Mth.lerp(partialTick.toDouble(), 0.0, d.x)
         val y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
         val z = Mth.lerp(partialTick.toDouble(), 0.0, d.z)

@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.client.input.InputState.calculateGrenadeSpeed
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.enums.toModEntity
@@ -18,7 +19,7 @@ import java.util.*
 import java.util.function.Supplier
 
 @Serializable
-class ClientGrenadeThrowMessage(
+data class ClientGrenadeThrowMessage(
     @Serializable(with = UUIDSerializer::class) val ownerUuid: UUID,
     @Serializable(with = Vec3Serializer::class) val position: Vec3,
     @Serializable(with = Vec3Serializer::class) val velocity: Vec3,
@@ -54,6 +55,7 @@ class ClientGrenadeThrowMessage(
             val entityType = msg.grenadeType.toModEntity()
             val entity = entityType.create(level) ?: return
             entity.initialize(msg.ownerUuid, msg.position, msg.velocity)
+            ModLogger.info("Spawning grenade entity at ${msg.position} with velocity ${msg.velocity.length()} blocks per tick")
             level.addFreshEntity(entity)
         }
 

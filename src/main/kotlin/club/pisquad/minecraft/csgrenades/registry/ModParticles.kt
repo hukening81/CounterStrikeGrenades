@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.ModLogger
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.SimpleParticleType
 import net.minecraftforge.eventbus.api.IEventBus
@@ -16,6 +17,7 @@ object ModParticles {
         PARTICLE_TYPES.register("smoke_particle") { SimpleParticleType(true) }
 
     fun register(bus: IEventBus) {
+        ModLogger.info("Registering particles")
         PARTICLE_TYPES.register(bus)
     }
 }

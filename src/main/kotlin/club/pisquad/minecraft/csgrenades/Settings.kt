@@ -11,7 +11,7 @@ const val BOUNCE_RESTORATION_RATE: Double = 0.7
 const val BOUNCE_FRICTION: Double = 0.2
 const val MINIMUM_VELOCITY_AFTER_BOUNCE = 0.05
 
-const val AIR_DRAG_CONSTANT = 0.98
+const val AIR_DRAG_CONSTANT = 1.0
 const val GRAVITY_CONSTANT = 0.05
 
 const val POSITION_ERROR_TOLERANCE: Double = 1.0

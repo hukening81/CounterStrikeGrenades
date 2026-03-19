@@ -3,6 +3,7 @@
 package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
@@ -38,7 +39,8 @@ abstract class CsGrenadeMessageHandler<Msg : Any>(
     }
 
     @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
-    fun decoder(buffer: FriendlyByteBuf): Msg = Cbor.decodeFromByteArray(messageClass.serializer(), buffer.readByteArray())
+    fun decoder(buffer: FriendlyByteBuf): Msg =
+        Cbor.decodeFromByteArray(messageClass.serializer(), buffer.readByteArray())
 
     abstract fun handler(msg: Msg, ctx: Supplier<NetworkEvent.Context>)
 }
@@ -62,6 +64,7 @@ object ModPacketHandler {
     )
 
     fun register() {
+        ModLogger.info("Registering network packets")
 //        INSTANCE.registerMessage(
 //            messageTypeCount,
 //            FlashBangExplodedMessage::class.java,
@@ -90,7 +93,13 @@ object ModPacketHandler {
         SmokeGrenadePacketHandler.registerMessages(this)
     }
 
-    fun <M : Any> registerMessage(message: Class<M>, encoder: BiConsumer<M, FriendlyByteBuf>, decoder: Function1<FriendlyByteBuf, M>, consumer: BiConsumer<M, Supplier<NetworkEvent.Context>>, direction: Optional<NetworkDirection>) {
+    fun <M : Any> registerMessage(
+        message: Class<M>,
+        encoder: BiConsumer<M, FriendlyByteBuf>,
+        decoder: Function1<FriendlyByteBuf, M>,
+        consumer: BiConsumer<M, Supplier<NetworkEvent.Context>>,
+        direction: Optional<NetworkDirection>
+    ) {
         INSTANCE.registerMessage(messageTypeCount, message, encoder, decoder, consumer, direction)
     }
 

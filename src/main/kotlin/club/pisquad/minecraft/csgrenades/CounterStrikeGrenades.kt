@@ -7,16 +7,12 @@ import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModParticles
 import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext
-import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger
 
 /**
  * Main mod class. Should be an `object` declaration annotated with `@Mod`.
@@ -30,7 +26,7 @@ import org.apache.logging.log4j.Logger
 class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
 
     init {
-        Logger.log(Level.INFO, "Hello Counter Strike Grenades")
+        ModLogger.info("Initializing Mod -- Common Setup")
 //        val modBus = KotlinModLoadingContext.get().getKEventBus()
         val modBus = context.modEventBus
         modEventBus = modBus
@@ -42,15 +38,12 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
         ModSoundEvents.register(modEventBus)
         ModPacketHandler.register()
 
+        ModLogger.info("Generating/Reading server-side config")
         context.registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC)
     }
 
     companion object {
         const val ID = "csgrenades"
-
-        // the logger for our mod
-        val Logger: Logger = LogManager.getLogger(ID)
-
         lateinit var modEventBus: IEventBus
         lateinit var modLoadingContext: FMLJavaModLoadingContext
 
@@ -62,7 +55,7 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
         @JvmStatic
         @SubscribeEvent
         fun onClientSetup(event: FMLClientSetupEvent) {
-            Logger.log(Level.INFO, "Initializing client...")
+            ModLogger.info("Initializing Mod -- Client Setup")
         }
 
         /**
@@ -71,8 +64,7 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
         @JvmStatic
         @SubscribeEvent
         fun onServerSetup(event: FMLDedicatedServerSetupEvent) {
-            MinecraftForge.EVENT_BUS
-            Logger.log(Level.INFO, "Server starting...")
+            ModLogger.info("Initializing Mod -- Server Setup")
         }
     }
 }

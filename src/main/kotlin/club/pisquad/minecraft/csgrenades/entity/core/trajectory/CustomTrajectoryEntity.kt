@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.minus
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
@@ -100,16 +100,24 @@ abstract class CustomTrajectoryEntity(
 
     override fun tick() {
         super.baseTick()
+
         val lastPos = this.trajectory.nodes.last().position
         val node = this.trajectory.tick(this.level())
+
+        ModLogger.debug(
+            "Grenade ${this.id} moved ${
+                this.center.minus(node.position).length()
+            } blocks last tick, current velocity ${node.velocity.length()}"
+        )
+
         this.moveTo(node.position.minusGrenadeSizeOffset())
         this.deltaMovement = this.center.minus(lastPos)
-        if (this.deltaMovement.lengthSqr() > 100) {
-            CounterStrikeGrenades.Logger.warn("Grenade entity moved ${this.deltaMovement} last tick")
-        }
+
+
+
         if (this.level().isClientSide) {
             if (!trajectory.initialized) {
-                CounterStrikeGrenades.Logger.warn("Client trajectory not initialized")
+                ModLogger.warn("Client trajectory not initialized")
             }
         } else {
             val radius = this.level().server!!.playerList.viewDistance.times(16).toDouble()
@@ -131,8 +139,8 @@ abstract class CustomTrajectoryEntity(
         }
     }
 
-    fun syncServerMovement(node: TickNode) {
-        this.trajectory.syncServerNode(node)
+    fun syncServerMovement(id: Int, node: TickNode) {
+        this.trajectory.syncServerNode(id, node)
     }
 
 

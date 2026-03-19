@@ -22,7 +22,7 @@ class ServerGrenadeMovementSyncMessage(
                 val grenade = Minecraft.getInstance().level?.getEntity(msg.id)
                 if (grenade != null) {
                     grenade as CounterStrikeGrenadeEntity
-                    grenade.syncServerMovement(msg.node)
+                    grenade.syncServerMovement(msg.id, msg.node)
                 }
             }
 

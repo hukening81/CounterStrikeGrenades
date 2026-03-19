@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.core
 
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectoryEntity
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
@@ -131,7 +131,7 @@ abstract class CounterStrikeGrenadeEntity(
     }
 
     override fun onHitBlock(data: SubtickNode.BlockBounceData) {
-        CounterStrikeGrenades.Logger.debug("hit block")
+        ModLogger.debug("hit block")
 //        if (this.level().isClientSide) {
 //            println("Client Bounce")
 //            playClientBounceSound()

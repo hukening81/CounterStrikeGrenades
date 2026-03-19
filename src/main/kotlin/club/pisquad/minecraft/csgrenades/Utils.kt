@@ -123,19 +123,29 @@ fun Vec3.horizontalDistanceTo(other: Vec3): Double = sqrt(
     Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble(),
 )
 
-fun BlockPos.horizontalDistanceToSqr(other: BlockPos): Double = Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble()
+fun BlockPos.horizontalDistanceToSqr(other: BlockPos): Double =
+    Vec2(this.x.toFloat(), this.z.toFloat()).distanceToSqr(Vec2(other.x.toFloat(), other.z.toFloat())).toDouble()
 
 fun BlockPos.horizontalDistanceTo(other: BlockPos): Double = sqrt(
     this.horizontalDistanceToSqr(other),
 )
 
 fun Double.toTick(): Long = this.times(20).toLong()
+
 fun Double.toMetersPerTick(): Double {
     return this.div(20)
 }
 
+fun Double.toMetersPerSecond(): Double {
+    return this.times(20)
+}
+
 fun Vec3.toMetersPerTick(): Vec3 {
     return Vec3(this.x.toMetersPerTick(), this.y.toMetersPerTick(), this.z.toMetersPerTick())
+}
+
+fun Vec3.toMetersPerSecond(): Vec3 {
+    return Vec3(this.x.toMetersPerSecond(), this.y.toMetersPerSecond(), this.z.toMetersPerSecond())
 }
 
 fun renderTestParticleAtPosition(level: Level, position: Vec3) {

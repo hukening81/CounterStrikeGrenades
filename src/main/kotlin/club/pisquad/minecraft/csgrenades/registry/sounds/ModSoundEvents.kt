@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.registry.sounds
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.ModLogger
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraftforge.eventbus.api.IEventBus
@@ -21,6 +22,7 @@ object ModSoundEvents {
     val incendiary = IncendiarySoundEvents
 
     fun register(bus: IEventBus) {
+        ModLogger.info("Registering sound events")
         SOUND_EVENTS.register(bus)
     }
 
