@@ -31,12 +31,6 @@ object BounceHelper {
             deltaMovement,
         ) ?: return BounceResult(BounceResultTypes.THROUGH)
         val tickDelta = position.distanceTo(point).div(velocity.length())
-//        if (tickDelta > 1) {
-//            println("dd")
-//        }
-//        if (direction != Direction.UP) {
-//            println("uiu")
-//        }
         return BounceResult(
             BounceResultTypes.BOUNCE,
             point,
@@ -50,7 +44,11 @@ object BounceHelper {
         return !level.getBlockState(blockPos).isAir
     }
 
-    private fun getFirstCollision(aabbs: List<AABB>, position: Vec3, deltaMovement: Vec3): Triple<AABB, Vec3, Direction>? {
+    private fun getFirstCollision(
+        aabbs: List<AABB>,
+        position: Vec3,
+        deltaMovement: Vec3
+    ): Triple<AABB, Vec3, Direction>? {
         val segment = Segment(position, position.add(deltaMovement))
         val candidates: MutableList<Triple<AABB, Vec3, Direction>> = mutableListOf()
 

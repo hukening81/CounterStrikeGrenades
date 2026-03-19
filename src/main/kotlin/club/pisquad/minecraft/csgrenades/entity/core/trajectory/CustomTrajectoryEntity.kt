@@ -1,9 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.GRENADE_ENTITY_SIZE_HALF
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
-import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectoryEntity.SpawnData
 import club.pisquad.minecraft.csgrenades.minus
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
@@ -12,7 +10,6 @@ import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
@@ -108,7 +105,7 @@ abstract class CustomTrajectoryEntity(
         val node = this.trajectory.tick(this.level())
         this.moveTo(node.position.minusGrenadeSizeOffset())
         this.deltaMovement = this.center.minus(lastPos)
-        if (this.deltaMovement.lengthSqr() >100){
+        if (this.deltaMovement.lengthSqr() > 100) {
             CounterStrikeGrenades.Logger.warn("Grenade entity moved ${this.deltaMovement} last tick")
         }
         if (this.level().isClientSide) {
@@ -135,8 +132,8 @@ abstract class CustomTrajectoryEntity(
         }
     }
 
-    fun syncServerMovement(node: TrajectoryNode.TickNode) {
-        this.trajectory.syncServerNode(node, this.level() as ClientLevel)
+    fun syncServerMovement(node: TickNode) {
+        this.trajectory.syncServerNode(node)
     }
 
 
