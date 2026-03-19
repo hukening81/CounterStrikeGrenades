@@ -10,7 +10,6 @@ import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
-import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -139,9 +138,9 @@ abstract class CustomTrajectoryEntity(
 
     /**Provide basic hook for playing sound events
      * */
-    abstract fun onHitBlock(position: Vec3, direction: Direction)
+    abstract fun onHitBlock(data: SubtickNode.BlockBounceData)
 
-    abstract fun onHitEntity(position: Vec3, direction: Direction, entity: Entity)
+    abstract fun onHitEntity(data: SubtickNode.EntityBounceData)
 
     fun onTrajectoryComplete() {}
 }

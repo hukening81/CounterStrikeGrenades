@@ -1,8 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
-import club.pisquad.minecraft.csgrenades.SERVER_NODE_CACHE_MAX_SIZE
-import net.minecraft.core.Direction
-import net.minecraft.world.entity.Entity
+import club.pisquad.minecraft.csgrenades.SERVER_TRAJECTORY_NODE_CACHE_MAX_SIZE
+import net.minecraft.client.Minecraft
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import kotlin.time.Clock
@@ -11,13 +10,13 @@ import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 class Trajectory(
-    val bounceCB: Function2<Vec3, Direction, Unit>,
-    val hitEntityCB: Function3<Vec3, Direction, Entity, Unit>,
+    val hitBlockCB: Function1<SubtickNode.BlockBounceData, Unit>,
+    val hitEntityCB: Function1<SubtickNode.EntityBounceData, Unit>,
     val completeCB: Function0<Unit>,
 ) {
     var beginTime: Instant = Clock.System.now()
     var initialized: Boolean = false
-    private val serverNodeCache: ServerNodeCache = ServerNodeCache()
+    val serverNodeCaches: ServerNodeCache = ServerNodeCache()
     val completed: Boolean
         get() {
             return nodes.last().completed
@@ -52,7 +51,7 @@ class Trajectory(
 //        return result.sortedBy { it.tick }
 //    }
 
-    fun tick(level: Level): TickNode {
+    fun tick(level: Level, invokeCB: Boolean = true): TickNode {
         if (!this.initialized) {
             throw Exception("Use before initialization")
         }
@@ -61,10 +60,21 @@ class Trajectory(
         }
 
 
-        this.nodes.add(this.nodes.last().processTick(level, this.bounceCB, this.hitEntityCB))
+        this.nodes.add(this.nodes.last().processTick(level))
 
-        if (nodes.last().completed) {
-            this.completeCB()
+        // Do callbacks
+        if (invokeCB) {
+            this.nodes.last().subtickNodes.forEach {
+                if (it.bounceData is SubtickNode.BlockBounceData) {
+                    this.hitBlockCB(it.bounceData)
+                } else if (it.bounceData is SubtickNode.EntityBounceData) {
+                    throw NotImplementedError()
+                }
+            }
+
+            if (nodes.last().completed) {
+                this.completeCB()
+            }
         }
 
         return this.nodes.last()
@@ -85,27 +95,44 @@ class Trajectory(
      * by allowing the client to be behind a few node
      * */
     fun syncServerNode(node: TickNode) {
-        serverNodeCache.add(node)
-    }
+        // Cache future nodes
+        val clientNode = this.nodes.find { it.tick == node.tick }
+        if (clientNode == null) {
+            serverNodeCaches.add(node)
+        } else if (clientNode.compareServerNode(node)) {
+            // Do error correction
+            // This will not invoke any callbacks
+            val count = this.nodes.last().tick - node.tick
+            this.nodes.dropLast(count)
 
-    private class ServerNodeCache {
-        // add from back and remove from front
-        private val queue: ArrayDeque<TickNode> = ArrayDeque()
-
-        fun add(node: TickNode) {
-            while (queue.size > SERVER_NODE_CACHE_MAX_SIZE) {
-                queue.removeFirst()
+            //TODO(hukenign81): Replace this with a safer approach
+            val level: Level = Minecraft.getInstance().player!!.level()
+            repeat(count) {
+                this.tick(level, false)
             }
-            queue.addLast(node)
         }
 
-        fun getOrNull(tick: Int): TickNode? {
-            return queue.find { it.tick == tick }
-        }
 
-        fun getLast(): TickNode? {
-            return queue.last()
+    }
+}
+
+// Only cahces future node
+class ServerNodeCache {
+    // add from back and remove from front
+    private val queue: ArrayDeque<TickNode> = ArrayDeque()
+
+    fun add(node: TickNode) {
+        while (queue.size > SERVER_TRAJECTORY_NODE_CACHE_MAX_SIZE) {
+            queue.removeFirst()
         }
+        queue.addLast(node)
     }
 
+    fun find(tick: Int): TickNode? {
+        return queue.find { it.tick == tick }
+    }
+
+    fun lastOrNull(): TickNode? {
+        return queue.lastOrNull()
+    }
 }

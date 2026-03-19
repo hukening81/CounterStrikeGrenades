@@ -2,13 +2,13 @@ package club.pisquad.minecraft.csgrenades.entity.core
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectoryEntity
+import club.pisquad.minecraft.csgrenades.entity.core.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
-import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
@@ -130,7 +130,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     }
 
-    override fun onHitBlock(position: Vec3, direction: Direction) {
+    override fun onHitBlock(data: SubtickNode.BlockBounceData) {
         CounterStrikeGrenades.Logger.debug("hit block")
 //        if (this.level().isClientSide) {
 //            println("Client Bounce")
@@ -140,7 +140,7 @@ abstract class CounterStrikeGrenadeEntity(
 //        }
     }
 
-    override fun onHitEntity(position: Vec3, direction: Direction, entity: Entity) {
+    override fun onHitEntity(data: SubtickNode.EntityBounceData) {
         if (this.level().isClientSide) {
             playClientHitEntitySound()
         }

@@ -1,21 +1,14 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.client.input.InputState
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.Trajectory
-import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
-import club.pisquad.minecraft.csgrenades.renderTestParticleAtPosition
-import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.LogicalSide
 import net.minecraftforge.fml.common.Mod
-import kotlin.collections.map
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
-import kotlin.concurrent.atomics.update
 
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object TrajectoryRenderer {
@@ -27,26 +20,26 @@ object TrajectoryRenderer {
     @SubscribeEvent
     fun onPlayerTick(event: TickEvent.LevelTickEvent) {
         return
-        if (event.side == LogicalSide.SERVER) return
-        if (InputState.idle) {
-            nodes.update { emptyList() }
-            return
-        }
-        val player = Minecraft.getInstance().player ?: return
-        // Only render when reached the strength target
-        if (InputState.strengthTransitionTarget != InputState.strength) {
-            nodes.update { emptyList() }
-            return
-        }
-
-        val message = ClientGrenadeThrowMessage.fromInputState() ?: return
-        val trajectory = Trajectory({ _, _ -> }, { _, _, _ -> }, {})
-        trajectory.initialize(message.position, message.velocity)
-        trajectory.tickUntilComplete(player.level())
-        nodes.update { extractNodesFromTrajectory(trajectory) }
-
-        // DEBUG
-        nodes.load().forEach { renderTestParticleAtPosition(Minecraft.getInstance().player!!.level(), it) }
+//       ` if (event.side == LogicalSide.SERVER) return
+//        if (InputState.idle) {
+//            nodes.update { emptyList() }
+//            return
+//        }
+//        val player = Minecraft.getInstance().player ?: return
+//        // Only render when reached the strength target
+//        if (InputState.strengthTransitionTarget != InputState.strength) {
+//            nodes.update { emptyList() }
+//            return
+//        }
+//
+//        val message = ClientGrenadeThrowMessage.fromInputState() ?: return
+//        val trajectory = Trajectory({ _, _ -> }, { _, _, _ -> }, {})
+//        trajectory.initialize(message.position, message.velocity)
+//        trajectory.tickUntilComplete(player.level())
+//        nodes.update { extractNodesFromTrajectory(trajectory) }
+//
+//        // DEBUG
+//        nodes.load().forEach { renderTestParticleAtPosition(Minecraft.getInstance().player!!.level(), it) }`
     }
 
     private fun extractNodesFromTrajectory(trajectory: Trajectory): List<Vec3> {
