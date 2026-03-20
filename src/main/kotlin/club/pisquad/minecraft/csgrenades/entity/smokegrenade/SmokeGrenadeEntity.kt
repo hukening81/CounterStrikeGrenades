@@ -18,7 +18,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel
     ActivateAfterLandingGrenadeEntity(
         pEntityType,
         pLevel,
-        GrenadeType.FLASH_BANG,
+        GrenadeType.SMOKE_GRENADE,
         ModConfig.smokegrenade.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
     ) {
     override val sounds = GrenadeEntitySoundEvents(
@@ -33,6 +33,7 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel
     companion object {
         private val smokeDataPointsAccessor: EntityDataAccessor<Set<SmokeDataPoint>> =
             SynchedEntityData.defineId(SmokeGrenadeEntity::class.java, ModSerializers.smokeDataPointSetSerializer)
+
     }
 
     override fun defineSynchedData() {

@@ -87,7 +87,7 @@
   "flashbang.bounce": {
     "category": "player",
     "sounds": [
-      "csgrenades:flashbang/grenade_hit1"
+      "csgrenades:flashbang/bounce"
     ]
   },
   "flashbang.throw": {

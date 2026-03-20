@@ -166,6 +166,7 @@ data class SubtickNode(
 
     @Serializable
     class EntityBounceData(
-
+        val id: Int,
+        @Serializable(with = Vec3Serializer::class) val position: Vec3,
     ) : BounceData();
 }

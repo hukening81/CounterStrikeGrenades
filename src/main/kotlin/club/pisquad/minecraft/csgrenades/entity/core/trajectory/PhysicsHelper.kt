@@ -19,10 +19,9 @@ object PhysicsHelper {
         val z = Mth.lerp(partialTick, velocity.z, velocity.z.times(AIR_DRAG_CONSTANT))
 
         val v = Vec3(x, y, z).add(0.0, -GRAVITY_CONSTANT.times(partialTick), 0.0)
-        if (v.lengthSqr() > 100) {
-            ModLogger.warn("New velocity is more than 10 blocks per tick")
-        }
-        println("original velocity $velocity, new velocity$v")
+//        if (v.lengthSqr() > 100) {
+//            ModLogger.warn("New velocity is more than 10 blocks per tick")
+//        }
         return v
     }
 

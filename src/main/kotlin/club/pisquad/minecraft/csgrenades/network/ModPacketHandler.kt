@@ -5,6 +5,7 @@ package club.pisquad.minecraft.csgrenades.network
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadePacketHandler
@@ -65,14 +66,6 @@ object ModPacketHandler {
 
     fun register() {
         ModLogger.info("Registering network packets")
-//        INSTANCE.registerMessage(
-//            messageTypeCount,
-//            FlashBangExplodedMessage::class.java,
-//            FlashBangExplodedMessage::encoder,
-//            FlashBangExplodedMessage::decoder,
-//            FlashBangExplodedMessage::handler,
-//            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
-//        )
         registerMessage(
             ClientGrenadeThrowMessage::class.java,
             ClientGrenadeThrowMessage::encoder,
@@ -86,6 +79,13 @@ object ModPacketHandler {
             ServerGrenadeMovementSyncMessage::decoder,
             ServerGrenadeMovementSyncMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT),
+        )
+        registerMessage(
+            ServerGrenadeBlockBounceSoundMessage::class.java,
+            ServerGrenadeBlockBounceSoundMessage::encoder,
+            ServerGrenadeBlockBounceSoundMessage::decoder,
+            ServerGrenadeBlockBounceSoundMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         )
 
         HEGrenadePacketHandler.registerMessages(this)

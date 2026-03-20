@@ -6,7 +6,7 @@ object FlashbangSoundEvents {
     val explodeDistant = ModSoundEvents.registerSoundEvent("flashbang.explode_distant")
     val ring = ModSoundEvents.registerSoundEvent("flashbang.ring")
     val ringLoop = ModSoundEvents.registerSoundEvent("flashbang.ring_loop")
-    val bounce = ModSoundEvents.registerSoundEvent("flashbang.hit")
+    val bounce = ModSoundEvents.registerSoundEvent("flashbang.bounce")
     val throwSound = ModSoundEvents.registerSoundEvent("flashbang.throw")
     val pinpull = ModSoundEvents.registerSoundEvent("flashbang.pinpull")
     val pinpullStart = ModSoundEvents.registerSoundEvent("flashbang.pinpull_start")

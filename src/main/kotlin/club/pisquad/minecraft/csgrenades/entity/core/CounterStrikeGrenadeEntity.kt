@@ -5,6 +5,8 @@ import club.pisquad.minecraft.csgrenades.entity.core.trajectory.CustomTrajectory
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -19,6 +21,7 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceKey
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageType
 import net.minecraft.world.entity.Entity
@@ -29,7 +32,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
-
+import kotlin.random.Random
 
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out CounterStrikeGrenadeEntity>,
@@ -38,6 +41,7 @@ abstract class CounterStrikeGrenadeEntity(
 ) :
     CustomTrajectoryEntity(pEntityType, pLevel) {
     lateinit var ownerUuid: UUID
+
 
     abstract val sounds: GrenadeEntitySoundEvents
     abstract val damageTypes: GrenadeEntityDamageTypes
@@ -92,16 +96,10 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun shouldBeSaved(): Boolean = false
 
-//    abstract fun getHitDamageSource(hitEntity: LivingEntity): DamageSource
-
     open fun activate() {
         this.entityData.set(isActivatedAccessor, true)
-        if (this.level().isClientSide) {
-            // EMPTY
-        } else {
-//            println("Firing grenade activate event ${this.grenadeType}")
-            MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
-        }
+        ModLogger.trace(this, "Firing GrenadeActivateEvent")
+        MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -131,27 +129,53 @@ abstract class CounterStrikeGrenadeEntity(
     }
 
     override fun onHitBlock(data: SubtickNode.BlockBounceData) {
-        ModLogger.debug("hit block")
-//        if (this.level().isClientSide) {
-//            println("Client Bounce")
-//            playClientBounceSound()
-//        } else {
-//            println("Server Bounce")
-//        }
-    }
-
-    override fun onHitEntity(data: SubtickNode.EntityBounceData) {
+        ModLogger.info("{} hit block({}) at tick{}", this.grenadeType, data.blockPos, this.tickCount)
         if (this.level().isClientSide) {
-            playClientHitEntitySound()
+            // EMPTY
+        } else {
+            ModPacketHandler.sendMessageToPlayer(
+                this.level().dimension(),
+                ServerGrenadeBlockBounceSoundMessage(this.grenadeType, this.id, data)
+            )
         }
     }
 
-    fun playClientBounceSound() {
-
+    override fun onHitEntity(data: SubtickNode.EntityBounceData) {
+        ModLogger.info("{} hit entity({}) at tick{}", this.grenadeType, data.id, this.tickCount)
+        if (this.level().isClientSide) {
+            // EMPTY
+        } else {
+//            playServerEntityHitSound(data.position)
+        }
     }
 
-    fun playClientHitEntitySound() {
+    fun playClientBlockHitSound(position: Vec3) {
+        ModLogger.debug(this, "Playing hit block sound for {} at {}", this.id, position)
 
+        this.level().playSeededSound(
+            null,
+            position.x,
+            position.y,
+            position.z,
+            this.sounds.hitBlock,
+            SoundSource.PLAYERS,
+            1.0f, 1.0f,
+            Random.nextInt().toLong(),
+        )
+    }
+
+    fun playServerEntityHitSound(position: Vec3) {
+        ModLogger.debug(this, "Playing hit entity sound for {} at {}", this.id, position)
+        this.level().playSeededSound(
+            null,
+            position.x,
+            position.y,
+            position.z,
+            this.sounds.hitBlock,
+            SoundSource.PLAYERS,
+            16.0f, 1.0f,
+            Random.nextInt().toLong(),
+        )
     }
 
 

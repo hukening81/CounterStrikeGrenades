@@ -96,14 +96,14 @@ class Trajectory(
         // Cache future nodes
         val clientNode = this.nodes.find { it.tick == node.tick }
         if (clientNode == null) {
-            ModLogger.debug("Tick(${node.tick}) not found for $id, putting it in cache")
+            ModLogger.trace("Tick(${node.tick}) not found for $id, putting it in cache")
             serverNodeCaches.add(node)
         } else if (clientNode.compareServerNode(node)) {
             // Do error correction
             // This will not invoke any callbacks
             val count = this.nodes.last().tick - node.tick
 
-            ModLogger.debug("Tick(${node.tick} error for $id is too big, correcting $count nodes")
+            ModLogger.trace("Tick(${node.tick} error for $id is too big, correcting $count nodes")
 
             this.nodes.dropLast(count)
 

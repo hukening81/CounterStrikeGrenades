@@ -5,6 +5,6 @@ import net.minecraft.sounds.SoundEvent
 
 class GrenadeEntitySoundEvents(
     val throwSoundEvent: SoundEvent,
-    val bounce: SoundEvent,
+    val hitBlock: SoundEvent,
     val hitEntity: SoundEvent = CommonSoundEvents.hitEntity.get(),
 )

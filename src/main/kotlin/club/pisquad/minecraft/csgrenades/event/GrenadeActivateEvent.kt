@@ -7,7 +7,7 @@ import net.minecraftforge.event.entity.EntityEvent
 /**
  * Fires when a grenade activates.
  *
- * Only Fires on server side
+ * Fires on both server and client side
  *
  * by *activate* we mean *explode* for most of the grenades
  * */

@@ -55,7 +55,7 @@ data class ClientGrenadeThrowMessage(
             val entityType = msg.grenadeType.toModEntity()
             val entity = entityType.create(level) ?: return
             entity.initialize(msg.ownerUuid, msg.position, msg.velocity)
-            ModLogger.info("Spawning grenade entity at ${msg.position} with velocity ${msg.velocity.length()} blocks per tick")
+            ModLogger.info("Spawning ${msg.grenadeType} entity at ${msg.position} with velocity ${msg.velocity.length()} blocks per tick")
             level.addFreshEntity(entity)
         }
 

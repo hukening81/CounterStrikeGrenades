@@ -104,7 +104,7 @@ abstract class CustomTrajectoryEntity(
         val lastPos = this.trajectory.nodes.last().position
         val node = this.trajectory.tick(this.level())
 
-        ModLogger.debug(
+        ModLogger.trace(
             "Grenade ${this.id} moved ${
                 this.center.minus(node.position).length()
             } blocks last tick, current velocity ${node.velocity.length()}"
