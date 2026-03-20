@@ -21,4 +21,4 @@ const val POSITION_ERROR_TOLERANCE: Double = 1.0
 const val SERVER_TRAJECTORY_NODE_CACHE_MAX_SIZE: Int = 40
 
 // Sound Volume
-const val BLOCK_BOUNCE_SOUND_VOLUME: Float = 0.5f
+const val BLOCK_BOUNCE_SOUND_VOLUME: Float = 0.03f
