@@ -15,13 +15,10 @@ abstract class ActivateByFuseGrenadeEntity(
     grenadeType: GrenadeType,
     val fuseTime: Int,
 ) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
-    // Can we use entity.tickCount here?
-    var tickSinceSpawn: Int = 0
 
     override fun tick() {
         super.tick()
-        tickSinceSpawn++
-        if (!this.entityData.get(isActivatedAccessor) && tickSinceSpawn > fuseTime) {
+        if (!this.entityData.get(isActivatedAccessor) && this.tickCount > fuseTime) {
             this.activate()
         }
     }

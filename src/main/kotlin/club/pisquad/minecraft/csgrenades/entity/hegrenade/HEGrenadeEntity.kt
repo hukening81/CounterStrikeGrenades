@@ -41,7 +41,6 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
                 this.center,
                 HEGrenadeActivatedMessage(this.center)
             )
-//            this.doDamage()
             this.discard()
         }
     }

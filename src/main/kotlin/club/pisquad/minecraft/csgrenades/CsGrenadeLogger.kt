@@ -21,7 +21,7 @@ object ModLogger {
     }
 
     fun debug(entity: CounterStrikeGrenadeEntity, msg: String, vararg args: Any?) {
-        logger.debug("[{}(id:{} tick:{})] {}", entity.grenadeType, entity.id, entity.tickCount, *args)
+        logger.debug("[{}(id:{} tick:{})] {}", entity.grenadeType, entity.id, entity.tickCount, msg.format(args))
     }
 
     fun info(entity: CounterStrikeGrenadeEntity, msg: String, vararg args: Any?) {

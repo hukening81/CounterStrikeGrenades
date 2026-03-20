@@ -9,6 +9,7 @@ import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessa
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.flashbang.FlashbangPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.SmokeGrenadePacketHandler
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -92,6 +93,7 @@ object ModPacketHandler {
         HEGrenadePacketHandler.registerMessages(this)
         FireGrenadePacketHandler.registerMessages(this)
         SmokeGrenadePacketHandler.registerMessages(this)
+        FlashbangPacketHandler.registerMessages(this)
     }
 
     fun <M : Any> registerMessage(

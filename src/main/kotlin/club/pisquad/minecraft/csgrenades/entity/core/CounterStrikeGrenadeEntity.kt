@@ -99,7 +99,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     open fun activate() {
         this.entityData.set(isActivatedAccessor, true)
-        ModLogger.trace(this, "Firing GrenadeActivateEvent")
+        ModLogger.debug(this, "Firing GrenadeActivateEvent")
         MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
     }
 

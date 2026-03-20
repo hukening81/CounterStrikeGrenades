@@ -4,8 +4,10 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
@@ -140,6 +142,10 @@ fun Double.toMetersPerSecond(): Double {
     return this.times(20)
 }
 
+fun Long.nanoSecondToSecond(): Double {
+    return this.div(1_000_000_000.0)
+}
+
 fun Vec3.toMetersPerTick(): Vec3 {
     return Vec3(this.x.toMetersPerTick(), this.y.toMetersPerTick(), this.z.toMetersPerTick())
 }
@@ -174,4 +180,10 @@ fun Double.isBetween(value1: Double, value2: Double): Boolean {
 
 fun Player.getShootOrigin(): Vec3 {
     return this.eyePosition
+}
+
+fun ServerLevel.getPlayersWithinMessageRange(center: Vec3): List<Player> {
+    val range = SERVER_MESSAGE_RANGE.toDouble()
+    val box = AABB.ofSize(center, range, range, range)
+    return this.getEntitiesOfClass(Player::class.java, box).toList()
 }
