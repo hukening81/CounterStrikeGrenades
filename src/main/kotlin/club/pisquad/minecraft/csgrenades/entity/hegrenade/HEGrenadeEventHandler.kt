@@ -7,7 +7,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 
 
-@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = [Dist.DEDICATED_SERVER])
+@Mod.EventBusSubscriber(
+    modid = CounterStrikeGrenades.ID,
+    bus = Mod.EventBusSubscriber.Bus.MOD,
+    value = [Dist.DEDICATED_SERVER]
+)
 object HEGrenadeEventHandler {
 
     @JvmStatic

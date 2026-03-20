@@ -25,7 +25,10 @@ abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(propertie
 
     init {
         val builder = ImmutableMultimap.builder<Attribute, AttributeModifier>()
-        builder.put(Attributes.ATTACK_SPEED, AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", 1000.0, AttributeModifier.Operation.ADDITION))
+        builder.put(
+            Attributes.ATTACK_SPEED,
+            AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", 1000.0, AttributeModifier.Operation.ADDITION)
+        )
         this.defaultModifiers = builder.build()
     }
 

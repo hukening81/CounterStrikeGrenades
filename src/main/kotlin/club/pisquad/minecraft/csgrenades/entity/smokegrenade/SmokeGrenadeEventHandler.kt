@@ -5,5 +5,9 @@ import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.fml.common.Mod
 
 
-@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = [Dist.DEDICATED_SERVER])
+@Mod.EventBusSubscriber(
+    modid = CounterStrikeGrenades.ID,
+    bus = Mod.EventBusSubscriber.Bus.MOD,
+    value = [Dist.DEDICATED_SERVER]
+)
 object SmokeGrenadeEventHandler

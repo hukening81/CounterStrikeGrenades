@@ -19,6 +19,10 @@ object FovEffectRenderer {
             return
         }
         event.newFovModifier =
-            event.fovModifier + linearInterpolate(0.0, ModConfig.throwConfig.fov_effect_amount.get(), InputState.strength.div(3)).toFloat()
+            event.fovModifier + linearInterpolate(
+                0.0,
+                ModConfig.throwConfig.fov_effect_amount.get(),
+                InputState.strength.div(3)
+            ).toFloat()
     }
 }

@@ -73,7 +73,8 @@ class SmokeSpreadCalculator(val level: ServerLevel, val center: Vec3) {
                         probe.velocity = Vec3.ZERO
                         return
                     }
-                    val massCenter = neighbors.map { it.position }.reduce { acc, vec3 -> acc.add(vec3) }.div(neighbors.size.toDouble())
+                    val massCenter = neighbors.map { it.position }.reduce { acc, vec3 -> acc.add(vec3) }
+                        .div(neighbors.size.toDouble())
 //                    val force = 1.div(probe.distanceToSqr(massCenter))
                     val rawVelocity = probe.position.minus(massCenter)
                     probe.velocity = rawVelocity.normalize()
@@ -175,7 +176,8 @@ class SmokeSpreadCalculator(val level: ServerLevel, val center: Vec3) {
                 val west = blockAtState.getValue(BlockStateProperties.WEST)
 
                 val corner = getGrenadeCornerType(blockAt, center)
-                return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(level)
+                return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner)
+                    .toMutableList().filterAir(level)
             }
 
             is ChainBlock -> {
@@ -241,7 +243,8 @@ class SmokeSpreadCalculator(val level: ServerLevel, val center: Vec3) {
                 val north = blockAtState.getValue(BlockStateProperties.NORTH_WALL) != WallSide.NONE
                 val south = blockAtState.getValue(BlockStateProperties.SOUTH_WALL) != WallSide.NONE
 
-                return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(level)
+                return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner)
+                    .toMutableList().filterAir(level)
             }
 
             is SlabBlock -> {
@@ -284,7 +287,8 @@ class SmokeSpreadCalculator(val level: ServerLevel, val center: Vec3) {
                     val west = blockAtState.getValue(BlockStateProperties.WEST)
 
                     val corner = getGrenadeCornerType(blockAt, center)
-                    return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner).toMutableList().filterAir(level)
+                    return ExtendableBlockState(north, south, west, east).nonBlockingAdjacentForCorner(blockAt, corner)
+                        .toMutableList().filterAir(level)
                 } else {
                     // Unhandled situation, default to emptyList
                     return listOf()

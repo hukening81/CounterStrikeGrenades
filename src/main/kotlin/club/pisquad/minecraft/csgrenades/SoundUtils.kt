@@ -26,5 +26,6 @@ enum class SoundTypes(val initialVolume: Double, val hearableRange: Double) {
 }
 
 object SoundUtils {
-    fun getVolumeFromDistance(distance: Double, soundType: SoundTypes): Double = max(0.0, soundType.initialVolume.times(1 - distance.div(soundType.hearableRange)))
+    fun getVolumeFromDistance(distance: Double, soundType: SoundTypes): Double =
+        max(0.0, soundType.initialVolume.times(1 - distance.div(soundType.hearableRange)))
 }

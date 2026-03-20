@@ -1,6 +1,10 @@
 package club.pisquad.minecraft.csgrenades.entity.core.trajectory
 
-import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.AIR_DRAG_CONSTANT
+import club.pisquad.minecraft.csgrenades.BOUNCE_FRICTION
+import club.pisquad.minecraft.csgrenades.BOUNCE_RESTORATION_RATE
+import club.pisquad.minecraft.csgrenades.GRAVITY_CONSTANT
+import club.pisquad.minecraft.csgrenades.MINIMUM_VELOCITY_AFTER_BOUNCE
 import club.pisquad.minecraft.csgrenades.math.Segment
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction

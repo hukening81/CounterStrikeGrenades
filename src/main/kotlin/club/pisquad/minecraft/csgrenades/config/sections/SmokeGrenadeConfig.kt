@@ -14,7 +14,7 @@ object SmokeGrenadeConfig : ConfigSection {
         grenadeCommonConfig.build(builder)
 
         smokeRadius = builder.defineInRange("smoke_radius", 6.0, 1.0, 20.0)
-        
+
         builder.pop()
 
     }

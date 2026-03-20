@@ -19,7 +19,10 @@ object SmokeGrenadeSmokeRenderer {
         val player = minecraft.player!!
         val level = player.level()
         val renderDistanceMeter = minecraft.options.renderDistance().get().times(16)
-        val activatedSmokes = level.getEntitiesOfClass(SmokeGrenadeEntity::class.java, player.boundingBox.inflate(renderDistanceMeter.toDouble())) {
+        val activatedSmokes = level.getEntitiesOfClass(
+            SmokeGrenadeEntity::class.java,
+            player.boundingBox.inflate(renderDistanceMeter.toDouble())
+        ) {
             it.isActivated()
         }
         activatedSmokes.forEach { smoke ->

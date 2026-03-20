@@ -23,7 +23,10 @@ abstract class ActivateAfterLandingGrenadeEntity(
     var tickSinceLanding: Int = 0
 
     companion object {
-        val isLandedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId<Boolean>(ActivateAfterLandingGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
+        val isLandedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId<Boolean>(
+            ActivateAfterLandingGrenadeEntity::class.java,
+            EntityDataSerializers.BOOLEAN
+        )
     }
 
     override fun defineSynchedData() {

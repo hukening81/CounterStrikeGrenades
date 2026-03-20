@@ -9,7 +9,8 @@ import kotlin.math.roundToInt
 class RoundedDouble(val value: Long) {
     companion object {
         const val DECIMAL: Int = 2
-        fun fromDouble(value: Double): RoundedDouble = RoundedDouble(value.times(10.0.pow(DECIMAL)).roundToInt().toLong())
+        fun fromDouble(value: Double): RoundedDouble =
+            RoundedDouble(value.times(10.0.pow(DECIMAL)).roundToInt().toLong())
     }
 
     fun toDouble(): Double = value.div(10.0.pow(DECIMAL))

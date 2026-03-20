@@ -5,7 +5,12 @@ import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-abstract class FireGrenadeEntity(entityType: EntityType<out FireGrenadeEntity>, level: Level, grenadeType: GrenadeType, fuseTime: Int) :
+abstract class FireGrenadeEntity(
+    entityType: EntityType<out FireGrenadeEntity>,
+    level: Level,
+    grenadeType: GrenadeType,
+    fuseTime: Int
+) :
     ActivateByFuseGrenadeEntity(entityType, level, grenadeType, fuseTime)
 
 //import club.pisquad.minecraft.csgrenades.*

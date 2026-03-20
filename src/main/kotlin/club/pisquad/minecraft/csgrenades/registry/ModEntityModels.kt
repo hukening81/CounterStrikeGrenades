@@ -2,12 +2,7 @@ package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType.DECOY
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType.FLASH_BANG
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType.HE_GRENADE
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType.INCENDIARY
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType.MOLOTOV
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType.SMOKE_GRENADE
+import club.pisquad.minecraft.csgrenades.enums.GrenadeType.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.resources.ResourceLocation

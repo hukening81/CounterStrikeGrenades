@@ -1,9 +1,13 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
-import club.pisquad.minecraft.csgrenades.*
+import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.linearInterpolate
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
+import club.pisquad.minecraft.csgrenades.toMetersPerTick
+import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.event.TickEvent
