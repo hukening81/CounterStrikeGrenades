@@ -21,6 +21,7 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceKey
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageType
@@ -134,7 +135,8 @@ abstract class CounterStrikeGrenadeEntity(
             // EMPTY
         } else {
             ModPacketHandler.sendMessageToPlayer(
-                this.level().dimension(),
+                this.level() as ServerLevel,
+                this.center,
                 ServerGrenadeBlockBounceSoundMessage(this.grenadeType, this.id, data)
             )
         }

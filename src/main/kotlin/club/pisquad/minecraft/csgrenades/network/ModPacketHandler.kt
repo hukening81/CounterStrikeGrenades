@@ -4,6 +4,7 @@ package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
+import club.pisquad.minecraft.csgrenades.SERVER_MESSAGE_RANGE
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
@@ -15,9 +16,9 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.serializer
 import net.minecraft.network.FriendlyByteBuf
-import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.level.Level
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.network.NetworkEvent
 import net.minecraftforge.network.NetworkRegistry
@@ -103,7 +104,11 @@ object ModPacketHandler {
         INSTANCE.registerMessage(messageTypeCount, message, encoder, decoder, consumer, direction)
     }
 
-    fun sendMessageToPlayer(dimension: ResourceKey<Level>, message: Any) {
-        INSTANCE.send(PacketDistributor.DIMENSION.with { dimension }, message)
+    fun sendMessageToPlayer(level: ServerLevel, position: Vec3, message: Any) {
+        level.players().forEach {
+            if (it.position().distanceTo(position) < SERVER_MESSAGE_RANGE) {
+                INSTANCE.send(PacketDistributor.PLAYER.with { it }, message)
+            }
+        }
     }
 }

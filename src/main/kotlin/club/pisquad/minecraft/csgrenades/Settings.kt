@@ -3,6 +3,9 @@ package club.pisquad.minecraft.csgrenades
 const val GRENADE_ENTITY_SIZE = 0.25
 const val GRENADE_ENTITY_SIZE_HALF = GRENADE_ENTITY_SIZE.div(2)
 
+const val SERVER_MESSAGE_RANGE: Int = 100
+
+
 // Incendiary
 const val INCENDIARY_PARTICLE_DENSITY = 1
 const val INCENDIARY_PARTICLE_LIFETIME = 1200

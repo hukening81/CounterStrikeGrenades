@@ -10,6 +10,7 @@ import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadeActi
 import club.pisquad.minecraft.csgrenades.registry.damage.ModDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.sounds.HEGrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -35,7 +36,11 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
         if (this.level().isClientSide) {
             // EMPTY
         } else {
-            ModPacketHandler.sendMessageToPlayer(this.level().dimension(), HEGrenadeActivatedMessage(this.center))
+            ModPacketHandler.sendMessageToPlayer(
+                this.level() as ServerLevel,
+                this.center,
+                HEGrenadeActivatedMessage(this.center)
+            )
 //            this.doDamage()
             this.discard()
         }
