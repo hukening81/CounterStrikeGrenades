@@ -6,6 +6,6 @@ import club.pisquad.minecraft.csgrenades.item.core.GrenadeItemSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 
 class HEGrenadeItem(properties: Properties) : CounterStrikeGrenadeItem(properties) {
-    override val sounds: GrenadeItemSoundEvents = GrenadeItemSoundEvents(ModSoundEvents.hegrenade.draw.get())
+    override val sounds: GrenadeItemSoundEvents = GrenadeItemSoundEvents(ModSoundEvents.hegrenade.draw)
     override val grenadeType: GrenadeType = GrenadeType.HE_GRENADE
 }

@@ -1,13 +1,13 @@
 package club.pisquad.minecraft.csgrenades.registry.sounds
 
 object FlashbangSoundEvents {
-    val draw = ModSoundEvents.registerSoundEvent("flashbang.draw")
-    val explode = ModSoundEvents.registerSoundEvent("flashbang.explode")
-    val explodeDistant = ModSoundEvents.registerSoundEvent("flashbang.explode_distant")
-    val ring = ModSoundEvents.registerSoundEvent("flashbang.ring")
-    val ringLoop = ModSoundEvents.registerSoundEvent("flashbang.ring_loop")
-    val bounce = ModSoundEvents.registerSoundEvent("flashbang.bounce")
-    val throwSound = ModSoundEvents.registerSoundEvent("flashbang.throw")
-    val pinpull = ModSoundEvents.registerSoundEvent("flashbang.pinpull")
-    val pinpullStart = ModSoundEvents.registerSoundEvent("flashbang.pinpull_start")
+    val draw = GrenadeSoundData.createDraw("flashbang.draw")
+    val explode = GrenadeSoundData.create("flashbang.explode")
+    val explodeDistant = GrenadeSoundData.create("flashbang.explode_distant")
+    val ring = GrenadeSoundData.create("flashbang.ring")
+    val ringLoop = GrenadeSoundData.create("flashbang.ring_loop")
+    val hitBlock = GrenadeSoundData.createHitBlock("flashbang.hit_block")
+    val throwSound = GrenadeSoundData.createThrow("flashbang.throw")
+    val pinpull = GrenadeSoundData.create("flashbang.pinpull")
+    val pinpullStart = GrenadeSoundData.create("flashbang.pinpull_start")
 }

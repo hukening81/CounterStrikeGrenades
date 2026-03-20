@@ -1,13 +1,13 @@
 package club.pisquad.minecraft.csgrenades.registry.sounds
 
 object SmokeGrenadeSoundEvents {
-    val can = ModSoundEvents.registerSoundEvent("smokegrenade.can")
-    val draw = ModSoundEvents.registerSoundEvent("smokegrenade.draw")
-    val bounce = ModSoundEvents.registerSoundEvent("smokegrenade.hit")
-    val throwSound = ModSoundEvents.registerSoundEvent("smokegrenade.throw")
-    val pinpull = ModSoundEvents.registerSoundEvent("smokegrenade.pinpull")
-    val pinpullStart = ModSoundEvents.registerSoundEvent("smokegrenade.pinpull_start")
-    val explodeDistant = ModSoundEvents.registerSoundEvent("smokegrenade.explode_distant")
-    val clear = ModSoundEvents.registerSoundEvent("smokegrenade.clear")
-    val emit = ModSoundEvents.registerSoundEvent("smokegrenade.emit")
+    val can = GrenadeSoundData.create("smokegrenade.can")
+    val draw = GrenadeSoundData.createDraw("smokegrenade.draw")
+    val hitBlock = GrenadeSoundData.createHitBlock("smokegrenade.hit")
+    val throwSound = GrenadeSoundData.createThrow("smokegrenade.throw")
+    val pinpull = GrenadeSoundData.create("smokegrenade.pinpull")
+    val pinpullStart = GrenadeSoundData.create("smokegrenade.pinpull_start")
+    val explodeDistant = GrenadeSoundData.create("smokegrenade.explode_distant")
+    val clear = GrenadeSoundData.create("smokegrenade.clear")
+    val emit = GrenadeSoundData.create("smokegrenade.emit")
 }

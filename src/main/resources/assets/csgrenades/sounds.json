@@ -84,7 +84,7 @@
       }
     ]
   },
-  "flashbang.bounce": {
+  "flashbang.hit_block": {
     "category": "player",
     "sounds": [
       "csgrenades:flashbang/bounce"
@@ -148,7 +148,7 @@
       "csgrenades:hegrenade/grenade_throw"
     ]
   },
-  "hegrenade.bounce": {
+  "hegrenade.hit_block": {
     "category": "player",
     "sounds": [
       "csgrenades:hegrenade/he_bounce-1"
@@ -166,7 +166,7 @@
       "csgrenades:hegrenade/pinpull_start"
     ]
   },
-  "incendiary.bounce": {
+  "incendiary.hit_block": {
     "category": "player",
     "sounds": [
       "csgrenades:incendiary/bounce"

@@ -22,8 +22,8 @@ class DecoyGrenadeEntity(
     ModConfig.decoy.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
 ) {
     override val sounds = GrenadeEntitySoundEvents(
-        DecoySoundEvents.throwSound.get(),
-        FlashbangSoundEvents.bounce.get(),
+        DecoySoundEvents.throwSound,
+        FlashbangSoundEvents.hitBlock,
     )
     override val damageTypes = GrenadeEntityDamageTypes(
         ModDamageTypes.decoy.hit,

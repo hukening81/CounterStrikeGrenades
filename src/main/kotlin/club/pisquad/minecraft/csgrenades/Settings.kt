@@ -20,5 +20,10 @@ const val GRAVITY_CONSTANT = 0.05
 const val POSITION_ERROR_TOLERANCE: Double = 1.0
 const val SERVER_TRAJECTORY_NODE_CACHE_MAX_SIZE: Int = 40
 
-// Sound Volume
-const val BLOCK_BOUNCE_SOUND_VOLUME: Float = 0.03f
+// Common sound volumes
+object CommonSoundVolumes {
+    const val HIT_BLOCK: Double = 0.03
+    const val THROW: Double = 1.0
+    const val DRAW: Double = 1.0
+}
+

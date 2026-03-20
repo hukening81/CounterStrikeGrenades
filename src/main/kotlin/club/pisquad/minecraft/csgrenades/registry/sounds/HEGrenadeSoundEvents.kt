@@ -1,14 +1,11 @@
 package club.pisquad.minecraft.csgrenades.registry.sounds
 
 object HEGrenadeSoundEvents {
-    val detonate = ModSoundEvents.registerSoundEvent("hegrenade.detonate")
-    val detonateDistant = ModSoundEvents.registerSoundEvent("hegrenade.detonate_distant")
-    val draw = ModSoundEvents.registerSoundEvent("hegrenade.draw")
-    val explode = ModSoundEvents.registerSoundEvent("hegrenade.explode")
-    val explodeDistant = ModSoundEvents.registerSoundEvent("hegrenade.explode_distant")
-    val throwSound = ModSoundEvents.registerSoundEvent("hegrenade.throw")
-    val bounce = ModSoundEvents.registerSoundEvent("hegrenade.bounce")
-    val hitBlock = ModSoundEvents.registerSoundEvent("hegrenade.hit_block")
-    val pinpull = ModSoundEvents.registerSoundEvent("hegrenade.pinpull")
-    val pinpullStart = ModSoundEvents.registerSoundEvent("hegrenade.pinpull_start")
+    val draw = GrenadeSoundData.createDraw("hegrenade.draw")
+    val explode = GrenadeSoundData.create("hegrenade.explode")
+    val explodeDistant = GrenadeSoundData.create("hegrenade.explode_distant")
+    val throwSound = GrenadeSoundData.createThrow("hegrenade.throw")
+    val hitBlock = GrenadeSoundData.createHitBlock("hegrenade.hit_block")
+    val pinpull = GrenadeSoundData.create("hegrenade.pinpull")
+    val pinpullStart = GrenadeSoundData.create("hegrenade.pinpull_start")
 }

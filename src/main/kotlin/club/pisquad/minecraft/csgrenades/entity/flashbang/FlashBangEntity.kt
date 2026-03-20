@@ -22,8 +22,8 @@ class FlashBangEntity(pEntityType: EntityType<out FlashBangEntity>, pLevel: Leve
     ModConfig.flashbang.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
 ) {
     override val sounds = GrenadeEntitySoundEvents(
-        FlashbangSoundEvents.throwSound.get(),
-        FlashbangSoundEvents.bounce.get(),
+        FlashbangSoundEvents.throwSound,
+        FlashbangSoundEvents.hitBlock,
     )
     override val damageTypes: GrenadeEntityDamageTypes = GrenadeEntityDamageTypes(
         ModDamageTypes.flashbang.hit,

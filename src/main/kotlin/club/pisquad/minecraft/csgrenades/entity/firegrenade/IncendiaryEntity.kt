@@ -16,8 +16,8 @@ class IncendiaryEntity(pEntityType: EntityType<out IncendiaryEntity>, pLevel: Le
     ModConfig.incendiary.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
 ) {
     override val sounds = GrenadeEntitySoundEvents(
-        IncendiarySoundEvents.throwSound.get(),
-        ModSoundEvents.incendiary.bounce.get(),
+        IncendiarySoundEvents.throwSound,
+        ModSoundEvents.incendiary.hitBlock,
     )
     override val damageTypes = GrenadeEntityDamageTypes(
         ModDamageTypes.incendiary.hit,

@@ -22,8 +22,8 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
         ModConfig.hegrenade.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
     ) {
     override val sounds = GrenadeEntitySoundEvents(
-        HEGrenadeSoundEvents.throwSound.get(),
-        HEGrenadeSoundEvents.bounce.get(),
+        HEGrenadeSoundEvents.throwSound,
+        HEGrenadeSoundEvents.hitBlock,
     )
     override val damageTypes = GrenadeEntityDamageTypes(
         ModDamageTypes.hegrenade.hit,

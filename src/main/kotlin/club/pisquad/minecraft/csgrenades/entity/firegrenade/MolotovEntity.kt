@@ -14,8 +14,8 @@ class MolotovEntity(pEntityType: EntityType<out MolotovEntity>, pLevel: Level) :
     pEntityType, pLevel, GrenadeType.MOLOTOV, ModConfig.molotov.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
 ) {
     override val sounds = GrenadeEntitySoundEvents(
-        ModSoundEvents.molotov.throwSound.get(),
-        ModSoundEvents.molotov.bounce.get(),
+        ModSoundEvents.molotov.throwSound,
+        ModSoundEvents.molotov.hitBlock,
     )
     override val damageTypes: GrenadeEntityDamageTypes = GrenadeEntityDamageTypes(
         ModDamageTypes.molotov.hit,

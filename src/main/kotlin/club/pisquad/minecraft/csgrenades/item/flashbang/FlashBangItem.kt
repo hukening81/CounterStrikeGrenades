@@ -6,7 +6,7 @@ import club.pisquad.minecraft.csgrenades.item.core.GrenadeItemSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
 
 class FlashBangItem(properties: Properties) : CounterStrikeGrenadeItem(properties) {
-    override val sounds: GrenadeItemSoundEvents = GrenadeItemSoundEvents(ModSoundEvents.flashbang.draw.get())
+    override val sounds: GrenadeItemSoundEvents = GrenadeItemSoundEvents(ModSoundEvents.flashbang.draw)
     override val grenadeType: GrenadeType = GrenadeType.FLASH_BANG
 
 }

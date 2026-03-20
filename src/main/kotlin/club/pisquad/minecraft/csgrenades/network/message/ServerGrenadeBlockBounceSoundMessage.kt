@@ -1,15 +1,14 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
-import club.pisquad.minecraft.csgrenades.BLOCK_BOUNCE_SOUND_VOLUME
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
+import club.pisquad.minecraft.csgrenades.registry.sounds.GrenadeSoundData
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
-import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraftforge.network.NetworkEvent
 import java.util.function.Supplier
@@ -42,9 +41,9 @@ class ServerGrenadeBlockBounceSoundMessage(
                         position.x,
                         position.y,
                         position.z,
-                        soundEvent,
+                        soundEvent.sound.get(),
                         SoundSource.PLAYERS,
-                        BLOCK_BOUNCE_SOUND_VOLUME,
+                        soundEvent.volume,
                         1.0f,
                         false
                     )
@@ -52,7 +51,7 @@ class ServerGrenadeBlockBounceSoundMessage(
             }
         }
 
-        private fun getBounceSoundEvent(id: Int): SoundEvent? {
+        private fun getBounceSoundEvent(id: Int): GrenadeSoundData? {
             val level: ClientLevel = Minecraft.getInstance().level ?: return null
             val entity: CounterStrikeGrenadeEntity = (level.getEntity(id) as CounterStrikeGrenadeEntity?) ?: return null
             return entity.sounds.hitBlock

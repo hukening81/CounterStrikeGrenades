@@ -15,7 +15,7 @@ class FlashbangRingSound(
     val targetVolume: Float,
     private val startTime: Instant = Instant.now(),
 ) : AbstractTickableSoundInstance(
-    ModSoundEvents.flashbang.ring.get(),
+    ModSoundEvents.flashbang.ring.sound.get(),
     SoundSource.MASTER,
     RandomSource.createNewThreadLocalInstance(),
 ) {

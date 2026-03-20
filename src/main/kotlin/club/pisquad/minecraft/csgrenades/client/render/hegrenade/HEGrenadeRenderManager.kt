@@ -56,7 +56,7 @@ class HEGrenadeRenderer(
         val distance = player.position().distanceTo(data.position)
 
         val soundEvent =
-            if (distance > 15) ModSoundEvents.hegrenade.explodeDistant.get() else ModSoundEvents.hegrenade.explode.get()
+            if (distance > 15) ModSoundEvents.hegrenade.explodeDistant.sound else ModSoundEvents.hegrenade.explode.sound
         val volume: Float =
             if (distance > 15) 3.0f else 0.5f
 
@@ -65,7 +65,7 @@ class HEGrenadeRenderer(
             data.position.x,
             data.position.y,
             data.position.z,
-            soundEvent,
+            soundEvent.get(),
             SoundSource.PLAYERS,
             volume,
             1.0f,
