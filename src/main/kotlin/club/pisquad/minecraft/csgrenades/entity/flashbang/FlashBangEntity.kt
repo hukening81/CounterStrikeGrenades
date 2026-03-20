@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.flashbang
 
 import club.pisquad.minecraft.csgrenades.ModLogger
+import club.pisquad.minecraft.csgrenades.client.sound.flashbang.FlashbangSoundEvents
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.core.ActivateByFuseGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntityDamageTypes
@@ -10,7 +11,6 @@ import club.pisquad.minecraft.csgrenades.getPlayersWithinMessageRange
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.flashbang.FlashbangActivatedMessage
 import club.pisquad.minecraft.csgrenades.registry.damage.ModDamageTypes
-import club.pisquad.minecraft.csgrenades.registry.sounds.FlashbangSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType

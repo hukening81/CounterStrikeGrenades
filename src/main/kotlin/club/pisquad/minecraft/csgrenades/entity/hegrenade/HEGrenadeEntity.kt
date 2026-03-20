@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.hegrenade
 
+import club.pisquad.minecraft.csgrenades.client.sound.hegrenade.HEGrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.core.ActivateByFuseGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntityDamageTypes
@@ -8,7 +9,6 @@ import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadeActivatedMessage
 import club.pisquad.minecraft.csgrenades.registry.damage.ModDamageTypes
-import club.pisquad.minecraft.csgrenades.registry.sounds.HEGrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType

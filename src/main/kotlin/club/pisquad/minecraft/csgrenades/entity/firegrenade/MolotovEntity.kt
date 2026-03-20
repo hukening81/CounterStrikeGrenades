@@ -5,7 +5,7 @@ import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntitySoundEvents
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.damage.ModDamageTypes
-import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.client.sound.ModSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level

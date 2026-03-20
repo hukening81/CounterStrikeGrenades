@@ -5,7 +5,7 @@ import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.core.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
-import club.pisquad.minecraft.csgrenades.registry.sounds.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.client.sound.GrenadeSoundData
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
@@ -41,9 +41,9 @@ class ServerGrenadeBlockBounceSoundMessage(
                         position.x,
                         position.y,
                         position.z,
-                        soundEvent.sound.get(),
+                        soundEvent.getSoundEvent(),
                         SoundSource.PLAYERS,
-                        soundEvent.volume,
+                        soundEvent.getVolume(),
                         1.0f,
                         false
                     )

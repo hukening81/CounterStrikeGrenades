@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.registry.sounds
+package club.pisquad.minecraft.csgrenades.client.sound
 
 object CommonSoundEvents {
     val burnDamage = GrenadeSoundData.create("common.burn_damage")

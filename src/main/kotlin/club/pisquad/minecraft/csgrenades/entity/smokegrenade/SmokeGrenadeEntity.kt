@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.entity.smokegrenade
 
+import club.pisquad.minecraft.csgrenades.client.sound.smokegrenade.SmokeGrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.entity.core.ActivateAfterLandingGrenadeEntity
 import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntityDamageTypes
@@ -7,7 +8,6 @@ import club.pisquad.minecraft.csgrenades.entity.core.GrenadeEntitySoundEvents
 import club.pisquad.minecraft.csgrenades.enums.GrenadeType
 import club.pisquad.minecraft.csgrenades.registry.ModSerializers
 import club.pisquad.minecraft.csgrenades.registry.damage.ModDamageTypes
-import club.pisquad.minecraft.csgrenades.registry.sounds.SmokeGrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData

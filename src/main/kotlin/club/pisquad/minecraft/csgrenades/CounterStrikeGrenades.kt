@@ -6,7 +6,7 @@ import club.pisquad.minecraft.csgrenades.registry.ModCreativeTabs
 import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModParticles
-import club.pisquad.minecraft.csgrenades.registry.sounds.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.client.sound.ModSoundEvents
 import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod

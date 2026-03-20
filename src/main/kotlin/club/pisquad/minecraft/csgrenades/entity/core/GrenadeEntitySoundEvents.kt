@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.entity.core
 
-import club.pisquad.minecraft.csgrenades.registry.sounds.CommonSoundEvents
-import club.pisquad.minecraft.csgrenades.registry.sounds.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.client.sound.CommonSoundEvents
+import club.pisquad.minecraft.csgrenades.client.sound.GrenadeSoundData
 
 class GrenadeEntitySoundEvents(
     val throwSoundEvent: GrenadeSoundData,
