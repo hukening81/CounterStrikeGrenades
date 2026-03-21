@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.client.render.hegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.getRandomLocationFromSphere
-import club.pisquad.minecraft.csgrenades.client.sound.ModSoundEvents
+import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeRegistries
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.core.particles.ParticleTypes
@@ -56,7 +56,7 @@ class HEGrenadeRenderer(
         val distance = player.position().distanceTo(data.position)
 
         val soundEvent =
-            if (distance > 15) ModSoundEvents.hegrenade.explodeDistant.getSoundEvent() else ModSoundEvents.hegrenade.explode.getSoundEvent()
+            if (distance > 15) HEGrenadeRegistries.sounds.explodeDistant.getSoundEvent() else HEGrenadeRegistries.sounds.explode.getSoundEvent()
         val volume: Float =
             if (distance > 15) 3.0f else 0.5f
 

@@ -1,7 +1,9 @@
 package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
+import club.pisquad.minecraft.csgrenades.getItem
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.CreativeModeTab
@@ -15,15 +17,16 @@ object ModCreativeTabs {
 
     val CSGRENADES_TAB: RegistryObject<CreativeModeTab> = CREATIVE_MODE_TABS.register("csgrenades_tab") {
         CreativeModeTab.builder()
-            .icon { ModItems.HEGRENADE_ITEM.get().defaultInstance }
+            .icon { GrenadeType.HE_GRENADE.getItem().defaultInstance }
             .title(Component.translatable("itemGroup.csgrenades"))
             .displayItems { _, output ->
-                output.accept(ModItems.HEGRENADE_ITEM.get())
-                output.accept(ModItems.SMOKE_GRENADE_ITEM.get())
-                output.accept(ModItems.FLASH_BANG_ITEM.get())
-                output.accept(ModItems.DECOY_GRENADE_ITEM.get())
-                output.accept(ModItems.MOLOTOV_ITEM.get())
-                output.accept(ModItems.INCENDIARY_ITEM.get())
+                GrenadeType.entries.forEach { output.accept(it.getItem()) }
+//                output.accept(ModItems.HEGRENADE_ITEM.get())
+//                output.accept(ModItems.SMOKE_GRENADE_ITEM.get())
+//                output.accept(ModItems.FLASH_BANG_ITEM.get())
+//                output.accept(ModItems.DECOY_GRENADE_ITEM.get())
+//                output.accept(ModItems.MOLOTOV_ITEM.get())
+//                output.accept(ModItems.INCENDIARY_ITEM.get())
             }
             .build()
     }

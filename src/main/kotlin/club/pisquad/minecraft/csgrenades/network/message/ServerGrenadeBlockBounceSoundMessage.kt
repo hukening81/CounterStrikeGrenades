@@ -1,9 +1,9 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.core.trajectory.SubtickNode
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.trajectory.SubtickNode
+import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.client.sound.GrenadeSoundData
 import kotlinx.serialization.Serializable

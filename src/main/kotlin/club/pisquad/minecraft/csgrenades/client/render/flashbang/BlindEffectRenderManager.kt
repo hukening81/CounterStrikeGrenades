@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.client.render.flashbang
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.entity.flashbang.FlashbangBlindEffectData
+import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangBlindEffectData
 import club.pisquad.minecraft.csgrenades.nanoSecondToSecond
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferUploader
@@ -46,7 +46,7 @@ object BlindEffectRenderManager {
         if (player.isSpectator) {
             return
         }
-        
+
         renderOverlayWithOpacity(getOpacity(timeDelta), event.poseStack)
 
     }

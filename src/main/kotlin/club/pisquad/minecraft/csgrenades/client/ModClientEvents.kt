@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.registry.ModItems
+import club.pisquad.minecraft.csgrenades.GrenadeType
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.event.ModelEvent
@@ -15,18 +15,10 @@ object ModClientEvents {
     @JvmStatic
     @SubscribeEvent
     fun onModelsRegistered(event: ModelEvent.RegisterAdditional) {
-        val grenadeItems = listOf(
-            ModItems.HEGRENADE_ITEM,
-            ModItems.FLASH_BANG_ITEM,
-            ModItems.SMOKE_GRENADE_ITEM,
-            ModItems.INCENDIARY_ITEM,
-            ModItems.MOLOTOV_ITEM,
-            ModItems.DECOY_GRENADE_ITEM,
-        )
+        val keys = GrenadeType.entries.map { it.resourceKey }
 
-        grenadeItems.forEach { item ->
-            val itemName = item.id.path
-            val thrownModelLocation = ResourceLocation(CounterStrikeGrenades.ID, "item/${itemName}_t")
+        keys.forEach { key ->
+            val thrownModelLocation = ResourceLocation(CounterStrikeGrenades.ID, "item/${key}_t")
             event.register(thrownModelLocation)
         }
     }

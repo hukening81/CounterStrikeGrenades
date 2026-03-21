@@ -5,13 +5,13 @@ package club.pisquad.minecraft.csgrenades.network
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.SERVER_MESSAGE_RANGE
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangPacketHandler
+import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadePacketHandler
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
-import club.pisquad.minecraft.csgrenades.network.message.firegrenade.FireGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.flashbang.FlashbangPacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.hegrenade.HEGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.smokegrenade.SmokeGrenadePacketHandler
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.cbor.Cbor

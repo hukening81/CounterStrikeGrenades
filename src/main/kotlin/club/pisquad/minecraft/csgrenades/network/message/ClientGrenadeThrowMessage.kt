@@ -1,11 +1,11 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
+import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.client.input.InputState.calculateGrenadeSpeed
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.enums.toModEntity
+import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
+import club.pisquad.minecraft.csgrenades.getEntity
 import club.pisquad.minecraft.csgrenades.getShootOrigin
-import club.pisquad.minecraft.csgrenades.item.core.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
@@ -52,7 +52,7 @@ data class ClientGrenadeThrowMessage(
         }
 
         private fun spawnGrenadeEntity(level: Level, msg: ClientGrenadeThrowMessage) {
-            val entityType = msg.grenadeType.toModEntity()
+            val entityType = msg.grenadeType.getEntity()
             val entity = entityType.create(level) ?: return
             entity.initialize(msg.ownerUuid, msg.position, msg.velocity)
             ModLogger.info("Spawning ${msg.grenadeType} entity at ${msg.position} with velocity ${msg.velocity.length()} blocks per tick")

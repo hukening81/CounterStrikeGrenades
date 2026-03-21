@@ -1,9 +1,9 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
-import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
+import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.getItem
 import club.pisquad.minecraft.csgrenades.registry.ModEntityModels
-import club.pisquad.minecraft.csgrenades.registry.ModItems
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.EntityRenderer
@@ -183,13 +183,6 @@ class GrenadeEntityRenderer<T>(
     }
 
     private fun getItemStack(grenadeType: GrenadeType): ItemStack {
-        return when (grenadeType) {
-            GrenadeType.FLASH_BANG -> ItemStack(ModItems.FLASH_BANG_ITEM.get())
-            GrenadeType.SMOKE_GRENADE -> ItemStack(ModItems.SMOKE_GRENADE_ITEM.get())
-            GrenadeType.HE_GRENADE -> ItemStack(ModItems.HEGRENADE_ITEM.get())
-            GrenadeType.INCENDIARY -> ItemStack(ModItems.INCENDIARY_ITEM.get())
-            GrenadeType.MOLOTOV -> ItemStack(ModItems.MOLOTOV_ITEM.get())
-            GrenadeType.DECOY -> ItemStack(ModItems.DECOY_GRENADE_ITEM.get())
-        }
+        return ItemStack(grenadeType.getItem())
     }
 }

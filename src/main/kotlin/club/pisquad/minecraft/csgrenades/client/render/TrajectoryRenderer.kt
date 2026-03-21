@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.entity.core.trajectory.Trajectory
+import club.pisquad.minecraft.csgrenades.core.entity.trajectory.Trajectory
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.event.TickEvent

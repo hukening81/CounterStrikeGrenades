@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType
-import club.pisquad.minecraft.csgrenades.enums.GrenadeType.*
+import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.GrenadeType.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.resources.ResourceLocation

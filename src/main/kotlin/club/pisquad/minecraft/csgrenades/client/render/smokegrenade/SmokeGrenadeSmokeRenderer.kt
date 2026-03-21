@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.render.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraftforge.api.distmarker.Dist

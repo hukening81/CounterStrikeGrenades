@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.sound
 
 import club.pisquad.minecraft.csgrenades.CommonSoundVolumes
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.sounds.SoundEvent
 import net.minecraftforge.registries.RegistryObject
 

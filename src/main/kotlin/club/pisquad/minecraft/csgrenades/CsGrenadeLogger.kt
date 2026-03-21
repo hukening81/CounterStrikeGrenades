@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades
 
-import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 

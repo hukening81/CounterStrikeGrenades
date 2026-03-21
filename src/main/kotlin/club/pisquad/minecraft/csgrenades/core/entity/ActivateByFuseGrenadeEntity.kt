@@ -1,0 +1,25 @@
+package club.pisquad.minecraft.csgrenades.core.entity
+
+import club.pisquad.minecraft.csgrenades.GrenadeType
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.level.Level
+
+/**
+ * Abstract class for HE Grenade and Fire Grenade
+ * These grenades activate after certain amount of time
+ * @param fuseTime Grenade will activate after this amount of delay (in tick)
+ * */
+abstract class ActivateByFuseGrenadeEntity(
+    pEntityType: EntityType<out ActivateByFuseGrenadeEntity>,
+    pLevel: Level,
+    grenadeType: GrenadeType,
+    val fuseTime: Int,
+) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
+
+    override fun tick() {
+        super.tick()
+        if (!this.entityData.get(isActivatedAccessor) && this.tickCount > fuseTime) {
+            this.activate()
+        }
+    }
+}

@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
-import club.pisquad.minecraft.csgrenades.entity.core.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.entity.core.trajectory.TickNode
+import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.trajectory.TickNode
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft

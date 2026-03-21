@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.entity.firegrenade.BlockPosListEntityDataSerializer
-import club.pisquad.minecraft.csgrenades.entity.smokegrenade.SmokeDataPointSetEntityDataSerializer
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.BlockPosListEntityDataSerializer
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils.SmokeDataPointSetEntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
