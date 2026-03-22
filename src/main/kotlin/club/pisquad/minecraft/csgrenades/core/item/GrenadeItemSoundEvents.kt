@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.core.item
 
-import club.pisquad.minecraft.csgrenades.client.sound.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
 
 
-data class GrenadeItemSoundEvents(val draw: GrenadeSoundData)
+data class GrenadeItemSoundEvents(val draw: SimpleGrenadeSound)

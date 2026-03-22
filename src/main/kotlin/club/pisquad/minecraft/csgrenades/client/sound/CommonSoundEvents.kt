@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.sound
 
 object CommonSoundEvents {
-    val burnDamage = GrenadeSoundData.create("common.burn_damage")
-    val hitEntity = GrenadeSoundData.create("common.hit_entity")
-    val throwSound = GrenadeSoundData.createThrow("common.throw")
+    val burnDamage = SimpleGrenadeSound.create("common.burn_damage")
+    val hitEntity = SimpleGrenadeSound.create("common.hit_entity")
+    val throwSound = SimpleGrenadeSound.createThrow("common.throw")
 }

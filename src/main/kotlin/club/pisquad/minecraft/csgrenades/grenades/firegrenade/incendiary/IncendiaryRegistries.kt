@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.client.sound.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
@@ -25,13 +25,13 @@ object IncendiaryDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object IncendiarySoundEvents : GrenadeSoundEvents {
-    override val hitBlock = GrenadeSoundData.Companion.createHitBlock("incendiary.hit_block")
-    val detonate = GrenadeSoundData.Companion.create("incendiary.detonate")
-    val detonateDistant = GrenadeSoundData.Companion.create("incendiary.detonate_distant")
-    val detonateAir = GrenadeSoundData.Companion.create("incendiary.detonate_air")
-    override val draw = GrenadeSoundData.Companion.createDraw("incendiary.draw")
-    val pinpull = GrenadeSoundData.Companion.create("incendiary.pinpull")
-    val pinpullStart = GrenadeSoundData.Companion.create("incendiary.pinpull_start")
-    val pop = GrenadeSoundData.Companion.create("incendiary.pop")
-    override val `throw` = GrenadeSoundData.Companion.createThrow("incendiary.throw")
+    override val hitBlock = SimpleGrenadeSound.Companion.createHitBlock("incendiary.hit_block")
+    val detonate = SimpleGrenadeSound.Companion.create("incendiary.detonate")
+    val detonateDistant = SimpleGrenadeSound.Companion.create("incendiary.detonate_distant")
+    val detonateAir = SimpleGrenadeSound.Companion.create("incendiary.detonate_air")
+    override val draw = SimpleGrenadeSound.Companion.createDraw("incendiary.draw")
+    val pinpull = SimpleGrenadeSound.Companion.create("incendiary.pinpull")
+    val pinpullStart = SimpleGrenadeSound.Companion.create("incendiary.pinpull_start")
+    val pop = SimpleGrenadeSound.Companion.create("incendiary.pop")
+    override val `throw` = SimpleGrenadeSound.Companion.createThrow("incendiary.throw")
 }

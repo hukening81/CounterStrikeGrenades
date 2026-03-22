@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.decoy
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.client.sound.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangRegistries
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
@@ -27,9 +27,9 @@ object DecoyDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object DecoySoundEvents : GrenadeSoundEvents {
-    override val draw = GrenadeSoundData.Companion.createDraw("decoy.draw")
-    override val `throw` = GrenadeSoundData.Companion.createThrow("decoy.throw")
+    override val draw = SimpleGrenadeSound.Companion.createDraw("decoy.draw")
+    override val `throw` = SimpleGrenadeSound.Companion.createThrow("decoy.throw")
     override val hitBlock = FlashbangRegistries.sounds.hitBlock
-    val pinpull = GrenadeSoundData.Companion.create("decoy.pinpull")
-    val pinpullStart = GrenadeSoundData.Companion.create("decoy.pinpull_start")
+    val pinpull = SimpleGrenadeSound.Companion.create("decoy.pinpull")
+    val pinpullStart = SimpleGrenadeSound.Companion.create("decoy.pinpull_start")
 }

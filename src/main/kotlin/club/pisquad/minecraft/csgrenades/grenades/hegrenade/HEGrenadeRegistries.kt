@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.client.sound.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
@@ -26,11 +26,11 @@ object HEGrenadeDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object HEGrenadeSoundEvents : GrenadeSoundEvents {
-    override val draw = GrenadeSoundData.Companion.createDraw("hegrenade.draw")
-    override val hitBlock = GrenadeSoundData.Companion.createHitBlock("hegrenade.hit_block")
-    val explode = GrenadeSoundData.Companion.create("hegrenade.explode")
-    val explodeDistant = GrenadeSoundData.Companion.create("hegrenade.explode_distant")
-    override val `throw` = GrenadeSoundData.Companion.createThrow("hegrenade.throw")
-    val pinpull = GrenadeSoundData.Companion.create("hegrenade.pinpull")
-    val pinpullStart = GrenadeSoundData.Companion.create("hegrenade.pinpull_start")
+    override val draw = SimpleGrenadeSound.Companion.createDraw("hegrenade.draw")
+    override val hitBlock = SimpleGrenadeSound.Companion.createHitBlock("hegrenade.hit_block")
+    val explode = SimpleGrenadeSound.Companion.create("hegrenade.explode")
+    val explodeDistant = SimpleGrenadeSound.Companion.create("hegrenade.explode_distant")
+    override val `throw` = SimpleGrenadeSound.Companion.createThrow("hegrenade.throw")
+    val pinpull = SimpleGrenadeSound.Companion.create("hegrenade.pinpull")
+    val pinpullStart = SimpleGrenadeSound.Companion.create("hegrenade.pinpull_start")
 }
