@@ -2,11 +2,10 @@ package club.pisquad.minecraft.csgrenades.client.render.hegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.getRandomLocationFromSphere
-import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeRegistries
+import club.pisquad.minecraft.csgrenades.grenades.hegrenade.client.HEGrenadeSoundManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.event.TickEvent
@@ -52,25 +51,7 @@ class HEGrenadeRenderer(
     private var soundInstance: SoundInstance? = null
 
     init {
-        val player = Minecraft.getInstance().player!!
-        val distance = player.position().distanceTo(data.position)
-
-        val soundEvent =
-            if (distance > 15) HEGrenadeRegistries.sounds.explodeDistant.getSoundEvent() else HEGrenadeRegistries.sounds.explode.getSoundEvent()
-        val volume: Float =
-            if (distance > 15) 3.0f else 0.5f
-
-
-        player.level().playLocalSound(
-            data.position.x,
-            data.position.y,
-            data.position.z,
-            soundEvent,
-            SoundSource.PLAYERS,
-            volume,
-            1.0f,
-            false
-        )
+        HEGrenadeSoundManager.playExplosionSound(data.position)
 
         val particleEngine = Minecraft.getInstance().particleEngine
 

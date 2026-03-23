@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.registry
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
+import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraftforge.eventbus.api.IEventBus
@@ -11,9 +11,9 @@ import net.minecraftforge.registries.ForgeRegistries
 import net.minecraftforge.registries.RegistryObject
 
 interface GrenadeSoundEvents {
-    val draw: SimpleGrenadeSound
-    val hitBlock: SimpleGrenadeSound
-    val `throw`: SimpleGrenadeSound
+    val draw: GrenadeSoundData
+    val hitBlock: GrenadeSoundData
+    val `throw`: GrenadeSoundData
 }
 
 object ModSoundEvents {

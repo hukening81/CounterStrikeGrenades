@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
+import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
@@ -24,13 +24,13 @@ object SmokeGrenadeDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object SmokeGrenadeSoundEvents : GrenadeSoundEvents {
-    val can = SimpleGrenadeSound.Companion.create("smokegrenade.can")
-    override val draw = SimpleGrenadeSound.Companion.createDraw("smokegrenade.draw")
-    override val hitBlock = SimpleGrenadeSound.Companion.createHitBlock("smokegrenade.hit")
-    override val `throw` = SimpleGrenadeSound.Companion.createThrow("smokegrenade.throw")
-    val pinpull = SimpleGrenadeSound.Companion.create("smokegrenade.pinpull")
-    val pinpullStart = SimpleGrenadeSound.Companion.create("smokegrenade.pinpull_start")
-    val explodeDistant = SimpleGrenadeSound.Companion.create("smokegrenade.explode_distant")
-    val clear = SimpleGrenadeSound.Companion.create("smokegrenade.clear")
-    val emit = SimpleGrenadeSound.Companion.create("smokegrenade.emit")
+    val can = GrenadeSoundData.Companion.create("smokegrenade.can")
+    override val draw = GrenadeSoundData.Companion.createDraw("smokegrenade.draw")
+    override val hitBlock = GrenadeSoundData.Companion.createHitBlock("smokegrenade.hit")
+    override val `throw` = GrenadeSoundData.Companion.createThrow("smokegrenade.throw")
+    val pinpull = GrenadeSoundData.Companion.create("smokegrenade.pinpull")
+    val pinpullStart = GrenadeSoundData.Companion.create("smokegrenade.pinpull_start")
+    val explodeDistant = GrenadeSoundData.Companion.create("smokegrenade.explode_distant")
+    val clear = GrenadeSoundData.Companion.create("smokegrenade.clear")
+    val emit = GrenadeSoundData.Companion.create("smokegrenade.emit")
 }

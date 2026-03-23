@@ -3,7 +3,7 @@ package club.pisquad.minecraft.csgrenades
 const val GRENADE_ENTITY_SIZE = 0.25
 const val GRENADE_ENTITY_SIZE_HALF = GRENADE_ENTITY_SIZE.div(2)
 
-const val SERVER_MESSAGE_RANGE: Int = 100
+const val SERVER_MESSAGE_RANGE: Double = 100.0
 
 
 const val BOUNCE_RESTORATION_RATE: Double = 0.7

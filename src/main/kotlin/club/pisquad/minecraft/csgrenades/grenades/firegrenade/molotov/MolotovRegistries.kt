@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade.molotov
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
+import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
@@ -25,16 +25,16 @@ object MolotovDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object MolotovSoundEvents : GrenadeSoundEvents {
-    val detonate = SimpleGrenadeSound.Companion.create("molotov.detonate")
-    val detonateDistant = SimpleGrenadeSound.Companion.create("molotov.detonate_distant")
-    val detonateAir = SimpleGrenadeSound.Companion.create("molotov.detonate_air")
-    override val draw = SimpleGrenadeSound.Companion.createDraw("molotov.draw")
-    val extinguish = SimpleGrenadeSound.Companion.create("molotov.extinguish")
-    val fireIdle = SimpleGrenadeSound.Companion.create("molotov.fire_idle")
-    val ignite = SimpleGrenadeSound.Companion.create("molotov.ignite")
-    val fireLoop = SimpleGrenadeSound.Companion.create("molotov.fire_loop")
-    val fireFadeout = SimpleGrenadeSound.Companion.create("molotov.fire_fadeout")
-    override val `throw` = SimpleGrenadeSound.Companion.createThrow("molotov.throw")
-    val smash = SimpleGrenadeSound.Companion.create("molotov.smash")
-    override val hitBlock = SimpleGrenadeSound.Companion.createHitBlock("molotov.bounce")
+    val detonate = GrenadeSoundData.Companion.create("molotov.detonate")
+    val detonateDistant = GrenadeSoundData.Companion.create("molotov.detonate_distant")
+    val detonateAir = GrenadeSoundData.Companion.create("molotov.detonate_air")
+    override val draw = GrenadeSoundData.Companion.createDraw("molotov.draw")
+    val extinguish = GrenadeSoundData.Companion.create("molotov.extinguish")
+    val fireIdle = GrenadeSoundData.Companion.create("molotov.fire_idle")
+    val ignite = GrenadeSoundData.Companion.create("molotov.ignite")
+    val fireLoop = GrenadeSoundData.Companion.create("molotov.fire_loop")
+    val fireFadeout = GrenadeSoundData.Companion.create("molotov.fire_fadeout")
+    override val `throw` = GrenadeSoundData.Companion.createThrow("molotov.throw")
+    val smash = GrenadeSoundData.Companion.create("molotov.smash")
+    override val hitBlock = GrenadeSoundData.Companion.createHitBlock("molotov.bounce")
 }

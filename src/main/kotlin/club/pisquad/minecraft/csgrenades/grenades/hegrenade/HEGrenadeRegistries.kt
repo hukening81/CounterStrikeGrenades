@@ -1,8 +1,10 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.client.sound.SimpleGrenadeSound
+import club.pisquad.minecraft.csgrenades.SERVER_MESSAGE_RANGE
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
+import club.pisquad.minecraft.csgrenades.core.sound.DistanceSegmentedSoundData
+import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
@@ -26,11 +28,16 @@ object HEGrenadeDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object HEGrenadeSoundEvents : GrenadeSoundEvents {
-    override val draw = SimpleGrenadeSound.Companion.createDraw("hegrenade.draw")
-    override val hitBlock = SimpleGrenadeSound.Companion.createHitBlock("hegrenade.hit_block")
-    val explode = SimpleGrenadeSound.Companion.create("hegrenade.explode")
-    val explodeDistant = SimpleGrenadeSound.Companion.create("hegrenade.explode_distant")
-    override val `throw` = SimpleGrenadeSound.Companion.createThrow("hegrenade.throw")
-    val pinpull = SimpleGrenadeSound.Companion.create("hegrenade.pinpull")
-    val pinpullStart = SimpleGrenadeSound.Companion.create("hegrenade.pinpull_start")
+    override val draw = GrenadeSoundData.Companion.createDraw("hegrenade.draw")
+    override val hitBlock = GrenadeSoundData.Companion.createHitBlock("hegrenade.hit_block")
+    val explode = DistanceSegmentedSoundData(
+        Pair(25.0, GrenadeSoundData.create("hegrenade.explode")),
+        Pair(SERVER_MESSAGE_RANGE, GrenadeSoundData.create("hegrenade.explode_distant"))
+    )
+
+    //    val explode = GrenadeSoundData.Companion.create("hegrenade.explode")
+//    val explodeDistant = GrenadeSoundData.Companion.create("hegrenade.explode_distant")
+    override val `throw` = GrenadeSoundData.Companion.createThrow("hegrenade.throw")
+    val pinpull = GrenadeSoundData.Companion.create("hegrenade.pinpull")
+    val pinpullStart = GrenadeSoundData.Companion.create("hegrenade.pinpull_start")
 }
