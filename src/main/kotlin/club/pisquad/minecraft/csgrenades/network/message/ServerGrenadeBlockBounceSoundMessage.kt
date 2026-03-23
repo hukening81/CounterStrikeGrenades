@@ -12,6 +12,7 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.sounds.SoundSource
 import net.minecraftforge.network.NetworkEvent
 import java.util.function.Supplier
+import kotlin.random.Random
 
 @Serializable
 class ServerGrenadeBlockBounceSoundMessage(
@@ -37,15 +38,17 @@ class ServerGrenadeBlockBounceSoundMessage(
                     ModLogger.warn("Cannot retrieve client level")
                 } else {
                     val position = msg.data.position
-                    level.playLocalSound(
+                    //TODO(hukening81): replace with a spatial sound
+                    level.playSeededSound(
+                        null,
                         position.x,
                         position.y,
                         position.z,
                         soundEvent.soundEvent,
                         SoundSource.PLAYERS,
-                        soundEvent.volume,
+                        10.0f,
                         1.0f,
-                        false
+                        Random.nextLong()
                     )
                 }
             }

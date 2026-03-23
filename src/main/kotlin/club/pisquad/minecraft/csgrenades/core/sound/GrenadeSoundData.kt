@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.core.sound
 
-import club.pisquad.minecraft.csgrenades.CommonSoundVolumes
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
@@ -22,23 +22,13 @@ class GrenadeSoundData(
         get() = volumeD.toFloat()
 
     companion object {
-        fun create(name: String, volume: Double = 1.0): GrenadeSoundData {
+        fun create(name: String): GrenadeSoundData {
             return GrenadeSoundData(
                 ModSoundEvents.registerSoundEvent(name),
-                volume
+                // I think once this value changes, the whole sounds.json need to change to compensate
+                // and yes it is the case
+                .1
             )
-        }
-
-        fun createThrow(name: String, volume: Double = CommonSoundVolumes.THROW): GrenadeSoundData {
-            return create(name, volume)
-        }
-
-        fun createDraw(name: String, volume: Double = CommonSoundVolumes.DRAW): GrenadeSoundData {
-            return create(name, volume)
-        }
-
-        fun createHitBlock(name: String, volume: Double = CommonSoundVolumes.HIT_BLOCK): GrenadeSoundData {
-            return create(name, volume)
         }
     }
 }
@@ -60,6 +50,7 @@ class DistanceSegmentedSoundData(vararg val ranges: Pair<Double, GrenadeSoundDat
                 )
             }
         }
+        ModLogger.warn("Failed to create sound instance {}", ranges)
         return null
     }
 }

@@ -25,8 +25,8 @@ object FlashBangDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object FlashbangSoundEvents : GrenadeSoundEvents {
-    override val draw = GrenadeSoundData.Companion.createDraw("flashbang.draw")
-    
+    override val draw = GrenadeSoundData.Companion.create("flashbang.draw")
+
     val explode = DistanceSegmentedSoundData(
         Pair(
             25.0, GrenadeSoundData.create("flashbang.explode"),
@@ -42,8 +42,8 @@ object FlashbangSoundEvents : GrenadeSoundEvents {
 //    val explodeDistant = GrenadeSoundData.Companion.create("flashbang.explode_distant")
     val ring = GrenadeSoundData.Companion.create("flashbang.ring")
     val ringLoop = GrenadeSoundData.Companion.create("flashbang.ring_loop")
-    override val hitBlock = GrenadeSoundData.Companion.createHitBlock("flashbang.hit_block")
-    override val `throw` = GrenadeSoundData.Companion.createThrow("flashbang.throw")
+    override val hitBlock = GrenadeSoundData.Companion.create("flashbang.hit_block")
+    override val `throw` = GrenadeSoundData.Companion.create("flashbang.throw")
     val pinpull = GrenadeSoundData.Companion.create("flashbang.pinpull")
     val pinpullStart = GrenadeSoundData.Companion.create("flashbang.pinpull_start")
 }

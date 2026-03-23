@@ -28,8 +28,8 @@ object HEGrenadeDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object HEGrenadeSoundEvents : GrenadeSoundEvents {
-    override val draw = GrenadeSoundData.Companion.createDraw("hegrenade.draw")
-    override val hitBlock = GrenadeSoundData.Companion.createHitBlock("hegrenade.hit_block")
+    override val draw = GrenadeSoundData.Companion.create("hegrenade.draw")
+    override val hitBlock = GrenadeSoundData.Companion.create("hegrenade.hit_block")
     val explode = DistanceSegmentedSoundData(
         Pair(25.0, GrenadeSoundData.create("hegrenade.explode")),
         Pair(SERVER_MESSAGE_RANGE, GrenadeSoundData.create("hegrenade.explode_distant"))
@@ -37,7 +37,7 @@ object HEGrenadeSoundEvents : GrenadeSoundEvents {
 
     //    val explode = GrenadeSoundData.Companion.create("hegrenade.explode")
 //    val explodeDistant = GrenadeSoundData.Companion.create("hegrenade.explode_distant")
-    override val `throw` = GrenadeSoundData.Companion.createThrow("hegrenade.throw")
+    override val `throw` = GrenadeSoundData.Companion.create("hegrenade.throw")
     val pinpull = GrenadeSoundData.Companion.create("hegrenade.pinpull")
     val pinpullStart = GrenadeSoundData.Companion.create("hegrenade.pinpull_start")
 }

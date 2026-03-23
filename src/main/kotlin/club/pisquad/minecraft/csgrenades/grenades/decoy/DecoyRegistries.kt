@@ -27,8 +27,8 @@ object DecoyDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object DecoySoundEvents : GrenadeSoundEvents {
-    override val draw = GrenadeSoundData.Companion.createDraw("decoy.draw")
-    override val `throw` = GrenadeSoundData.Companion.createThrow("decoy.throw")
+    override val draw = GrenadeSoundData.Companion.create("decoy.draw")
+    override val `throw` = GrenadeSoundData.Companion.create("decoy.throw")
     override val hitBlock = FlashbangRegistries.sounds.hitBlock
     val pinpull = GrenadeSoundData.Companion.create("decoy.pinpull")
     val pinpullStart = GrenadeSoundData.Companion.create("decoy.pinpull_start")
