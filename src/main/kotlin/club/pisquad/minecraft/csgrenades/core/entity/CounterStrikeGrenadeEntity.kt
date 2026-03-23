@@ -12,7 +12,7 @@ import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.protobuf.ProtoBuf
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
@@ -108,7 +108,7 @@ abstract class CounterStrikeGrenadeEntity(
     @OptIn(ExperimentalSerializationApi::class)
     override fun readSpawnData(additionalData: FriendlyByteBuf) {
         super.readSpawnData(additionalData)
-        val spawnData = Cbor.decodeFromByteArray(SpawnData.serializer(), additionalData.readByteArray())
+        val spawnData = ProtoBuf.decodeFromByteArray(SpawnData.serializer(), additionalData.readByteArray())
         ownerUuid = spawnData.ownerUuid
     }
 
@@ -116,7 +116,7 @@ abstract class CounterStrikeGrenadeEntity(
     override fun writeSpawnData(buffer: FriendlyByteBuf) {
         super.writeSpawnData(buffer)
         val spawnData = SpawnData(ownerUuid)
-        buffer.writeByteArray(Cbor.encodeToByteArray(SpawnData.serializer(), spawnData))
+        buffer.writeByteArray(ProtoBuf.encodeToByteArray(SpawnData.serializer(), spawnData))
     }
 
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {

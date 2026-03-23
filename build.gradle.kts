@@ -194,7 +194,7 @@ dependencies {
         exclude(group = "org.jetbrains", module = "annotations")
     }
 
-    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-cbor-jvm:$kotlinSerializationVersion") {
+    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm:$kotlinSerializationVersion") {
         exclude(group = "org.jetbrains", module = "annotations")
     }
 
@@ -203,7 +203,6 @@ dependencies {
 //    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
 //        exclude(group = "org.jetbrains", module = "annotations")
 //    }
-//    implementation(kotlin("stdlib"))
 }
 tasks.test {
     useJUnitPlatform()
@@ -243,6 +242,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 tasks.named<Jar>("jar") {
     archiveClassifier = "slim"
+//    duplicatesStrategy = DuplicatesStrategy.WARN
     manifest {
         attributes(
             "Specification-Title" to modId,

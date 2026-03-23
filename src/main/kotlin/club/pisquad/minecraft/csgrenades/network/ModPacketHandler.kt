@@ -14,7 +14,7 @@ import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounc
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.protobuf.ProtoBuf
 import kotlinx.serialization.serializer
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.resources.ResourceLocation
@@ -37,13 +37,13 @@ abstract class CsGrenadeMessageHandler<Msg : Any>(
 ) {
     @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
     fun encoder(message: Msg, buffer: FriendlyByteBuf) {
-        val byteArray = Cbor.encodeToByteArray(messageClass.serializer(), message)
+        val byteArray = ProtoBuf.encodeToByteArray(messageClass.serializer(), message)
         buffer.writeByteArray(byteArray)
     }
 
     @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
     fun decoder(buffer: FriendlyByteBuf): Msg =
-        Cbor.decodeFromByteArray(messageClass.serializer(), buffer.readByteArray())
+        ProtoBuf.decodeFromByteArray(messageClass.serializer(), buffer.readByteArray())
 
     abstract fun handler(msg: Msg, ctx: Supplier<NetworkEvent.Context>)
 }

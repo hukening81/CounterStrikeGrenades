@@ -9,7 +9,7 @@ import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSy
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.protobuf.ProtoBuf
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -75,7 +75,7 @@ abstract class CustomTrajectoryEntity(
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun readSpawnData(additionalData: FriendlyByteBuf) {
-        val spawnData: SpawnData = Cbor.decodeFromByteArray(SpawnData.serializer(), additionalData.readByteArray())
+        val spawnData: SpawnData = ProtoBuf.decodeFromByteArray(SpawnData.serializer(), additionalData.readByteArray())
         initializeMovementState(spawnData.position, spawnData.velocity)
     }
 
@@ -85,7 +85,7 @@ abstract class CustomTrajectoryEntity(
             this.center,
             this.velocity,
         )
-        buffer.writeByteArray(Cbor.encodeToByteArray(SpawnData.serializer(), spawnData))
+        buffer.writeByteArray(ProtoBuf.encodeToByteArray(SpawnData.serializer(), spawnData))
     }
 
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
