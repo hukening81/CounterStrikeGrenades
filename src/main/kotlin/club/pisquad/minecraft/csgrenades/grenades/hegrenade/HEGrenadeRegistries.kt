@@ -1,7 +1,6 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.ModSettings.SERVER_MESSAGE_RANGE
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.core.sound.DistanceSegmentedSoundData
 import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
@@ -30,9 +29,9 @@ object HEGrenadeDamageTypes : GrenadeEntityDamageTypes {
 object HEGrenadeSoundEvents : GrenadeSoundEvents {
     override val draw = GrenadeSoundData.Companion.createDraw("hegrenade.draw")
     override val hitBlock = GrenadeSoundData.Companion.createHitBlock("hegrenade.hit_block")
-    val explode = DistanceSegmentedSoundData(
-        Pair(25.0, GrenadeSoundData.create("hegrenade.explode")),
-        Pair(SERVER_MESSAGE_RANGE, GrenadeSoundData.create("hegrenade.explode_distant"))
+    val explode = DistanceSegmentedSoundData.createTwoPhasedExplosion(
+        GrenadeSoundData.create("hegrenade.explode"),
+        GrenadeSoundData.create("hegrenade.explode_distant")
     )
 
     //    val explode = GrenadeSoundData.Companion.create("hegrenade.explode")

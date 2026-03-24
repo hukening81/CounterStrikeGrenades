@@ -22,7 +22,7 @@ class GrenadeSoundData(
         get() = volumeD.toFloat()
 
     companion object {
-        fun create(name: String, volume: Double = 1.0): GrenadeSoundData {
+        fun create(name: String, volume: Double = 10.0): GrenadeSoundData {
             return GrenadeSoundData(
                 ModSoundEvents.registerSoundEvent(name),
                 volume
@@ -77,7 +77,6 @@ class DistanceSegmentedSoundData(vararg val ranges: Pair<Double, GrenadeSoundDat
                 return data.play(position, volume)
             }
         }
-        ModLogger.warn("Failed to create sound instance {}", ranges)
         return false
     }
 
