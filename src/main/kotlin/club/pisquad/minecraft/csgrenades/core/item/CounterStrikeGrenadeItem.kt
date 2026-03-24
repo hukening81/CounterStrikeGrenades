@@ -20,8 +20,7 @@ private var drawSoundPlayedSlot: Int = -1
 
 abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(2)) {
     val defaultModifiers: ImmutableMultimap<Attribute, AttributeModifier>
-
-    //    abstract val sounds:
+    
     abstract val grenadeType: GrenadeType
 
     init {

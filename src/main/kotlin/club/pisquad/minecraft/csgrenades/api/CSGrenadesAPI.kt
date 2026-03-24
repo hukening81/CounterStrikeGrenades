@@ -16,6 +16,12 @@ import java.util.*
  * This API should only be called on server side for consistant behavior
  */
 object CSGrenadesAPI {
+
+
+    // With this convention, I hope to minimize namespace contamination
+    val player = CSGrenadePlayerAPI
+    val sound = CSGrenadeSoundAPI
+
     /**
      * Spawn a grenade with the provide context
      *
@@ -36,12 +42,12 @@ object CSGrenadesAPI {
         level.addFreshEntity(entity)
 
         if (removeItem) {
-            Player.removeGrenadeFromInventory(owner, context.grenadeType)
+            player.removeGrenadeFromInventory(owner, context.grenadeType)
         }
         return entity
     }
 
-    object Player {
+    object CSGrenadePlayerAPI {
         fun removeGrenadeFromInventory(player: ServerPlayer, grenadeType: GrenadeType): Boolean {
             val item = player.mainHandItem.item
             if (item is CounterStrikeGrenadeItem && item.grenadeType == grenadeType) {
