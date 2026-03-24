@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import org.joml.Quaternionf
 
 //@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 //object GrenadeRenderCacheHelper {
@@ -153,14 +154,17 @@ class GrenadeEntityRenderer<T>(
     ) {
         entity as CounterStrikeGrenadeEntity
         poseStack.pushPose()
+
+        // Movement
         val d = entity.deltaMovement
-
-
         val x = Mth.lerp(partialTick.toDouble(), 0.0, d.x)
         val y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
         val z = Mth.lerp(partialTick.toDouble(), 0.0, d.z)
-
         poseStack.translate(x, y, z)
+
+        // Rotation
+
+        poseStack.mulPose(Quaternionf(entity.rotation.getPartialTick(partialTick.toDouble())))
 
         val itemStack = getItemStack(entity.grenadeType)
 

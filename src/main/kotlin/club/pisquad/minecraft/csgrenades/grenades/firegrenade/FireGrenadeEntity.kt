@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade
 
-import club.pisquad.minecraft.csgrenades.core.entity.ActivateByFuseGrenadeEntity
 import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateByFuseGrenadeEntity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -17,7 +17,7 @@ abstract class FireGrenadeEntity(
 //import club.pisquad.minecraft.csgrenades.client.render.firegrenade.*
 //import club.pisquad.minecraft.csgrenades.config.*
 //import club.pisquad.minecraft.csgrenades.entity.*
-//import club.pisquad.minecraft.csgrenades.core.entity.ActivateByFuseGrenadeEntity
+//import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateByFuseGrenadeEntity
 //import club.pisquad.minecraft.csgrenades.entity.smokegrenade.*
 //import club.pisquad.minecraft.csgrenades.enums.*
 //import club.pisquad.minecraft.csgrenades.network.*

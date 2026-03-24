@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.decoy
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.core.entity.ActivateAfterLandingGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 

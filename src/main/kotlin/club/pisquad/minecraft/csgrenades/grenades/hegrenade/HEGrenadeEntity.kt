@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.core.entity.ActivateByFuseGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateByFuseGrenadeEntity
 import club.pisquad.minecraft.csgrenades.grenades.hegrenade.messages.HEGrenadeActivatedMessage
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.toTick

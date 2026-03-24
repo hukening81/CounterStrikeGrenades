@@ -3,7 +3,7 @@ package club.pisquad.minecraft.csgrenades.grenades.flashbang
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.core.entity.ActivateByFuseGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateByFuseGrenadeEntity
 import club.pisquad.minecraft.csgrenades.getPlayersWithinMessageRange
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.messages.FlashbangActivatedMessage
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler

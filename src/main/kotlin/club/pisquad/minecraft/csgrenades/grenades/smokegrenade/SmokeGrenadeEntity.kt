@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.core.entity.ActivateAfterLandingGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils.SmokeDataPoint
 import club.pisquad.minecraft.csgrenades.registry.ModSerializers
 import club.pisquad.minecraft.csgrenades.toTick

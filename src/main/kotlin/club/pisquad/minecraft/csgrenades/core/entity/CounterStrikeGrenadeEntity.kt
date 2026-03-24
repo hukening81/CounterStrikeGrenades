@@ -46,6 +46,7 @@ abstract class CounterStrikeGrenadeEntity(
 ) :
     CustomTrajectoryEntity(pEntityType, pLevel) {
     lateinit var ownerUuid: UUID
+    val rotation: GrenadeRotation
 
 
     abstract val sounds: GrenadeSoundEvents
@@ -60,6 +61,7 @@ abstract class CounterStrikeGrenadeEntity(
     init {
         isNoGravity = true
         noPhysics = true
+        rotation = GrenadeRotation(this.id.toLong())
     }
 
     companion object {
@@ -89,8 +91,10 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun tick() {
         super.tick()
-//        TrajectoryHelper.step(level(), trajectory)
-//        this.moveTo(trajectory.position.minusGrenadeSizeOffset())
+
+        if (this.level().isClientSide) {
+            this.rotation.tick()
+        }
     }
 
     override fun onAddedToWorld() {
@@ -139,6 +143,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun onHitBlock(data: SubtickNode.BlockBounceData) {
         ModLogger.info("{} hit block({}) at tick{}", this.grenadeType, data.blockPos, this.tickCount)
+        rotation.randomize()
         if (this.level().isClientSide) {
             // EMPTY
         } else {
@@ -152,6 +157,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun onHitEntity(data: SubtickNode.EntityBounceData) {
         ModLogger.info("{} hit entity({}) at tick{}", this.grenadeType, data.id, this.tickCount)
+        rotation.randomize()
         if (this.level().isClientSide) {
             // EMPTY
         } else {

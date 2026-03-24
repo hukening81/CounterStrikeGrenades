@@ -16,6 +16,8 @@ object ModSettings {
 
             const val AIR_DRAG_CONSTANT = 1.0
             const val GRAVITY_CONSTANT = 0.05
+
+            const val ROTATION_SPEED: Double = 1.0
         }
     }
 
