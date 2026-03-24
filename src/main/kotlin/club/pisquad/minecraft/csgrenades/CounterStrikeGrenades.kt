@@ -3,7 +3,6 @@ package club.pisquad.minecraft.csgrenades
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.registry.RegistryHelper
-import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
@@ -23,12 +22,8 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
 
     init {
         ModLogger.info("Initializing Mod -- Common Setup")
-//        val modBus = KotlinModLoadingContext.get().getKEventBus()
-        val modBus = context.modEventBus
-        modEventBus = modBus
-        modLoadingContext = context
-        
-        RegistryHelper.registerMod(modEventBus)
+
+        RegistryHelper.registerMod(context.modEventBus)
 
         ModPacketHandler.register()
 
@@ -38,8 +33,6 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
 
     companion object {
         const val ID = "csgrenades"
-        lateinit var modEventBus: IEventBus
-        lateinit var modLoadingContext: FMLJavaModLoadingContext
 
         /**
          * This is used for initializing client specific
