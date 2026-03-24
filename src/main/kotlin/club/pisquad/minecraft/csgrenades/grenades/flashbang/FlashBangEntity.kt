@@ -30,6 +30,7 @@ class FlashBangEntity(pEntityType: EntityType<out FlashBangEntity>, pLevel: Leve
             ModLogger.debug(this, "Sending FlashbangActivatedMessage with data size:${data.size}")
             ModPacketHandler.sendMessageToPlayer(
                 this.level() as ServerLevel, this.center, FlashbangActivatedMessage(
+                    this.center,
                     data
                 )
             )

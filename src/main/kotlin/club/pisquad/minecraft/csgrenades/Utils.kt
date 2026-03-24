@@ -190,6 +190,10 @@ fun Player.getShootOrigin(): Vec3 {
     return this.eyePosition
 }
 
+fun Player.getEarPosition(): Vec3 {
+    return this.position()
+}
+
 fun ServerLevel.getPlayersWithinMessageRange(center: Vec3): List<Player> {
     val range = ModSettings.SERVER_MESSAGE_RANGE
     val box = AABB.ofSize(center, range, range, range)
