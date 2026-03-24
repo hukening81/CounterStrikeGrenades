@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.core.entity
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
+import club.pisquad.minecraft.csgrenades.SERVER_MESSAGE_RANGE
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.CustomTrajectoryEntity
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
@@ -35,6 +36,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
+import kotlin.math.pow
 import kotlin.random.Random
 
 abstract class CounterStrikeGrenadeEntity(
@@ -129,6 +131,10 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun readAdditionalSaveData(pCompound: CompoundTag) {
 
+    }
+
+    override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
+        return distance < SERVER_MESSAGE_RANGE.pow(2)
     }
 
     override fun onHitBlock(data: SubtickNode.BlockBounceData) {
