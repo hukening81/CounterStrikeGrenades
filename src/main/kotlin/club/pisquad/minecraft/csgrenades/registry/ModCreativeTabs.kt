@@ -3,7 +3,6 @@ package club.pisquad.minecraft.csgrenades.registry
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.getItem
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.CreativeModeTab
@@ -17,10 +16,10 @@ object ModCreativeTabs {
 
     val CSGRENADES_TAB: RegistryObject<CreativeModeTab> = CREATIVE_MODE_TABS.register("csgrenades_tab") {
         CreativeModeTab.builder()
-            .icon { GrenadeType.HE_GRENADE.getItem().defaultInstance }
+            .icon { GrenadeType.HE_GRENADE.item.defaultInstance }
             .title(Component.translatable("itemGroup.csgrenades"))
             .displayItems { _, output ->
-                GrenadeType.entries.forEach { output.accept(it.getItem()) }
+                GrenadeType.entries.forEach { output.accept(it.item) }
 //                output.accept(ModItems.HEGRENADE_ITEM.get())
 //                output.accept(ModItems.SMOKE_GRENADE_ITEM.get())
 //                output.accept(ModItems.FLASH_BANG_ITEM.get())

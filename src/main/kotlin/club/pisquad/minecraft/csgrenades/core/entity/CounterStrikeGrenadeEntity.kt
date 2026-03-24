@@ -40,18 +40,19 @@ import java.util.*
 import kotlin.math.pow
 import kotlin.random.Random
 
+interface GrenadeEntityData {
+    val sounds: GrenadeSoundEvents
+    val damageTypes: GrenadeEntityDamageTypes
+}
+
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out CounterStrikeGrenadeEntity>,
     pLevel: Level,
     val grenadeType: GrenadeType,
 ) :
-    CustomTrajectoryEntity(pEntityType, pLevel) {
+    CustomTrajectoryEntity(pEntityType, pLevel), GrenadeEntityData {
     lateinit var ownerUuid: UUID
     val rotation: GrenadeRotation
-
-
-    abstract val sounds: GrenadeSoundEvents
-    abstract val damageTypes: GrenadeEntityDamageTypes
 
     val owner: Player?
         get() {
@@ -157,7 +158,7 @@ abstract class CounterStrikeGrenadeEntity(
             ModPacketHandler.sendMessageToPlayer(
                 this.level() as ServerLevel,
                 this.center,
-                ServerGrenadeBlockBounceSoundMessage(this.grenadeType, this.id, data)
+                ServerGrenadeBlockBounceSoundMessage(this.grenadeType, this.uuid, data)
             )
         }
     }

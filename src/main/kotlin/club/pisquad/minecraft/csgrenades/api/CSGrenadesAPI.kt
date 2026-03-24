@@ -4,7 +4,6 @@ import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
-import club.pisquad.minecraft.csgrenades.getEntity
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
@@ -29,7 +28,7 @@ object CSGrenadesAPI {
         removeItem: Boolean = true
     ): CounterStrikeGrenadeEntity? {
         val level = owner.level() as ServerLevel
-        val entityType = context.grenadeType.getEntity()
+        val entityType = context.grenadeType.entity
         val entity = entityType.create(level) ?: return null
         entity.initialize(context.ownerUuid, context.position, context.velocity)
 
