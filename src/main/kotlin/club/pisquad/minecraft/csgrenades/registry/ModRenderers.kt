@@ -16,7 +16,7 @@ object ModRenderers {
     @SubscribeEvent
     fun registerEntityRenderers(event: EntityRenderersEvent.RegisterRenderers) {
         GrenadeType.entries.forEach {
-            EntityRenderers.register(it.entity, ::GrenadeEntityRenderer)
+            EntityRenderers.register(it.entity.get(), ::GrenadeEntityRenderer)
         }
 //        EntityRenderers.register(ModEntities.FLASH_BANG_ENTITY.get(), ::GrenadeEntityRenderer)
 //        EntityRenderers.register(ModEntities.SMOKE_GRENADE_ENTITY.get(), ::GrenadeEntityRenderer)

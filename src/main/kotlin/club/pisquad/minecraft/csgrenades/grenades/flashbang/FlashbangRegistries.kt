@@ -9,6 +9,7 @@ import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
 import net.minecraft.world.item.Item
 
+
 object FlashbangRegistries :
     CounterStrikeGrenadeRegistries<FlashBangEntity, FlashBangItem, FlashBangDamageTypes, FlashbangSoundEvents>(
         GrenadeType.FLASH_BANG,

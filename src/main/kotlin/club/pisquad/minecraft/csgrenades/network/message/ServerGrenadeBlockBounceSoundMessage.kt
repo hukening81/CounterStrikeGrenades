@@ -26,7 +26,7 @@ class ServerGrenadeBlockBounceSoundMessage(
             ModLogger.debug("Recieved block bounce sound message from server for ${msg.grenadeType} ${msg.data}")
             val context = ctx.get()
             context.packetHandled = true
-            val data = msg.grenadeType.sounds.hitBlock
+            val data = msg.grenadeType.sounds.get().hitBlock
 
             val level = Minecraft.getInstance().level
             if (level == null) {

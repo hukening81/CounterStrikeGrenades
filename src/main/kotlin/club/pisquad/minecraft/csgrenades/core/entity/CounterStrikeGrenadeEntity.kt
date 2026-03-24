@@ -26,7 +26,6 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageType
 import net.minecraft.world.entity.Entity
@@ -38,7 +37,6 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
 import kotlin.math.pow
-import kotlin.random.Random
 
 interface GrenadeEntityData {
     val sounds: GrenadeSoundEvents
@@ -172,36 +170,6 @@ abstract class CounterStrikeGrenadeEntity(
 //            playServerEntityHitSound(data.position)
         }
     }
-
-    fun playClientBlockHitSound(position: Vec3) {
-        ModLogger.debug(this, "Playing hit block sound for {} at {}", this.id, position)
-
-        this.level().playSeededSound(
-            null,
-            position.x,
-            position.y,
-            position.z,
-            this.sounds.hitBlock.soundEvent,
-            SoundSource.PLAYERS,
-            1.0f, 1.0f,
-            Random.nextInt().toLong(),
-        )
-    }
-
-    fun playServerEntityHitSound(position: Vec3) {
-        ModLogger.debug(this, "Playing hit entity sound for {} at {}", this.id, position)
-        this.level().playSeededSound(
-            null,
-            position.x,
-            position.y,
-            position.z,
-            this.sounds.hitBlock.soundEvent,
-            SoundSource.PLAYERS,
-            16.0f, 1.0f,
-            Random.nextInt().toLong(),
-        )
-    }
-
 
     fun getDamageSource(entity: Entity, resourceKey: ResourceKey<DamageType>): DamageSource {
         val registry = entity.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()

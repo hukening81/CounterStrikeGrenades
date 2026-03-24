@@ -10,47 +10,49 @@ import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import net.minecraft.world.entity.EntityType
+import java.util.function.Supplier
 
 enum class GrenadeType(
     val resourceKey: String,
-    val entity: EntityType<out CounterStrikeGrenadeEntity>,
-    val item: CounterStrikeGrenadeItem,
-    val sounds: GrenadeSoundEvents,
+    // Use supplier to avoid circular initialization
+    val entity: Supplier<out EntityType<out CounterStrikeGrenadeEntity>>,
+    val item: Supplier<out CounterStrikeGrenadeItem>,
+    val sounds: Supplier<out GrenadeSoundEvents>,
 ) {
     FLASH_BANG(
         "flashbang",
-        FlashbangRegistries.entity.get(),
-        FlashbangRegistries.item.get(),
-        FlashbangRegistries.sounds
+        { FlashbangRegistries.entity.get() },
+        { FlashbangRegistries.item.get() },
+        { FlashbangRegistries.sounds }
     ),
     SMOKE_GRENADE(
         "smokegrenade",
-        SmokeGrenadeRegistries.entity.get(),
-        SmokeGrenadeRegistries.item.get(),
-        SmokeGrenadeRegistries.sounds,
+        { SmokeGrenadeRegistries.entity.get() },
+        { SmokeGrenadeRegistries.item.get() },
+        { SmokeGrenadeRegistries.sounds },
     ),
     HE_GRENADE(
         "hegrenade",
-        HEGrenadeRegistries.entity.get(),
-        HEGrenadeRegistries.item.get(),
-        HEGrenadeRegistries.sounds
+        { HEGrenadeRegistries.entity.get() },
+        { HEGrenadeRegistries.item.get() },
+        { HEGrenadeRegistries.sounds }
     ),
     INCENDIARY(
         "incendiary",
-        IncendiaryRegistries.entity.get(),
-        IncendiaryRegistries.item.get(),
-        IncendiaryRegistries.sounds,
+        { IncendiaryRegistries.entity.get() },
+        { IncendiaryRegistries.item.get() },
+        { IncendiaryRegistries.sounds },
     ),
     MOLOTOV(
         "molotov",
-        MolotovRegistries.entity.get(),
-        MolotovRegistries.item.get(),
-        MolotovRegistries.sounds,
+        { MolotovRegistries.entity.get() },
+        { MolotovRegistries.item.get() },
+        { MolotovRegistries.sounds },
     ),
     DECOY(
         "decoy",
-        DecoyRegistries.entity.get(),
-        DecoyRegistries.item.get(),
-        DecoyRegistries.sounds
+        { DecoyRegistries.entity.get() },
+        { DecoyRegistries.item.get() },
+        { DecoyRegistries.sounds }
     ),
 }

@@ -82,7 +82,7 @@ object InputHandler {
     fun onPlayerTick(event: TickEvent.PlayerTickEvent) {
         if (event.side == LogicalSide.SERVER) return
         if (event.phase == TickEvent.Phase.START) return
-
+        return
 
 
         if (!lastScreenState && screenState) {
@@ -120,6 +120,7 @@ object InputHandler {
         lastScreenState = screenState
         lastSelectedSlot = selectedSlot
         lastButtonState = buttonState
+
 
         if (cooldownTimer > 0) {
             cooldownTimer--

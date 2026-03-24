@@ -52,6 +52,7 @@ abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(propertie
         if (entity.inventory.selected != drawSoundPlayedSlot) {
             drawSoundPlayedSlot = -1
         }
+        println("Inventory")
     }
 
     override fun onEntitySwing(stack: ItemStack?, entity: LivingEntity?): Boolean = true

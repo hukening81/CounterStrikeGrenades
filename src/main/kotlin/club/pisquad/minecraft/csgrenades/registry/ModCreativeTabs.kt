@@ -16,10 +16,10 @@ object ModCreativeTabs {
 
     val CSGRENADES_TAB: RegistryObject<CreativeModeTab> = CREATIVE_MODE_TABS.register("csgrenades_tab") {
         CreativeModeTab.builder()
-            .icon { GrenadeType.HE_GRENADE.item.defaultInstance }
+            .icon { GrenadeType.HE_GRENADE.item.get().defaultInstance }
             .title(Component.translatable("itemGroup.csgrenades"))
             .displayItems { _, output ->
-                GrenadeType.entries.forEach { output.accept(it.item) }
+                GrenadeType.entries.forEach { output.accept(it.item.get()) }
 //                output.accept(ModItems.HEGRENADE_ITEM.get())
 //                output.accept(ModItems.SMOKE_GRENADE_ITEM.get())
 //                output.accept(ModItems.FLASH_BANG_ITEM.get())

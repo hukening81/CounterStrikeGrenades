@@ -32,3 +32,7 @@ object ModSettings {
         }
     }
 }
+
+object AnimationSettings {
+    
+}
