@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.core.item
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import net.minecraft.core.BlockPos
@@ -16,12 +17,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 
-private var drawSoundPlayedSlot: Int = -1
-
 abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(2)) {
     val defaultModifiers: ImmutableMultimap<Attribute, AttributeModifier>
-    
+
     abstract val grenadeType: GrenadeType
+    var lastSelected = false
 
     init {
         val builder = ImmutableMultimap.builder<Attribute, AttributeModifier>()
@@ -42,16 +42,12 @@ abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(propertie
     }
 
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slotId: Int, isSelected: Boolean) {
-        if (!level.isClientSide) return
-        if (entity !is Player) return
-        if (isSelected && drawSoundPlayedSlot != slotId) {
-//            entity.playSound(drawSound, 0.2f, 1.0f)
-            drawSoundPlayedSlot = slotId
+        if (isSelected && !lastSelected) {
+            if (level.isClientSide) {
+                CSGrenadesAPI.sound.item.playDraw(grenadeType)
+            }
         }
-        if (entity.inventory.selected != drawSoundPlayedSlot) {
-            drawSoundPlayedSlot = -1
-        }
-        println("Inventory")
+        lastSelected = isSelected
     }
 
     override fun onEntitySwing(stack: ItemStack?, entity: LivingEntity?): Boolean = true
