@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.core.entity
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.SERVER_MESSAGE_RANGE
+import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.CustomTrajectoryEntity
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
@@ -134,7 +134,7 @@ abstract class CounterStrikeGrenadeEntity(
     }
 
     override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
-        return distance < SERVER_MESSAGE_RANGE.pow(2)
+        return distance < ModSettings.SERVER_MESSAGE_RANGE.pow(2)
     }
 
     override fun onHitBlock(data: SubtickNode.BlockBounceData) {

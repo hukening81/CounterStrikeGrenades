@@ -4,7 +4,7 @@ package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.SERVER_MESSAGE_RANGE
+import club.pisquad.minecraft.csgrenades.ModSettings.SERVER_MESSAGE_RANGE
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangPacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadePacketHandler

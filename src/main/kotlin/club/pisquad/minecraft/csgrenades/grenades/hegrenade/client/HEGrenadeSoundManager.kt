@@ -11,8 +11,6 @@ object HEGrenadeSoundManager {
     fun playExplosionSound(position: Vec3): Boolean {
         val player = Minecraft.getInstance().player!!
         val distance = player.position().distanceTo(position)
-        val instance = HEGrenadeRegistries.sounds.explode.getInstance(position, distance) ?: return false
-        Minecraft.getInstance().soundManager.play(instance)
-        return true
+        return HEGrenadeRegistries.sounds.explode.play(position, distance)
     }
 }

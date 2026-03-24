@@ -23,10 +23,14 @@ def convert_to_mono(file_path):
     temp_file = file_path + ".tmp.ogg"
     # We use the pan filter to ensure L and R are mixed 50/50 so no data is lost
     cmd = [
-        'ffmpeg', '-i', file_path, 
+        'ffmpeg',
+        '-i', file_path, 
         '-af', 'pan=mono|c0=0.5*c0+0.5*c1', 
+        '-c:a','libvorbis','-q:a','6',
+        '-map_metadata','-1',
         '-y', temp_file
     ]
+    # ffmpeg -i explode.ogg -af "pan=mono|c0=0.5*c0+0.5*c1" -c:a libvorbis -q:a 5 explode_fixed.ogg
     
     try:
         subprocess.run(cmd, check=True, capture_output=True)
@@ -45,10 +49,11 @@ def main():
         for file in files:
             if file.lower().endswith(".ogg"):
                 full_path = os.path.join(root, file)
-                if is_stereo(full_path):
-                    convert_to_mono(full_path)
-                else:
-                    print(f"- Skipping (Already Mono): {file}")
+                convert_to_mono(full_path)
+                # if is_stereo(full_path):
+                #     convert_to_mono(full_path)
+                # else:
+                #     print(f"- Skipping (Already Mono): {file}")
 
 if __name__ == "__main__":
     main()

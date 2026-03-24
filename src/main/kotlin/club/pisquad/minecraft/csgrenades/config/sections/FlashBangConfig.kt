@@ -1,9 +1,9 @@
 package club.pisquad.minecraft.csgrenades.config.sections
 
-import club.pisquad.minecraft.csgrenades.SERVER_MESSAGE_RANGE
+import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.config.ConfigSection
 import club.pisquad.minecraft.csgrenades.config.common.GrenadeCommonConfig
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import net.minecraftforge.common.ForgeConfigSpec
 
 object FlashBangConfig : ConfigSection {
@@ -27,10 +27,10 @@ object FlashBangConfig : ConfigSection {
             )
         ) { it is Double && it < 181 }
         blindEffectFadingRange =
-            builder.defineInRange("blind_effect_fading_range", 50.0, 1.0, SERVER_MESSAGE_RANGE.toDouble())
+            builder.defineInRange("blind_effect_fading_range", 50.0, 1.0, ModSettings.SERVER_MESSAGE_RANGE)
 
         blindEffectMaximumRadius =
-            builder.defineInRange("blind_effect_decay_ratio", 50.0, 10.0, SERVER_MESSAGE_RANGE.toDouble())
+            builder.defineInRange("blind_effect_decay_ratio", 50.0, 10.0, ModSettings.SERVER_MESSAGE_RANGE)
 
         builder.pop()
     }

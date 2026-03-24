@@ -111,10 +111,7 @@
   "hegrenade.detonate": {
     "category": "player",
     "sounds": [
-      {
-        "name": "csgrenades:hegrenade/detonate_02",
-        "volume": 0.0001
-      },
+      "csgrenades:hegrenade/detonate_02",
       "csgrenades:hegrenade/detonate_03"
     ]
   },

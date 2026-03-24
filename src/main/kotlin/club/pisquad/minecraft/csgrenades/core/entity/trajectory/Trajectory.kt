@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.core.entity.trajectory
 
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.SERVER_TRAJECTORY_NODE_CACHE_MAX_SIZE
+import club.pisquad.minecraft.csgrenades.ModSettings.Entity.SERVER_TRAJECTORY_NODE_CACHE_SIZE
 import net.minecraft.client.Minecraft
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
@@ -122,7 +122,7 @@ class ServerNodeCache {
     private val queue: ArrayDeque<TickNode> = ArrayDeque()
 
     fun add(node: TickNode) {
-        while (queue.size > SERVER_TRAJECTORY_NODE_CACHE_MAX_SIZE) {
+        while (queue.size > SERVER_TRAJECTORY_NODE_CACHE_SIZE) {
             queue.removeFirst()
         }
         queue.addLast(node)

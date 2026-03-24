@@ -167,11 +167,19 @@ fun renderTestParticleAtPosition(level: Level, position: Vec3) {
 }
 
 fun Vec3.minusGrenadeSizeOffset(): Vec3 {
-    return this.minus(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
+    return this.minus(
+        ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF,
+        ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF,
+        ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF
+    )
 }
 
 fun Vec3.addGrenadeSizeOffset(): Vec3 {
-    return this.add(GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF, GRENADE_ENTITY_SIZE_HALF)
+    return this.add(
+        ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF,
+        ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF,
+        ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF
+    )
 }
 
 fun Double.isBetween(value1: Double, value2: Double): Boolean {
@@ -183,7 +191,7 @@ fun Player.getShootOrigin(): Vec3 {
 }
 
 fun ServerLevel.getPlayersWithinMessageRange(center: Vec3): List<Player> {
-    val range = SERVER_MESSAGE_RANGE.toDouble()
+    val range = ModSettings.SERVER_MESSAGE_RANGE
     val box = AABB.ofSize(center, range, range, range)
     return this.getEntitiesOfClass(Player::class.java, box).toList()
 }

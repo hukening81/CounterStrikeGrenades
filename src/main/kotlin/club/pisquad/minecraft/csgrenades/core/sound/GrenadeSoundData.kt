@@ -1,14 +1,14 @@
 package club.pisquad.minecraft.csgrenades.core.sound
 
 import club.pisquad.minecraft.csgrenades.ModLogger
+import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
-import net.minecraft.client.resources.sounds.SimpleSoundInstance
-import net.minecraft.client.resources.sounds.SoundInstance
+import net.minecraft.client.Minecraft
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
-import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.registries.RegistryObject
+import kotlin.random.Random
 
 
 class GrenadeSoundData(
@@ -22,35 +22,74 @@ class GrenadeSoundData(
         get() = volumeD.toFloat()
 
     companion object {
-        fun create(name: String): GrenadeSoundData {
+        fun create(name: String, volume: Double = 1.0): GrenadeSoundData {
             return GrenadeSoundData(
                 ModSoundEvents.registerSoundEvent(name),
-                // I think once this value changes, the whole sounds.json need to change to compensate
-                // and yes it is the case
-                .1
+                volume
             )
         }
+
+        fun createDraw(name: String): GrenadeSoundData {
+            return create(name, ModSettings.Sound.Volume.DRAW)
+        }
+
+        fun createThrow(name: String): GrenadeSoundData {
+            return create(name, ModSettings.Sound.Volume.THROW)
+        }
+
+        fun createHitBlock(name: String): GrenadeSoundData {
+            return create(name, ModSettings.Sound.Volume.HIT_BLOCK)
+        }
+
+    }
+
+    /**
+     * Play this sound on client side
+     *
+     * @param position
+     * @param volume: use this control to overwrite for testing
+     * @return
+     */
+    fun play(position: Vec3, volume: Double? = volumeD): Boolean {
+        val player = Minecraft.getInstance().player
+        ModLogger.debug("Playing sound $soundEvent")
+        Minecraft.getInstance().level
+            ?.playSeededSound(
+                player,
+                position.x,
+                position.y,
+                position.z,
+                soundEvent,
+                source,
+                volume?.toFloat() ?: this.volume,
+                1.0f,
+                Random.nextLong()
+            ) ?: return false
+        return true
     }
 }
 
 class DistanceSegmentedSoundData(vararg val ranges: Pair<Double, GrenadeSoundData>) {
-    fun getInstance(position: Vec3, distance: Double): SoundInstance? {
+    fun play(position: Vec3, distance: Double, volume: Double? = null): Boolean {
         for (section in ranges) {
             if (distance < section.first) {
                 val data = section.second
-                return SimpleSoundInstance(
-                    data.soundEvent,
-                    data.source,
-                    data.volume,
-                    1.0f,
-                    RandomSource.create(),
-                    position.x,
-                    position.y,
-                    position.z
-                )
+                return data.play(position, volume)
             }
         }
         ModLogger.warn("Failed to create sound instance {}", ranges)
-        return null
+        return false
+    }
+
+    companion object {
+        fun createTwoPhasedExplosion(
+            explode: GrenadeSoundData,
+            explodeDistant: GrenadeSoundData
+        ): DistanceSegmentedSoundData {
+            return DistanceSegmentedSoundData(
+                Pair(ModSettings.Sound.EXPLOSION_SOUND_CHANGE_DISTANCE, explode),
+                Pair(ModSettings.SERVER_MESSAGE_RANGE, explodeDistant)
+            )
+        }
     }
 }

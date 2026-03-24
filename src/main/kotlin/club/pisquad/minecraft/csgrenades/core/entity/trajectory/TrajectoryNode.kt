@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.core.entity.trajectory
 
-import club.pisquad.minecraft.csgrenades.MINIMUM_VELOCITY_AFTER_BOUNCE
-import club.pisquad.minecraft.csgrenades.POSITION_ERROR_TOLERANCE
+import club.pisquad.minecraft.csgrenades.ModSettings.Entity.POSITION_ERROR_TOLERANCE
+import club.pisquad.minecraft.csgrenades.ModSettings.Entity.Physics.MINIMUM_VELOCITY_AFTER_BOUNCE
 import club.pisquad.minecraft.csgrenades.isBetween
 import club.pisquad.minecraft.csgrenades.math.Segment
 import club.pisquad.minecraft.csgrenades.minus

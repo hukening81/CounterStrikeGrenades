@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades
 
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
+import club.pisquad.minecraft.csgrenades.grenades.decoy.DecoyRegistries
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.IncendiaryRegistries
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.molotov.MolotovRegistries
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangRegistries
@@ -26,7 +27,7 @@ fun GrenadeType.getEntity(): EntityType<out CounterStrikeGrenadeEntity> {
         GrenadeType.HE_GRENADE -> HEGrenadeRegistries.entity.get()
         GrenadeType.INCENDIARY -> IncendiaryRegistries.entity.get()
         GrenadeType.MOLOTOV -> MolotovRegistries.entity.get()
-        GrenadeType.DECOY -> MolotovRegistries.entity.get()
+        GrenadeType.DECOY -> DecoyRegistries.entity.get()
     }
 }
 
@@ -37,6 +38,6 @@ fun GrenadeType.getItem(): CounterStrikeGrenadeItem {
         GrenadeType.HE_GRENADE -> HEGrenadeRegistries.item.get()
         GrenadeType.INCENDIARY -> IncendiaryRegistries.item.get()
         GrenadeType.MOLOTOV -> MolotovRegistries.item.get()
-        GrenadeType.DECOY -> MolotovRegistries.item.get()
+        GrenadeType.DECOY -> DecoyRegistries.item.get()
     }
 }

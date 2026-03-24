@@ -9,10 +9,8 @@ import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
-import net.minecraft.sounds.SoundSource
 import net.minecraftforge.network.NetworkEvent
 import java.util.function.Supplier
-import kotlin.random.Random
 
 @Serializable
 class ServerGrenadeBlockBounceSoundMessage(
@@ -29,27 +27,30 @@ class ServerGrenadeBlockBounceSoundMessage(
             ModLogger.debug("Recieved block bounce sound message from server for ${msg.grenadeType} ${msg.data}")
             val context = ctx.get()
             context.packetHandled = true
-            val soundEvent = getBounceSoundEvent(msg.id)
-            if (soundEvent == null) {
+            val data = getBounceSoundEvent(msg.id)
+
+            if (data == null) {
                 ModLogger.warn("Cannot find entity ${msg.grenadeType}(${msg.id}) to play sound for")
             } else {
                 val level = Minecraft.getInstance().level
                 if (level == null) {
                     ModLogger.warn("Cannot retrieve client level")
                 } else {
-                    val position = msg.data.position
-                    //TODO(hukening81): replace with a spatial sound
-                    level.playSeededSound(
-                        null,
-                        position.x,
-                        position.y,
-                        position.z,
-                        soundEvent.soundEvent,
-                        SoundSource.PLAYERS,
-                        10.0f,
-                        1.0f,
-                        Random.nextLong()
-                    )
+                    data.play(msg.data.position)
+//                    val position = msg.data.position
+//                    val player = Minecraft.getInstance().player ?: return
+//                    //TODO(hukening81): replace with a spatial sound
+//                    level.playSeededSound(
+//                        player,
+//                        position.x,
+//                        position.y,
+//                        position.z,
+//                        data.soundEvent,
+//                        SoundSource.PLAYERS,
+//                        10.0f,
+//                        1.0f,
+//                        Random.nextLong()
+//                    )
                 }
             }
         }

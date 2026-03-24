@@ -3,7 +3,6 @@ package club.pisquad.minecraft.csgrenades.grenades.hegrenade.messages
 import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeExplosionData
 import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeRenderManager
 import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeHelper
-import club.pisquad.minecraft.csgrenades.grenades.hegrenade.client.HEGrenadeSoundManager
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
@@ -31,7 +30,7 @@ class HEGrenadeActivatedMessage(
             val level = Minecraft.getInstance().level ?: return
             HEGrenadeRenderManager.render(HEGrenadeExplosionData(msg.position))
 
-            HEGrenadeSoundManager.playExplosionSound(msg.position)
+//            HEGrenadeSoundManager.playExplosionSound(msg.position)
 
 
             HEGrenadeHelper.blowUpNearbySmokeGrenade(level, msg.position)
