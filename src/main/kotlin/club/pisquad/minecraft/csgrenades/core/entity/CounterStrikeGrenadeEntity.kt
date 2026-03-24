@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades.core.entity
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.ModSettings
+import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.CustomTrajectoryEntity
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
@@ -99,6 +100,12 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
+        CSGrenadesAPI.Grenade.register(this)
+    }
+
+    override fun onRemovedFromWorld() {
+        CSGrenadesAPI.Grenade.unregister(this.uuid)
+        super.onRemovedFromWorld()
     }
 
     override fun isOnFire(): Boolean = false

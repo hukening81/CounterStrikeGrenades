@@ -13,9 +13,12 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.phys.Vec3
 import java.util.*
 
+/**
+ * This API should only be called on server side for consistant behavior
+ */
 object CSGrenadesAPI {
     /**
-     * Spawn a grenade to the world
+     * Spawn a grenade with the provide context
      *
      * @param context
      * @return spanwed entity if success
@@ -54,6 +57,23 @@ object CSGrenadesAPI {
                 }
             }
             return false
+        }
+    }
+
+    object Grenade {
+        // Use this field direcly is on your own risk
+        val grenades: MutableMap<UUID, CounterStrikeGrenadeEntity> = mutableMapOf()
+
+        internal fun register(entity: CounterStrikeGrenadeEntity) {
+            grenades[entity.uuid] = entity
+        }
+
+        internal fun unregister(uuid: UUID): CounterStrikeGrenadeEntity? {
+            return grenades.remove(uuid)
+        }
+
+        fun get(grenadeType: GrenadeType): List<CounterStrikeGrenadeEntity> {
+            return grenades.filter { it.value.grenadeType == grenadeType }.map { it.value }
         }
     }
 }
