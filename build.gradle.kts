@@ -34,6 +34,7 @@ plugins {
     kotlin("jvm").version("2.3.20")
     kotlin("plugin.serialization").version("2.3.20")
     id("com.gradleup.shadow").version("9.2.0")
+    id("org.jetbrains.dokka") version "2.2.0"
 }
 
 version = modVersion
@@ -54,9 +55,9 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println(
     "Java: ${System.getProperty("java.version")}, JVM: ${System.getProperty("java.vm.version")} (${
         System.getProperty(
-            "java.vendor"
+            "java.vendor",
         )
-    }), Arch: ${System.getProperty("os.arch")}"
+    }), Arch: ${System.getProperty("os.arch")}",
 )
 configure<UserDevExtension> {
     // Change to your preferred mappings
@@ -81,8 +82,9 @@ configure<UserDevExtension> {
             if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
 
                 // NOTE(hukening81): This is mainly for my use case, since native glfw has some issue under wayland that will crash the test instance.
-                println("Running on a linux machine, use custom glfw library")
-                jvmArg("-Dorg.lwjgl.glfw.libname=/usr/lib/libglfw.so")
+                val libglfw = project.file("external/libglfw.so.3.4").absolutePath
+                println("Running on a linux machine, use custom glfw library: $libglfw")
+                jvmArg("-Dorg.lwjgl.glfw.libname=$libglfw")
                 // NOTE(hukening81): disable threaded optimization is recommended
                 environment("__GL_THREADED_OPTIMIZATIONS", "0")
             }
@@ -138,7 +140,7 @@ configure<UserDevExtension> {
                 "--output",
                 file("src/generated/resources/"),
                 "--existing",
-                file("src/main/resources")
+                file("src/main/resources"),
             )
 
             mods {
