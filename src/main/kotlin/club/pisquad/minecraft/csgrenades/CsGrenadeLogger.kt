@@ -14,17 +14,25 @@ object ModLogger {
     fun error(msg: String, vararg args: Any?) = logger.error(msg, *args)
     fun trace(msg: String, vararg args: Any?) = logger.trace(msg, *args)
 
-    fun trace(entity: CounterStrikeGrenadeEntity, msg: String, vararg args: Any?) {
-        // NOTE(hukening81): not sure how "msg.format(args)" affects performance
-        // NOTE(hukening81): someone need to write a generic method for following functions using logger.log
-        logger.trace("[{}(id:{} tick:{})] {}", entity.grenadeType, entity.id, entity.tickCount, msg.format(args))
+    private fun constructEntityLogString(entity: CounterStrikeGrenadeEntity, msg: () -> String): String {
+        return "[${entity.grenadeType}(id:${entity.id} tick:${entity.tickCount})]${msg.invoke()}"
     }
 
-    fun debug(entity: CounterStrikeGrenadeEntity, msg: String, vararg args: Any?) {
-        logger.debug("[{}(id:{} tick:{})] {}", entity.grenadeType, entity.id, entity.tickCount, msg.format(args))
+    fun trace(entity: CounterStrikeGrenadeEntity, msg: () -> String) {
+        if (logger.isTraceEnabled) {
+            logger.trace(constructEntityLogString(entity, msg))
+        }
     }
 
-    fun info(entity: CounterStrikeGrenadeEntity, msg: String, vararg args: Any?) {
-        logger.info("[{}(id:{} tick:{})] {}", entity.grenadeType, entity.id, entity.tickCount, msg.format(args))
+    fun debug(entity: CounterStrikeGrenadeEntity, msg: () -> String) {
+        if (logger.isDebugEnabled) {
+            logger.debug(constructEntityLogString(entity, msg))
+        }
+    }
+
+    fun info(entity: CounterStrikeGrenadeEntity, msg: () -> String) {
+        if (logger.isInfoEnabled) {
+            logger.info(constructEntityLogString(entity, msg))
+        }
     }
 }

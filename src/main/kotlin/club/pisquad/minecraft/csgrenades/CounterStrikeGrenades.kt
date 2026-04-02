@@ -9,13 +9,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext
 
-/**
- * Main mod class. Should be an `object` declaration annotated with `@Mod`.
- * The modid should be declared in this object and should match the modId entry
- * in mods.toml.
- *
- * An example for blocks is in the `blocks` package of this mod.
- */
 
 @Mod(CounterStrikeGrenades.ID)
 class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
@@ -34,20 +27,12 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
     companion object {
         const val ID = "csgrenades"
 
-        /**
-         * This is used for initializing client specific
-         * things such as renderers and keymaps
-         * Fired on the mod specific event bus.
-         */
         @JvmStatic
         @SubscribeEvent
         fun onClientSetup(event: FMLClientSetupEvent) {
             ModLogger.info("Initializing Mod -- Client Setup")
         }
-
-        /**
-         * Fired on the global Forge bus.
-         */
+        
         @JvmStatic
         @SubscribeEvent
         fun onServerSetup(event: FMLDedicatedServerSetupEvent) {

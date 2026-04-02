@@ -27,7 +27,7 @@ class FlashBangEntity(pEntityType: EntityType<out FlashBangEntity>, pLevel: Leve
             //EMPTY
         } else {
             val data = generateAffectedPlayerData()
-            ModLogger.debug(this, "Sending FlashbangActivatedMessage with data size:${data.size}")
+            ModLogger.debug(this) { "Sending FlashbangActivatedMessage with data size:${data.size}" }
             ModPacketHandler.sendMessageToPlayer(
                 this.level() as ServerLevel, this.center, FlashbangActivatedMessage(
                     this.center,
