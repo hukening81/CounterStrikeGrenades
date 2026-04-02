@@ -1,5 +1,6 @@
 import net.minecraftforge.gradle.userdev.UserDevExtension
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.dokka.gradle.formats.DokkaPublication
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.text.SimpleDateFormat
 import java.util.*
@@ -154,6 +155,20 @@ configure<UserDevExtension> {
 
 // Include assets and data from data generators
 sourceSets.main.get().resources { srcDirs("src/generated/resources/") }
+
+dokka {
+    dokkaSourceSets.main {
+        moduleName.set(project.name)
+        moduleVersion.set(project.version.toString())
+
+        includes.from(
+            project.fileTree("docs") {
+                include("**/*.md")
+            }
+        )
+    }
+}
+
 
 repositories {
     exclusiveContent {
