@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.core.item
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
+import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import net.minecraft.core.BlockPos
@@ -44,7 +44,7 @@ abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(propertie
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slotId: Int, isSelected: Boolean) {
         if (isSelected && !lastSelected) {
             if (level.isClientSide) {
-                CSGrenadesAPI.sound.item.playDraw(grenadeType)
+                CSGrenadeClientAPI.sound.playDraw(grenadeType)
             }
         }
         lastSelected = isSelected

@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
-import club.pisquad.minecraft.csgrenades.api.GrenadeSpawnContext
+import club.pisquad.minecraft.csgrenades.api.data.GrenadeSpawnContext
 import club.pisquad.minecraft.csgrenades.client.input.InputState.calculateGrenadeSpeed
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.getShootOrigin
@@ -21,7 +21,7 @@ data class ClientGrenadeThrowMessage(
             val player = context.sender ?: return
 
             val removeItem = !player.isCreative
-            CSGrenadesAPI.spawnGrenade(player, msg.context, removeItem)
+            CSGrenadesAPI.server.entity.spawnGrenade(player, msg.context, removeItem)
         }
 
         fun fromInputState(): ClientGrenadeThrowMessage? {

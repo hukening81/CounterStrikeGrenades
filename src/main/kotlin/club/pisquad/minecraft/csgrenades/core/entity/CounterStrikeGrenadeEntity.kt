@@ -3,12 +3,11 @@ package club.pisquad.minecraft.csgrenades.core.entity
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.ModSettings
+import club.pisquad.minecraft.csgrenades.api.CSGrenadeServerAPI
 import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.CustomTrajectoryEntity
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
@@ -99,11 +98,11 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
-        CSGrenadesAPI.Grenade.register(this)
+        CSGrenadeServerAPI.entity.register(this)
     }
 
     override fun onRemovedFromWorld() {
-        CSGrenadesAPI.Grenade.unregister(this.uuid)
+        CSGrenadeServerAPI.entity.unregister(this.uuid)
         super.onRemovedFromWorld()
     }
 
@@ -153,10 +152,11 @@ abstract class CounterStrikeGrenadeEntity(
         if (this.level().isClientSide) {
             // EMPTY
         } else {
-            ModPacketHandler.sendMessageToPlayer(
+            CSGrenadesAPI.server.sound.playHitBlockSound(
+                this.grenadeType,
+                this.uuid,
                 this.level() as ServerLevel,
-                this.center,
-                ServerGrenadeBlockBounceSoundMessage(this.grenadeType, this.uuid, data)
+                data.position
             )
         }
     }
