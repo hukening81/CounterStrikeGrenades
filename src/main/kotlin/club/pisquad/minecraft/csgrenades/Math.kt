@@ -32,3 +32,23 @@ fun Vec3.isPointWithinPlaneRange(
 ): Boolean {
     return this.isPointWithinPlaneRange(excludeAxis, aabb.minX, aabb.maxX, aabb.minY, aabb.maxY, aabb.minZ, aabb.maxZ)
 }
+
+fun Double.clamp(v1: Double, v2: Double): Double {
+    if (v1 > v2) {
+        return if (this > v1) {
+            v1
+        } else if (this < v2) {
+            v2
+        } else {
+            this
+        }
+    } else {
+        return if (this < v1) {
+            v1
+        } else if (this > v2) {
+            v2
+        } else {
+            this
+        }
+    }
+}

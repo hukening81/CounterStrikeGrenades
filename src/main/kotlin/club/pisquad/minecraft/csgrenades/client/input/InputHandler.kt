@@ -39,40 +39,52 @@ object InputHandler {
             val task = ThrowActionTask(
                 currentTime,
                 InputUtils.holdingGrenadeType!!,
-                strengthTarget,
                 InputUtils.selectedSlot
             )
             token = TaskRunner.add(task)
         }
     }
-//    fun setInventoryCoolDown() {
-//        val player = Minecraft.getInstance().player!!
-//        player.inventory.items.forEach {
-//            if (it.item is CounterStrikeGrenadeItem) {
-//                player.cooldowns.addCooldown(it.item, InputUtils.cooldown.toTick().toInt())
-//            }
-//        }
-//    }
+
+    fun getCurrentStrength(): Double? {
+        val task = (TaskRunner.getOrNull(token ?: return null) ?: return null) as ThrowActionTask
+        return task.strength
+    }
 }
 
 class ThrowActionTask(
     private val startTime: Long,
     private val grenadeType: GrenadeType,
-    private var strengthTarget: StrengthTarget,
     private val slot: Int,
 ) : RunnableTask<Unit> {
     private var prevStage: ThrowActionStage = ThrowActionStage.BEGIN
 
+    var strength: Double = 0.0
+    private val strengthTransitionSpeed: Double =
+        1.0.div(ModConfig.throwConfig.strength_transition_time.get()).div(20.0)
+
     override var state = Unit
     override fun runTask(s: Unit): Pair<Unit, Boolean> {
-        val delta = (System.currentTimeMillis() - startTime).div(1000.0)
+        val currentTime = System.currentTimeMillis()
+        val delta = (currentTime - startTime).div(1000.0)
+        val buttonState = InputUtils.buttonState
 
-        // Abort mission!
-        if (!InputUtils.buttonState.any() || InputUtils.screenState || InputUtils.selectedSlot != slot) {
+        // Abort mission, don't care about progress
+        if (InputUtils.screenState || InputUtils.selectedSlot != slot) {
             return Pair(Unit, true)
         }
 
-        when (val currentActionStage = getCurrentActionStage(delta)) {
+        val currentActionStage = getCurrentActionStage(delta)
+
+        // Stop input
+        if (!buttonState.any()) {
+            if (currentActionStage == ThrowActionStage.ADJUST) {
+                doThrow()
+            }
+            return Pair(Unit, true)
+        }
+
+
+        when (currentActionStage) {
             ThrowActionStage.BEGIN -> {
                 throw InvalidValueException("This should not be possible")
             }
@@ -90,10 +102,26 @@ class ThrowActionTask(
             }
 
             ThrowActionStage.ADJUST -> {
-
+                updateActionStage(currentActionStage)
+                val strengthTarget = buttonState.toStrengthTarget().strength
+                if (strengthTarget > strength) {
+                    strength += strengthTransitionSpeed
+                    if (strength > strengthTarget) {
+                        strength = strengthTarget
+                    }
+                } else if (strengthTarget < strength) {
+                    strength -= strengthTransitionSpeed
+                    if (strength < strengthTarget) {
+                        strength = strengthTarget
+                    }
+                }
             }
         }
         return Pair(Unit, false)
+    }
+
+    private fun doThrow() {
+
     }
 
     private fun updateActionStage(current: ThrowActionStage): Boolean {

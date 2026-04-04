@@ -28,6 +28,10 @@ object TaskRunner {
         return tasks[token] == null
     }
 
+    fun getOrNull(token: RegistrationToken): RunnableTask<out Any>? {
+        return tasks[token]
+    }
+
     @JvmStatic
     @SubscribeEvent
     fun onServerTick(event: TickEvent.ServerTickEvent) {

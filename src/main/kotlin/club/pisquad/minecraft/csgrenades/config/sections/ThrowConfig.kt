@@ -18,7 +18,7 @@ object ThrowConfig : ConfigSection {
         speed_weak = builder.defineInRange("throw_speed_weak", 15.0, 1.0, 100.0)
         speed_medium = builder.defineInRange("throw_speed_medium", 20.0, 1.0, 100.0)
         speed_strong = builder.defineInRange("throw_speed_strong", 25.0, 1.0, 100.0)
-        strength_transition_time = builder.defineInRange("strength_transition_time", 1.0, 0.1, 10.0)
+        strength_transition_time = builder.defineInRange("strength_transition_time", 0.5, 0.1, 10.0)
         fov_effect_amount = builder.defineInRange("fov_effect_amount", 0.12, 0.0, 1.0)
         trajectory_color = builder.define("trajectory_preview_color", "#FFFFFF")
         builder.pop()
