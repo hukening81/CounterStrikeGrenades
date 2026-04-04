@@ -26,7 +26,7 @@ class ServerGrenadeBlockBounceSoundMessage(
         ) {
             val context = ctx.get()
             context.packetHandled = true
-            ModLogger.debug("Recieved block bounce sound message from server for ${msg.grenadeType} ${msg.position}")
+            ModLogger.debug("Received block bounce sound message from server for ${msg.grenadeType} ${msg.position}")
             msg.grenadeType.sounds.get().hitBlock
             CSGrenadeClientAPI.sound.playHitBlock(msg.position, msg.grenadeType)
         }

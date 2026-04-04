@@ -25,7 +25,7 @@ object SmokeGrenadeDamageTypes : GrenadeEntityDamageTypes {
 object SmokeGrenadeSoundEvents : GrenadeSoundEvents {
     val can = GrenadeSoundData.create("smokegrenade.can")
     override val draw = GrenadeSoundData.create("smokegrenade.draw")
-    override val hitBlock = GrenadeSoundData.create("smokegrenade.hit")
+    override val hitBlock = GrenadeSoundData.create("smokegrenade.bounce")
     override val `throw` = GrenadeSoundData.create("smokegrenade.throw")
     override val pinPull = GrenadeSoundData.create("smokegrenade.pinpull")
     override val pinPullStart = GrenadeSoundData.create("smokegrenade.pinpull_start")
