@@ -15,8 +15,7 @@ object DecoyRegistries :
         DecoyDamageTypes,
         DecoySoundEvents,
         ::DecoyGrenadeEntity,
-        { DecoyGrenadeItem(Item.Properties()) }) {
-}
+        { DecoyGrenadeItem(Item.Properties()) })
 
 object DecoyDamageTypes : GrenadeEntityDamageTypes {
     val explosion = ModDamageTypes.registerSingle("decoy.explosion")
@@ -25,9 +24,9 @@ object DecoyDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object DecoySoundEvents : GrenadeSoundEvents {
-    override val draw = GrenadeSoundData.Companion.createDraw("decoy.draw")
-    override val `throw` = GrenadeSoundData.Companion.createThrow("decoy.throw")
+    override val draw = GrenadeSoundData.createDraw("decoy.draw")
+    override val `throw` = GrenadeSoundData.createThrow("decoy.throw")
     override val hitBlock = FlashbangRegistries.sounds.hitBlock
-    val pinpull = GrenadeSoundData.Companion.create("decoy.pinpull")
-    val pinpullStart = GrenadeSoundData.Companion.create("decoy.pinpull_start")
+    override val pinPull = GrenadeSoundData.create("decoy.pinpull")
+    override val pinPullStart = GrenadeSoundData.create("decoy.pinpull_start")
 }

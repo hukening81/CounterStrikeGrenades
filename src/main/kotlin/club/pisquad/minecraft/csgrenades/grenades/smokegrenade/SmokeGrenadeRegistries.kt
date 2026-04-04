@@ -15,8 +15,7 @@ object SmokeGrenadeRegistries :
         SmokeGrenadeSoundEvents,
         ::SmokeGrenadeEntity,
         { SmokeGrenadeItem(Item.Properties()) }
-    ) {
-}
+    )
 
 object SmokeGrenadeDamageTypes : GrenadeEntityDamageTypes {
     override val hit = ModDamageTypes.registerSingle("smokegrenade.hit")
@@ -24,13 +23,13 @@ object SmokeGrenadeDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object SmokeGrenadeSoundEvents : GrenadeSoundEvents {
-    val can = GrenadeSoundData.Companion.create("smokegrenade.can")
-    override val draw = GrenadeSoundData.Companion.create("smokegrenade.draw")
-    override val hitBlock = GrenadeSoundData.Companion.create("smokegrenade.hit")
-    override val `throw` = GrenadeSoundData.Companion.create("smokegrenade.throw")
-    val pinpull = GrenadeSoundData.Companion.create("smokegrenade.pinpull")
-    val pinpullStart = GrenadeSoundData.Companion.create("smokegrenade.pinpull_start")
-    val explodeDistant = GrenadeSoundData.Companion.create("smokegrenade.explode_distant")
-    val clear = GrenadeSoundData.Companion.create("smokegrenade.clear")
-    val emit = GrenadeSoundData.Companion.create("smokegrenade.emit")
+    val can = GrenadeSoundData.create("smokegrenade.can")
+    override val draw = GrenadeSoundData.create("smokegrenade.draw")
+    override val hitBlock = GrenadeSoundData.create("smokegrenade.hit")
+    override val `throw` = GrenadeSoundData.create("smokegrenade.throw")
+    override val pinPull = GrenadeSoundData.create("smokegrenade.pinpull")
+    override val pinPullStart = GrenadeSoundData.create("smokegrenade.pinpull_start")
+    val explodeDistant = GrenadeSoundData.create("smokegrenade.explode_distant")
+    val clear = GrenadeSoundData.create("smokegrenade.clear")
+    val emit = GrenadeSoundData.create("smokegrenade.emit")
 }

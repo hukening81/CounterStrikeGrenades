@@ -25,16 +25,19 @@ object MolotovDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object MolotovSoundEvents : GrenadeSoundEvents {
-    val detonate = GrenadeSoundData.Companion.create("molotov.detonate")
-    val detonateDistant = GrenadeSoundData.Companion.create("molotov.detonate_distant")
-    val detonateAir = GrenadeSoundData.Companion.create("molotov.detonate_air")
-    override val draw = GrenadeSoundData.Companion.create("molotov.draw")
-    val extinguish = GrenadeSoundData.Companion.create("molotov.extinguish")
-    val fireIdle = GrenadeSoundData.Companion.create("molotov.fire_idle")
-    val ignite = GrenadeSoundData.Companion.create("molotov.ignite")
-    val fireLoop = GrenadeSoundData.Companion.create("molotov.fire_loop")
-    val fireFadeout = GrenadeSoundData.Companion.create("molotov.fire_fadeout")
-    override val `throw` = GrenadeSoundData.Companion.create("molotov.throw")
-    val smash = GrenadeSoundData.Companion.create("molotov.smash")
-    override val hitBlock = GrenadeSoundData.Companion.create("molotov.bounce")
+    val detonate = GrenadeSoundData.create("molotov.detonate")
+    val detonateDistant = GrenadeSoundData.create("molotov.detonate_distant")
+    val detonateAir = GrenadeSoundData.create("molotov.detonate_air")
+    override val draw = GrenadeSoundData.create("molotov.draw")
+    val extinguish = GrenadeSoundData.create("molotov.extinguish")
+    val fireIdle = GrenadeSoundData.create("molotov.fire_idle")
+    val ignite = GrenadeSoundData.create("molotov.ignite")
+    val fireLoop = GrenadeSoundData.create("molotov.fire_loop")
+    val fireFadeout = GrenadeSoundData.create("molotov.fire_fadeout")
+    override val `throw` = GrenadeSoundData.create("molotov.throw")
+    val smash = GrenadeSoundData.create("molotov.smash")
+    override val hitBlock = GrenadeSoundData.create("molotov.bounce")
+
+    override val pinPull = fireIdle
+    override val pinPullStart = GrenadeSoundData.empty()
 }

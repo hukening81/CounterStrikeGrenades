@@ -1,5 +1,11 @@
 # Module CounterStrikeGrenades
 
-Hello, world!
+This mod provides cs2's utilities into Minecraft, with customizabilities for other use cases and compatibility with
+other mods (WIP).
 
-Documents under construction, should be updated before next release
+## Features
+- HE Grenade
+- FlashBang
+- Smoke Grenade
+- Incendiary & Molotov
+- Decoy

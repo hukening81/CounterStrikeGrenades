@@ -14,11 +14,13 @@ interface GrenadeSoundEvents {
     val draw: GrenadeSoundData
     val hitBlock: GrenadeSoundData
     val `throw`: GrenadeSoundData
+    val pinPullStart: GrenadeSoundData
+    val pinPull: GrenadeSoundData
 }
 
 object ModSoundEvents {
     val SOUND_EVENTS: DeferredRegister<SoundEvent> =
-        DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CounterStrikeGrenades.Companion.ID)
+        DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CounterStrikeGrenades.ID)
 
 //        val common = CommonSoundEvents
 //    val hegrenade = HEGrenadeSoundEvents
@@ -36,7 +38,7 @@ object ModSoundEvents {
     fun registerSoundEvent(name: String): RegistryObject<SoundEvent> {
         // Don't know why forge use the name in json file instead of the actual file location for ResourceLocation
         return SOUND_EVENTS.register(name) {
-            SoundEvent.createVariableRangeEvent(ResourceLocation(CounterStrikeGrenades.Companion.ID, name))
+            SoundEvent.createVariableRangeEvent(ResourceLocation(CounterStrikeGrenades.ID, name))
         }
     }
 }

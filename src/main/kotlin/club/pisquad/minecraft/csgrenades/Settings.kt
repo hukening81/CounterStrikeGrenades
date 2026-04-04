@@ -33,6 +33,7 @@ object ModSettings {
     }
 }
 
-object AnimationSettings {
-    
+object AnimationTiming {
+    const val PIN_PULL_START = 0.58
+    const val PIN_PULL = 0.79
 }

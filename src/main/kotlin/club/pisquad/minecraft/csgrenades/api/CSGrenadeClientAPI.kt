@@ -18,5 +18,15 @@ object CSGrenadeClientAPI {
             val position = Minecraft.getInstance().player?.getEarPosition() ?: return false
             return grenadeType.sounds.get().draw.play(position)
         }
+
+        fun playPinPullStart(grenadeType: GrenadeType): Boolean {
+            val position = Minecraft.getInstance().player?.getEarPosition() ?: return false
+            return grenadeType.sounds.get().pinPullStart.play(position)
+        }
+
+        fun playPinPull(grenadeType: GrenadeType): Boolean {
+            val position = Minecraft.getInstance().player?.getEarPosition() ?: return false
+            return grenadeType.sounds.get().pinPull.play(position)
+        }
     }
 }
