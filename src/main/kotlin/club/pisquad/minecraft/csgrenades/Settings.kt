@@ -3,6 +3,9 @@ package club.pisquad.minecraft.csgrenades
 object ModSettings {
     const val SERVER_MESSAGE_RANGE: Double = 128.0
 
+    // Within how much time after pressing jump key, a throw is considered a jump throw
+    const val JUMP_THROW_TIME_WINDOW: Double = 0.5
+
     object Entity {
         const val GRENADE_ENTITY_SIZE = 0.25
         const val GRENADE_ENTITY_SIZE_HALF = GRENADE_ENTITY_SIZE.div(2.0)

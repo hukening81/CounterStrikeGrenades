@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.config.sections
 
+import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.config.ConfigSection
 import club.pisquad.minecraft.csgrenades.config.common.GrenadeCommonConfig
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import net.minecraftforge.common.ForgeConfigSpec
 
 object HEGrenadeConfig : ConfigSection {

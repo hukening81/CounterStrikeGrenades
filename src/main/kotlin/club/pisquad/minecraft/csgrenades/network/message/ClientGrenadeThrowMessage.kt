@@ -11,7 +11,7 @@ import java.util.function.Supplier
 @Serializable
 data class ClientGrenadeThrowMessage(
     val context: GrenadeSpawnContext,
-//    val jumpThrow: Boolean
+    val jumpThrow: Boolean
 ) {
     companion object : CsGrenadeMessageHandler<ClientGrenadeThrowMessage>(ClientGrenadeThrowMessage::class) {
         override fun handler(msg: ClientGrenadeThrowMessage, ctx: Supplier<NetworkEvent.Context>) {

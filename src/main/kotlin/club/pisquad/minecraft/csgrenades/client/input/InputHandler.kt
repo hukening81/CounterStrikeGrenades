@@ -1,14 +1,13 @@
 package club.pisquad.minecraft.csgrenades.client.input
 
-import club.pisquad.minecraft.csgrenades.AnimationTiming
-import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.RunnableTask
 import club.pisquad.minecraft.csgrenades.core.TaskRunner
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import com.electronwill.nightconfig.core.conversion.InvalidValueException
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -28,9 +27,8 @@ object InputHandler {
         if (event.side == LogicalSide.SERVER) return
         if (event.phase == TickEvent.Phase.END) return
 
-        val strengthTarget = InputUtils.buttonState.toStrengthTarget()
         val currentTime = System.currentTimeMillis()
-        if (strengthTarget != StrengthTarget.NONE
+        if (InputUtils.buttonState.any()
             && InputUtils.isHoldingGrenade
             && !InputUtils.screenState
             && (token == null || TaskRunner.isDone(token!!))
@@ -45,22 +43,24 @@ object InputHandler {
         }
     }
 
-    fun getCurrentStrength(): Double? {
-        val task = (TaskRunner.getOrNull(token ?: return null) ?: return null) as ThrowActionTask
-        return task.strength
-    }
+//    fun getCurrentStrength(): Double? {
+//        val task = (TaskRunner.getOrNull(token ?: return null) ?: return null) as ThrowActionTask
+//        return task.strength
+//    }
 }
 
 class ThrowActionTask(
     private val startTime: Long,
-    private val grenadeType: GrenadeType,
+    private val grenade: GrenadeType,
     private val slot: Int,
 ) : RunnableTask<Unit> {
     private var prevStage: ThrowActionStage = ThrowActionStage.BEGIN
-
-    var strength: Double = 0.0
-    private val strengthTransitionSpeed: Double =
-        1.0.div(ModConfig.throwConfig.strength_transition_time.get()).div(20.0)
+    private var lastJumpKeyPress: Long = 0
+    private var lastButtonState: ButtonState = ButtonState.empty()
+//
+//    var strength: Double = 0.0
+//    private val strengthTransitionSpeed: Double =
+//        1.0.div(ModConfig.throwConfig.strength_transition_time.get()).div(20.0)
 
     override var state = Unit
     override fun runTask(s: Unit): Pair<Unit, Boolean> {
@@ -73,15 +73,26 @@ class ThrowActionTask(
             return Pair(Unit, true)
         }
 
+        if (InputUtils.jumpKeyState) {
+            lastJumpKeyPress = currentTime
+        }
+
         val currentActionStage = getCurrentActionStage(delta)
+
 
         // Stop input
         if (!buttonState.any()) {
             if (currentActionStage == ThrowActionStage.ADJUST) {
-                doThrow()
+                val jumpThrow = (currentTime - lastJumpKeyPress).div(1000.0) < ModSettings.JUMP_THROW_TIME_WINDOW
+                val throwType = lastButtonState.toThrowType()
+                if (throwType != null) {
+                    CSGrenadeClientAPI.player.throwGrenadeFromLocalPlayer(throwType, grenade, jumpThrow)
+                }
             }
             return Pair(Unit, true)
         }
+
+        lastButtonState = buttonState
 
 
         when (currentActionStage) {
@@ -91,37 +102,33 @@ class ThrowActionTask(
 
             ThrowActionStage.PINPULL_START -> {
                 if (updateActionStage(currentActionStage)) {
-                    CSGrenadeClientAPI.sound.playPinPullStart(grenadeType)
+                    CSGrenadeClientAPI.sound.playPinPullStart(grenade)
                 }
             }
 
             ThrowActionStage.PINPULL -> {
                 if (updateActionStage(currentActionStage)) {
-                    CSGrenadeClientAPI.sound.playPinPull(grenadeType)
+                    CSGrenadeClientAPI.sound.playPinPull(grenade)
                 }
             }
 
             ThrowActionStage.ADJUST -> {
                 updateActionStage(currentActionStage)
-                val strengthTarget = buttonState.toStrengthTarget().strength
-                if (strengthTarget > strength) {
-                    strength += strengthTransitionSpeed
-                    if (strength > strengthTarget) {
-                        strength = strengthTarget
-                    }
-                } else if (strengthTarget < strength) {
-                    strength -= strengthTransitionSpeed
-                    if (strength < strengthTarget) {
-                        strength = strengthTarget
-                    }
-                }
+//                val strengthTarget = buttonState.toStrengthTarget().strength
+//                if (strengthTarget > strength) {
+//                    strength += strengthTransitionSpeed
+//                    if (strength > strengthTarget) {
+//                        strength = strengthTarget
+//                    }
+//                } else if (strengthTarget < strength) {
+//                    strength -= strengthTransitionSpeed
+//                    if (strength < strengthTarget) {
+//                        strength = strengthTarget
+//                    }
+//                }
             }
         }
         return Pair(Unit, false)
-    }
-
-    private fun doThrow() {
-
     }
 
     private fun updateActionStage(current: ThrowActionStage): Boolean {
@@ -159,29 +166,41 @@ data class ButtonState(val primary: Boolean, val secondary: Boolean) {
         return primary || secondary
     }
 
-    fun toStrengthTarget(): StrengthTarget {
-        return when (Pair(primary, secondary)) {
-            Pair(true, true) -> {
-                StrengthTarget.MEDIUM
-            }
-
-            Pair(true, false) -> {
-                StrengthTarget.STRONG
-            }
-
-            Pair(false, true) -> {
-                StrengthTarget.WEAK
-            }
-
-            Pair(false, false) -> {
-                StrengthTarget.NONE
-            }
-
-            else -> {
-                throw Exception("This should never happen")
-            }
+    fun toThrowType(): ThrowType? {
+        return if (primary && secondary) {
+            ThrowType.MEDIUM
+        } else if (primary) {
+            ThrowType.STRONG
+        } else if (secondary) {
+            ThrowType.WEAK
+        } else {
+            null
         }
     }
+
+//    fun toStrengthTarget(): StrengthTarget {
+//        return when (Pair(primary, secondary)) {
+//            Pair(true, true) -> {
+//                StrengthTarget.MEDIUM
+//            }
+//
+//            Pair(true, false) -> {
+//                StrengthTarget.STRONG
+//            }
+//
+//            Pair(false, true) -> {
+//                StrengthTarget.WEAK
+//            }
+//
+//            Pair(false, false) -> {
+//                StrengthTarget.NONE
+//            }
+//
+//            else -> {
+//                throw Exception("This should never happen")
+//            }
+//        }
+//    }
 
     companion object {
         fun empty(): ButtonState {
@@ -231,8 +250,11 @@ private object InputUtils {
         get() {
             return ModConfig.throwConfig.cooldown.get()
         }
-}
 
-enum class StrengthTarget(val strength: Double) {
-    NONE(0.0), WEAK(1.0), MEDIUM(2.0), STRONG(3.0),
+    val jumpKeyState: Boolean
+        get() {
+            val mapping = Minecraft.getInstance().options.keyJump
+            val keycode = mapping.key.value
+            return InputConstants.isKeyDown(Minecraft.getInstance().window.window, keycode)
+        }
 }
