@@ -29,6 +29,13 @@ class GrenadeSoundData(
             )
         }
 
+        fun empty(): GrenadeSoundData {
+            return GrenadeSoundData(
+                ModSoundEvents.registerSoundEvent("dev_null"),
+                0.0
+            )
+        }
+
         fun createDraw(name: String): GrenadeSoundData {
             return create(name, ModSettings.Sound.Volume.DRAW)
         }

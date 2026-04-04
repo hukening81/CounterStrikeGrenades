@@ -15,8 +15,7 @@ object IncendiaryRegistries :
         IncendiaryDamageTypes,
         IncendiarySoundEvents,
         ::IncendiaryEntity,
-        { IncendiaryItem(Item.Properties()) }) {
-}
+        { IncendiaryItem(Item.Properties()) })
 
 object IncendiaryDamageTypes : GrenadeEntityDamageTypes {
     val fire = ModDamageTypes.registerSingle("incendiary.fire")
@@ -25,13 +24,13 @@ object IncendiaryDamageTypes : GrenadeEntityDamageTypes {
 }
 
 object IncendiarySoundEvents : GrenadeSoundEvents {
-    override val hitBlock = GrenadeSoundData.Companion.create("incendiary.hit_block")
-    val detonate = GrenadeSoundData.Companion.create("incendiary.detonate")
-    val detonateDistant = GrenadeSoundData.Companion.create("incendiary.detonate_distant")
-    val detonateAir = GrenadeSoundData.Companion.create("incendiary.detonate_air")
-    override val draw = GrenadeSoundData.Companion.create("incendiary.draw")
-    val pinpull = GrenadeSoundData.Companion.create("incendiary.pinpull")
-    val pinpullStart = GrenadeSoundData.Companion.create("incendiary.pinpull_start")
-    val pop = GrenadeSoundData.Companion.create("incendiary.pop")
-    override val `throw` = GrenadeSoundData.Companion.create("incendiary.throw")
+    override val hitBlock = GrenadeSoundData.create("incendiary.hit_block")
+    val detonate = GrenadeSoundData.create("incendiary.detonate")
+    val detonateDistant = GrenadeSoundData.create("incendiary.detonate_distant")
+    val detonateAir = GrenadeSoundData.create("incendiary.detonate_air")
+    override val draw = GrenadeSoundData.create("incendiary.draw")
+    override val pinPull = GrenadeSoundData.create("incendiary.pinpull")
+    override val pinPullStart = GrenadeSoundData.create("incendiary.pinpull_start")
+    val pop = GrenadeSoundData.create("incendiary.pop")
+    override val `throw` = GrenadeSoundData.create("incendiary.throw")
 }

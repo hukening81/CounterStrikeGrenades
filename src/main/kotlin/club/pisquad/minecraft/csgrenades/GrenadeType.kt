@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades
 
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.grenades.decoy.DecoyRegistries
@@ -55,4 +56,12 @@ enum class GrenadeType(
         { DecoyRegistries.item.get() },
         { DecoyRegistries.sounds }
     ),
+}
+
+enum class ThrowType(
+    val getSpeed: () -> Double
+) {
+    WEAK({ ModConfig.throwConfig.speed_weak.get().toMetersPerTick() }),
+    MEDIUM({ ModConfig.throwConfig.speed_medium.get().toMetersPerTick() }),
+    STRONG({ ModConfig.throwConfig.speed_strong.get().toMetersPerTick() }),
 }

@@ -3,10 +3,12 @@ package club.pisquad.minecraft.csgrenades.api
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.api.data.GrenadeSpawnContext
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
+import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.phys.Vec3
@@ -85,6 +87,15 @@ object CSGrenadeServerAPI {
                 }
             }
             return false
+        }
+
+        fun setInventoryCoolDown(player: ServerPlayer) {
+            val amount = ModConfig.throwConfig.cooldown.get().toTick().toInt()
+            player.inventory.items.forEach {
+                if (it.item is CounterStrikeGrenadeItem) {
+                    player.cooldowns.addCooldown(it.item, amount)
+                }
+            }
         }
     }
 }
