@@ -1,6 +1,5 @@
 import net.minecraftforge.gradle.userdev.UserDevExtension
 import org.gradle.jvm.tasks.Jar
-import org.jetbrains.dokka.gradle.formats.DokkaPublication
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.text.SimpleDateFormat
 import java.util.*
@@ -214,12 +213,11 @@ dependencies {
     "shade"("org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm:$kotlinSerializationVersion") {
         exclude(group = "org.jetbrains", module = "annotations")
     }
+    "shade"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2") {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
 
     testImplementation(kotlin("test"))
-
-//    "shade"("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion") {
-//        exclude(group = "org.jetbrains", module = "annotations")
-//    }
 }
 tasks.test {
     useJUnitPlatform()
@@ -278,15 +276,15 @@ tasks.named<Jar>("jar") {
 //    mustRunAfter(tasks.shadowJar)
 // }
 tasks.shadowJar {
-//    enableAutoRelocation = true
+    enableAutoRelocation = true
+    minimizeJar = true
     archiveClassifier.set("")
     configurations = listOf(project.configurations.getByName("shade"))
-    relocate("kotlinx.serialization", "club.pisquasd.csgrenades.shadow.serialization")
+    relocate("kotlinx.serialization", "club.pisquad.minecraft.csgrenades.shadow.serialization")
+    relocate("kotlinx.coroutines", "club.pisquad.minecraft.csgrenades.shadow.coroutines")
     from(sourceSets.main.get().output)
-//    dependencies {
-//        include("thedarkcolour:kotlinforforge:$kffVersion")
-//    }
-//    minimizeJar = true
+
+
     isZip64 = true
     manifest {
         attributes(
