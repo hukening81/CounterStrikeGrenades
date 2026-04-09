@@ -34,23 +34,25 @@ object SmokeGrenadeDebugRenderer {
     @JvmStatic
     @SubscribeEvent
     fun renderVoxelOutline(event: RenderLevelStageEvent) {
-        if (event.stage != RenderLevelStageEvent.Stage.AFTER_LEVEL) {
+        if (event.stage != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return
         }
         if (!SmokeGrenadeDebugState.showVoxelOutline) {
             return
         }
         val poseStack = event.poseStack
+        val camera = event.camera
 
         poseStack.pushPose()
+        poseStack.translate(-camera.position.x, -camera.position.y, -camera.position.z)
 
         RenderSystem.disableDepthTest()
         RenderSystem.enableBlend()
         RenderSystem.defaultBlendFunc()
-        RenderSystem.lineWidth(3f)
 
         val smokes = getNearbySmokeGrenade()
         val bufferSource = Minecraft.getInstance().renderBuffers().bufferSource()
+
         smokes.forEach { smoke ->
             smoke.getVoxels()?.keys?.forEach { pos ->
                 val buffer = bufferSource.getBuffer(RenderType.lines())
@@ -68,13 +70,14 @@ object SmokeGrenadeDebugRenderer {
                     1f,
                     1f
                 )
+                bufferSource.endLastBatch()
             }
         }
+        poseStack.popPose()
         
-        RenderSystem.lineWidth(1f)
         RenderSystem.disableBlend()
         RenderSystem.enableDepthTest()
 
-        poseStack.popPose()
+
     }
 }
