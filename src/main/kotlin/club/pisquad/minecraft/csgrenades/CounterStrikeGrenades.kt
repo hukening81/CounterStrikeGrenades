@@ -15,8 +15,8 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
 
     init {
         ModLogger.info("Initializing Mod -- Common Setup")
-
-        RegistryHelper.registerMod(context.modEventBus)
+        
+        RegistryHelper.commonSetup(context.modEventBus)
 
         ModPacketHandler.register()
 
@@ -32,7 +32,7 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
         fun onClientSetup(event: FMLClientSetupEvent) {
             ModLogger.info("Initializing Mod -- Client Setup")
         }
-        
+
         @JvmStatic
         @SubscribeEvent
         fun onServerSetup(event: FMLDedicatedServerSetupEvent) {

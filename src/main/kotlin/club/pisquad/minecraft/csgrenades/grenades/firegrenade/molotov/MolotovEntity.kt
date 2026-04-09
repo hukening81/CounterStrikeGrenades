@@ -8,8 +8,9 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
 class MolotovEntity(pEntityType: EntityType<out MolotovEntity>, pLevel: Level) : FireGrenadeEntity(
-    pEntityType, pLevel, GrenadeType.MOLOTOV, ModConfig.molotov.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
+    pEntityType, pLevel, ModConfig.molotov.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
 ) {
     override val sounds = MolotovRegistries.sounds
     override val damageTypes = MolotovRegistries.damageTypes
+    override val grenadeType: GrenadeType = GrenadeType.MOLOTOV
 }

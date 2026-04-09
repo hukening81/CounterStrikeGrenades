@@ -47,7 +47,7 @@ object CSGrenadeServerAPI {
             removeItem: Boolean = true
         ): CounterStrikeGrenadeEntity? {
             val level = owner.level() as ServerLevel
-            val entityType = context.grenadeType.entity.get()
+            val entityType = context.grenadeType.registries.get().entity.get()
             val entity = entityType.create(level) ?: return null
             entity.initialize(context.ownerUuid, context.position, context.velocity)
 

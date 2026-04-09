@@ -10,7 +10,7 @@ import club.pisquad.minecraft.csgrenades.registry.ModItems
 import net.minecraft.world.entity.EntityType
 import net.minecraftforge.registries.RegistryObject
 
-open class CounterStrikeGrenadeRegistries<
+abstract class CounterStrikeGrenadeRegistries<
         E : CounterStrikeGrenadeEntity,
         I : CounterStrikeGrenadeItem,
         D : GrenadeEntityDamageTypes,
@@ -24,4 +24,15 @@ open class CounterStrikeGrenadeRegistries<
 ) {
     val entity: RegistryObject<EntityType<E>> = ModEntities.registerSingle(grenadeType.resourceKey, entityFactory)
     val item: RegistryObject<I> = ModItems.registerSingle(grenadeType.resourceKey, itemFactory)
+
+    open fun registerSerializers() {}
 }
+
+//object ModGrenadeRegistries {
+//    val HE_GRENADE = HEGrenadeRegistries
+//    val SMOKE_GRENADE = SmokeGrenadeRegistries
+//    val FLASHBANG = FlashbangRegistries
+//    val MOLOTOV = MolotovRegistries
+//    val INCENDIARY = IncendiaryRegistries
+//    val Decoy = DecoyRegistries
+//}

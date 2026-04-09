@@ -3,7 +3,6 @@ package club.pisquad.minecraft.csgrenades.network.serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.DoubleArraySerializer
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -29,5 +28,3 @@ object Vec3Serializer : KSerializer<Vec3> {
         encoder.encodeSerializableValue(delegateSerializer, data)
     }
 }
-
-object Vec3ListSerializer : KSerializer<List<Vec3>> by ListSerializer(Vec3Serializer)

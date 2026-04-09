@@ -14,11 +14,11 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
     ActivateByFuseGrenadeEntity(
         pEntityType,
         pLevel,
-        GrenadeType.HE_GRENADE,
         ModConfig.hegrenade.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
     ) {
     override val sounds = HEGrenadeRegistries.sounds
     override val damageTypes = HEGrenadeRegistries.damageTypes
+    override val grenadeType: GrenadeType = GrenadeType.HE_GRENADE
 
 
     override fun activate() {

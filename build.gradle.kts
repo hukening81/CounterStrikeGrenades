@@ -277,12 +277,13 @@ tasks.named<Jar>("jar") {
 // }
 tasks.shadowJar {
     enableAutoRelocation = true
-    minimizeJar = true
+//    minimizeJar = true
     archiveClassifier.set("")
     configurations = listOf(project.configurations.getByName("shade"))
     relocate("kotlinx.serialization", "club.pisquad.minecraft.csgrenades.shadow.serialization")
     relocate("kotlinx.coroutines", "club.pisquad.minecraft.csgrenades.shadow.coroutines")
     from(sourceSets.main.get().output)
+    mergeServiceFiles()
 
 
     isZip64 = true

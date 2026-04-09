@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades
 
+import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
@@ -198,4 +199,16 @@ fun ServerLevel.getPlayersWithinMessageRange(center: Vec3): List<Player> {
     val range = ModSettings.SERVER_MESSAGE_RANGE
     val box = AABB.ofSize(center, range, range, range)
     return this.getEntitiesOfClass(Player::class.java, box).toList()
+}
+
+fun <T : CounterStrikeGrenadeEntity> T.runOnServer(task: T.() -> Unit) {
+    if (!this.level().isClientSide) {
+        task(this)
+    }
+}
+
+fun <T : CounterStrikeGrenadeEntity> T.runOnClient(task: T.() -> Unit) {
+    if (this.level().isClientSide) {
+        task(this)
+    }
 }

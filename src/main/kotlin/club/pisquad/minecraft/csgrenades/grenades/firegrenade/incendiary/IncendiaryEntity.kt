@@ -8,9 +8,10 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
 class IncendiaryEntity(pEntityType: EntityType<out IncendiaryEntity>, pLevel: Level) : FireGrenadeEntity(
-    pEntityType, pLevel, GrenadeType.INCENDIARY,
+    pEntityType, pLevel,
     ModConfig.incendiary.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
 ) {
     override val sounds = IncendiaryRegistries.sounds
     override val damageTypes = IncendiaryRegistries.damageTypes
+    override val grenadeType: GrenadeType = GrenadeType.INCENDIARY
 }

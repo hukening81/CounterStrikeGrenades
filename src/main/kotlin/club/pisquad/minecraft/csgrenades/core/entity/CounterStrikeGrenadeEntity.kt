@@ -1,10 +1,11 @@
 package club.pisquad.minecraft.csgrenades.core.entity
 
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.ModSettings
+import club.pisquad.minecraft.csgrenades.WithGrenadeType
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeServerAPI
 import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
+import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.CustomTrajectoryEntity
 import club.pisquad.minecraft.csgrenades.core.entity.trajectory.SubtickNode
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
@@ -14,8 +15,6 @@ import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
-import net.minecraft.core.Holder
-import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -23,11 +22,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.damagesource.DamageType
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -45,9 +40,8 @@ interface GrenadeEntityData {
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out CounterStrikeGrenadeEntity>,
     pLevel: Level,
-    val grenadeType: GrenadeType,
 ) :
-    CustomTrajectoryEntity(pEntityType, pLevel), GrenadeEntityData {
+    CustomTrajectoryEntity(pEntityType, pLevel), GrenadeEntityData, WithGrenadeType {
     lateinit var ownerUuid: UUID
     val rotation: GrenadeRotation
 
@@ -64,10 +58,12 @@ abstract class CounterStrikeGrenadeEntity(
     }
 
     companion object {
-        val speedAccessor: EntityDataAccessor<Float> =
-            SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.FLOAT)
         val isActivatedAccessor: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
+        val isLandedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId(
+            ActivateAfterLandingGrenadeEntity::class.java,
+            EntityDataSerializers.BOOLEAN
+        )
     }
 
     @Serializable
@@ -76,8 +72,8 @@ abstract class CounterStrikeGrenadeEntity(
     )
 
     override fun defineSynchedData() {
-        this.entityData.define(speedAccessor, 0f)
         this.entityData.define(isActivatedAccessor, false)
+        this.entityData.define(isLandedAccessor, false)
     }
 
     fun initialize(ownerUuid: UUID, position: Vec3, velocity: Vec3) {
@@ -171,9 +167,13 @@ abstract class CounterStrikeGrenadeEntity(
         }
     }
 
-    fun getDamageSource(entity: Entity, resourceKey: ResourceKey<DamageType>): DamageSource {
-        val registry = entity.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()
-        val damageType = registry.get(resourceKey)!!
-        return DamageSource(Holder.direct(damageType), this, this.owner, this.center)
+    override fun onTrajectoryComplete() {
+        // In current implementation, when a trajectory is completed, that means we have landed on the ground
+        onLanding()
     }
+
+    open fun onLanding() {
+        this.entityData.set(isLandedAccessor, true)
+    }
+
 }

@@ -7,20 +7,23 @@ import kotlinx.coroutines.*
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector2d
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 class VoxelWorker(entity: SmokeGrenadeEntity) {
-    val coroutineWorker: Deferred<Map<BlockPos, Int>> = ComputeScope.async {
-        floodFillWorker.compute()
-    }
+    val coroutineWorker: Deferred<Map<BlockPos, Int>>
 
     val floodFillWorker: FloodFillWorker
 
     init {
         val center = entity.center
-        val snapshot = generateSnapshot(center)
+        val snapshot = RegionSnapShot.fromCenter(center, entity.level())
         floodFillWorker = FloodFillWorker(center, snapshot)
+        coroutineWorker = ComputeScope.async {
+            floodFillWorker.compute()
+        }
     }
 
 
@@ -68,11 +71,18 @@ object SmokeShapeHelper {
     }
 
     fun getAllPossibleBlocks(center: Vec3): List<BlockPos> {
-        TODO()
+        val width = ModConfig.smokegrenade.smokeWidth.get()
+        val height = ModConfig.smokegrenade.smokeHeight.get()
+        val maxFall = ModConfig.smokegrenade.maxFall.get()
+
+        return buildList {
+            for (x in floor(center.x - width).toInt()..ceil(center.x + width).toInt()) {
+                for (z in floor(center.z - width).toInt()..ceil(center.z + width).toInt()) {
+                    for (y in floor(center.y - height - maxFall).toInt()..ceil(center.y + height).toInt()) {
+                        add(BlockPos(x, y, z))
+                    }
+                }
+            }
+        }
     }
-}
-
-private fun generateSnapshot(center: Vec3): RegionSnapShot {
-
-    TODO()
 }

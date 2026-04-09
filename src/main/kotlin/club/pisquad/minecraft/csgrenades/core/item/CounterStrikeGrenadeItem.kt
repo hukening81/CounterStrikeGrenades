@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.core.item
 
-import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.WithGrenadeType
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
@@ -17,10 +17,10 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 
-abstract class CounterStrikeGrenadeItem(properties: Properties) : Item(properties.stacksTo(2)) {
+abstract class CounterStrikeGrenadeItem(properties: Properties) :
+    Item(properties.stacksTo(2)), WithGrenadeType {
     val defaultModifiers: ImmutableMultimap<Attribute, AttributeModifier>
-
-    abstract val grenadeType: GrenadeType
+    
     var lastSelected = false
 
     init {
