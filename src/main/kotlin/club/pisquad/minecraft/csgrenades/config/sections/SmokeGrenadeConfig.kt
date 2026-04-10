@@ -9,7 +9,7 @@ object SmokeGrenadeConfig : ConfigSection {
     lateinit var smokeWidth: ForgeConfigSpec.DoubleValue
     lateinit var smokeHeight: ForgeConfigSpec.DoubleValue
     lateinit var maxFall: ForgeConfigSpec.DoubleValue
-    lateinit var initialQuantity: ForgeConfigSpec.IntValue
+    lateinit var initialIntensity: ForgeConfigSpec.IntValue
     val grenadeCommonConfig = GrenadeCommonConfig(2.5)
     override fun build(builder: ForgeConfigSpec.Builder) {
         builder.push(GrenadeType.SMOKE_GRENADE.resourceKey)
@@ -19,7 +19,7 @@ object SmokeGrenadeConfig : ConfigSection {
         smokeWidth = builder.defineInRange("shape_max_width", 6.0, 1.0, 20.0)
         smokeHeight = builder.defineInRange("shape_max_height", 4.5, 1.0, 20.0)
         maxFall = builder.defineInRange("shape_max_fall", 10.0, 1.0, 20.0)
-        initialQuantity = builder.defineInRange("initial_quantity", 10, 5, 25)
+        initialIntensity = builder.defineInRange("initial_intensity", 10, 5, 25)
         builder.pop()
     }
 

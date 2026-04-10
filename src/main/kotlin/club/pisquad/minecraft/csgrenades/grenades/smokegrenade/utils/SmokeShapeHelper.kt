@@ -1,10 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils
 
-import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.minus
-import kotlinx.coroutines.*
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -12,48 +9,6 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.time.measureTimedValue
-
-class VoxelWorker(entity: SmokeGrenadeEntity) {
-    val coroutineWorker: Deferred<Map<BlockPos, Int>>
-
-    val floodFillWorker: FloodFillWorker
-
-    init {
-        val center = entity.center
-        val (snapshot, duration) = measureTimedValue {
-            RegionSnapShot.fromCenter(center, entity.level())
-        }
-        ModLogger.debug(duration, "Generate region snapshot")
-
-        floodFillWorker = FloodFillWorker(center, snapshot)
-        coroutineWorker = ComputeScope.async {
-            val (result, duration) = measureTimedValue {
-                floodFillWorker.compute()
-            }
-            ModLogger.debug(duration, "Compute smoke spread")
-            result
-        }
-    }
-
-
-    companion object {
-        val ComputeScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun getResultOrNull(): Map<BlockPos, Int>? {
-        return if (coroutineWorker.isCompleted) {
-            coroutineWorker.getCompleted()
-        } else {
-            null
-        }
-    }
-
-    fun blockingUntilComplete(): Map<BlockPos, Int> {
-        return runBlocking { coroutineWorker.await() }
-    }
-}
 
 object SmokeShapeHelper {
     fun isInsideBaseShape(center: Vec3, position: Vec3, delta: Double = 1.0): Boolean {

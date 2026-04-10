@@ -54,7 +54,7 @@ object SmokeGrenadeDebugRenderer {
         val bufferSource = Minecraft.getInstance().renderBuffers().bufferSource()
 
         smokes.forEach { smoke ->
-            smoke.getVoxels()?.keys?.forEach { pos ->
+            smoke.getRegion()?.keys?.forEach { pos ->
                 val buffer = bufferSource.getBuffer(RenderType.lines())
                 LevelRenderer.renderLineBox(
                     poseStack,
@@ -74,10 +74,8 @@ object SmokeGrenadeDebugRenderer {
             }
         }
         poseStack.popPose()
-        
+
         RenderSystem.disableBlend()
         RenderSystem.enableDepthTest()
-
-
     }
 }

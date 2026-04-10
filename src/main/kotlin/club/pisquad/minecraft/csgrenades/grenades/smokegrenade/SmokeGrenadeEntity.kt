@@ -5,11 +5,11 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.data.AttachedSmokeData
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.SmokeGrenadeActivatedMessage
-import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils.VoxelWorker
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.RegionVoxelState
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelWorker
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.runOnServer
 import club.pisquad.minecraft.csgrenades.toTick
-import net.minecraft.core.BlockPos
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
@@ -52,8 +52,8 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel
         super.activate()
         this.runOnServer {
             val time = System.currentTimeMillis()
-            val voxels = voxelWorker!!.blockingUntilComplete()
-            val data = AttachedSmokeData.SmokeData(time, voxels)
+            val region = voxelWorker!!.blockingUntilComplete()
+            val data = AttachedSmokeData.SmokeData(time, region)
             this.entityData.set(smokeDataAccessor, data)
 
             val message = SmokeGrenadeActivatedMessage(
@@ -64,12 +64,12 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel
         }
     }
 
-    fun getVoxels(): Map<BlockPos, Int>? {
+    fun getRegion(): RegionVoxelState? {
         val data = this.entityData.get(smokeDataAccessor)
         return if (data is AttachedSmokeData.EmptySmokeData) {
             null
         } else {
-            (data as AttachedSmokeData.SmokeData).voxels
+            (data as AttachedSmokeData.SmokeData).region
         }
     }
 }

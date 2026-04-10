@@ -1,8 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.data
 
-import club.pisquad.minecraft.csgrenades.network.serializer.BlockPosSerializer
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.RegionVoxelState
 import kotlinx.serialization.Serializable
-import net.minecraft.core.BlockPos
 
 @Serializable
 sealed interface AttachedSmokeData {
@@ -12,9 +11,7 @@ sealed interface AttachedSmokeData {
     @Serializable
     data class SmokeData(
         val activationTime: Long,
-        val voxels: Map<@Serializable(
-            with = BlockPosSerializer::class
-        ) BlockPos, Int>
+        val region: RegionVoxelState
     ) : AttachedSmokeData {
     }
 }
