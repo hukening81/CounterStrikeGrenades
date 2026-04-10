@@ -9,14 +9,12 @@ import net.minecraft.world.phys.Vec3
 import kotlin.math.max
 
 @Serializable
-sealed interface VoxelState {
-
+sealed class VoxelState {
     /*Position of this voxel, corresponding to BlockPos*/
-    val position: BlockPos
+    abstract val position: @Serializable(with = BlockPosSerializer::class) BlockPos
+    abstract var intensity: Int
 
-    fun isOccupied(): Boolean
-
-    fun voxelIntensity(): Int
+    abstract fun isOccupied(): Boolean
 
     /**
      * Use this voxel as origin
@@ -28,25 +26,21 @@ sealed interface VoxelState {
      * @param center exact location of the smoke grenade
      * @return A list of directions this voxel can spread to when used as origin
      */
-    fun asOrigin(center: Vec3): List<Direction>
+    abstract fun asOrigin(center: Vec3): List<Direction>
 
-    fun getNeighborIntensity(direction: Direction): Int
+    abstract fun getNeighborIntensity(direction: Direction): Int
 
-    fun updateNeighborIntensity(direction: Direction, intensity: Int): Boolean
+    abstract fun updateNeighborIntensity(direction: Direction, intensity: Int): Boolean
 }
 
 @Serializable
 class AirVoxel(
     override val position: @Serializable(with = BlockPosSerializer::class) BlockPos
-) : VoxelState {
-    var intensity: Int = 0
+) : VoxelState() {
+    override var intensity: Int = 0
 
     override fun isOccupied(): Boolean {
         return intensity > 0
-    }
-
-    override fun voxelIntensity(): Int {
-        return intensity
     }
 
     override fun getNeighborIntensity(direction: Direction): Int {
@@ -71,18 +65,15 @@ class AirVoxel(
 @Serializable
 class SolidVoxel(
     override val position: @Serializable(with = BlockPosSerializer::class) BlockPos
-) : VoxelState {
+) : VoxelState() {
+    override var intensity: Int = 0
 
     override fun isOccupied(): Boolean {
         return false
     }
 
-    override fun voxelIntensity(): Int {
-        return 0
-    }
-
     override fun getNeighborIntensity(direction: Direction): Int {
-        return 0
+        return intensity
     }
 
     override fun updateNeighborIntensity(
@@ -94,5 +85,32 @@ class SolidVoxel(
 
     override fun asOrigin(center: Vec3): List<Direction> {
         return emptyList()
+    }
+}
+
+@Serializable
+class DoorVoxel(
+    override val position: @Serializable(with = BlockPosSerializer::class) BlockPos
+) : VoxelState() {
+
+    override var intensity: Int = 0
+
+    override fun isOccupied(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun asOrigin(center: Vec3): List<Direction> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getNeighborIntensity(direction: Direction): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateNeighborIntensity(
+        direction: Direction,
+        intensity: Int
+    ): Boolean {
+        TODO("Not yet implemented")
     }
 }
