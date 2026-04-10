@@ -18,7 +18,6 @@ class FloodFillWorker(
     var cycleStart: List<BlockPos> = listOf()
 
     fun compute(): Map<BlockPos, Int> {
-
         if (!snapshot[BlockPos.containing(center)]!!.canOccupy) {
             return emptyMap()
         }
@@ -26,7 +25,7 @@ class FloodFillWorker(
         doInitialSpread()
 
         // Basic Shape
-        while (cycleStart.isEmpty()) {
+        while (cycleStart.isNotEmpty()) {
             cycleStart = computeCurrentCycle()
         }
 
@@ -54,12 +53,12 @@ class FloodFillWorker(
         val addAxis = { inverse: Boolean, primary: Direction ->
             if (inverse) {
                 addSurrounding(primary.opposite)
-                if (interactionType.canSpread(primary.opposite)) {
+                if (interactionType.spreadability.canSpread(primary.opposite)) {
                     addSurrounding(primary.opposite)
                 }
             } else {
                 addSurrounding(primary.opposite)
-                if (interactionType.canSpread(primary)) {
+                if (interactionType.spreadability.canSpread(primary)) {
                     addSurrounding(primary)
                 }
             }
@@ -80,17 +79,17 @@ class FloodFillWorker(
                 direction: Direction,
             ->
             val newPos = center.relative(direction)
-            if (!SmokeShapeHelper.isInsideBaseShape(newPos.center, this.center)) {
+            if (!SmokeShapeHelper.isInsideBaseShape(this.center, newPos.center)) {
                 return@marker
             }
 
             val newQuantity = state[center]!! - 1
 
-
             snapshot[newPos]?.run {
                 if (this.canOccupy) {
                     if ((state[newPos] ?: 0) < newQuantity) {
                         state[newPos] = newQuantity
+                        nextCycle.add(newPos)
                     }
                 }
             }
@@ -98,7 +97,7 @@ class FloodFillWorker(
 
         for (ele in cycleStart) {
             snapshot[ele]?.run {
-                Direction.entries.filter { this.canSpread(it) }.forEach {
+                Direction.entries.filter { this.spreadability.canSpread(it) }.forEach {
                     trySpread(ele, it)
                 }
             }

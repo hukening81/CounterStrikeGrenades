@@ -1,16 +1,18 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils
 
+import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.minus
 import kotlinx.coroutines.*
 import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import org.joml.Vector2d
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.time.measureTimedValue
 
 class VoxelWorker(entity: SmokeGrenadeEntity) {
     val coroutineWorker: Deferred<Map<BlockPos, Int>>
@@ -19,20 +21,24 @@ class VoxelWorker(entity: SmokeGrenadeEntity) {
 
     init {
         val center = entity.center
-        val snapshot = RegionSnapShot.fromCenter(center, entity.level())
+        val (snapshot, duration) = measureTimedValue {
+            RegionSnapShot.fromCenter(center, entity.level())
+        }
+        ModLogger.debug(duration, "Generate region snapshot")
+
         floodFillWorker = FloodFillWorker(center, snapshot)
         coroutineWorker = ComputeScope.async {
-            floodFillWorker.compute()
+            val (result, duration) = measureTimedValue {
+                floodFillWorker.compute()
+            }
+            ModLogger.debug(duration, "Compute smoke spread")
+            result
         }
     }
 
 
     companion object {
         val ComputeScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    }
-
-    fun isDone(): Boolean {
-        return coroutineWorker.isCompleted
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -50,16 +56,16 @@ class VoxelWorker(entity: SmokeGrenadeEntity) {
 }
 
 object SmokeShapeHelper {
-    fun isInsideBaseShape(position: Vec3, center: Vec3, delta: Double = 1.0): Boolean {
+    fun isInsideBaseShape(center: Vec3, position: Vec3, delta: Double = 1.0): Boolean {
         val relativePos = position.minus(center)
 
         val c = getHalfFocalDistance(delta)
         val a = ModConfig.smokegrenade.smokeWidth.get().times(delta)
-        val axis = Vector2d(relativePos.x, relativePos.z).normalize()
-        val f1 = axis.mul(c)
-        val focus1 = Vec3(f1.x, 0.0, f1.y)
-        val f2 = axis.mul(-c)
-        val focus2 = Vec3(f2.x, 0.0, f2.y)
+        val axis = Vec2(relativePos.x.toFloat(), relativePos.z.toFloat()).normalized()
+        val f1 = axis.scale(c.toFloat())
+        val focus1 = Vec3(f1.x.toDouble(), 0.0, f1.y.toDouble())
+        val f2 = axis.scale(-c.toFloat())
+        val focus2 = Vec3(f2.x.toDouble(), 0.0, f2.y.toDouble())
 
         return (relativePos.distanceTo(focus1) + relativePos.distanceTo(focus2)) < 2 * a
     }

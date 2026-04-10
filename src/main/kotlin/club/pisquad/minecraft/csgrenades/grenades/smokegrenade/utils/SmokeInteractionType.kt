@@ -1,16 +1,12 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils
 
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
 
 data class SmokeInteractionType(
     val canOccupy: Boolean,
     val spreadability: Spreadability
 ) {
-    fun canSpread(direction: Direction): Boolean {
-        return spreadability.directions.contains(direction)
-    }
 
     companion object {
         val AIR = SmokeInteractionType(
