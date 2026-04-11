@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.state.properties.DoorHingeSide
+import net.minecraft.world.level.block.state.properties.Half
 import net.minecraft.world.phys.Vec3
 import kotlin.math.max
 
@@ -42,6 +43,7 @@ sealed class VoxelState {
     }
 }
 
+//region AirVoxel
 @Serializable
 class AirVoxel(
     override val position: @Serializable(with = BlockPosSerializer::class) BlockPos
@@ -73,6 +75,9 @@ class AirVoxel(
 
 }
 
+//endregion
+
+//region SolidVoxel
 @Serializable
 class SolidVoxel(
     override val position: @Serializable(with = BlockPosSerializer::class) BlockPos
@@ -99,6 +104,28 @@ class SolidVoxel(
     }
 }
 
+//endregion
+
+//region Water/waterlogged
+@Serializable
+class WaterVoxel(
+    override val position: @Serializable(with = BlockPosSerializer::class) BlockPos,
+) : VoxelState() {
+    override var intensity: Int = 0
+    override fun asOrigin(center: Vec3): List<Direction> {
+        return emptyList()
+    }
+
+    override fun getNeighborIntensity(direction: Direction): Int {
+        return 0
+    }
+
+    override fun updateIntensity(direction: Direction, intensity: Int): Boolean {
+        return false
+    }
+}
+
+//region DoorVoxel
 @Serializable
 class DoorVoxel(
     override val position: @Serializable(with = BlockPosSerializer::class) BlockPos,
@@ -106,20 +133,25 @@ class DoorVoxel(
     val hinge: DoorHingeSide,
     val opened: Boolean,
 ) : VoxelState() {
+
+    val blockingSide: Direction
+
     init {
+        blockingSide = calculateBlockingSide()
+        require(blockingSide.axis.isHorizontal)
         require(facing.axis.isHorizontal)
     }
 
     override var intensity: Int = 0
 
     override fun asOrigin(center: Vec3): List<Direction> {
-        val blocking = getBlockingSide()
+        val blocking = calculateBlockingSide()
         intensity = getInitialIntensity()
         return Direction.entries.filterNot { it == blocking }
     }
 
     override fun getNeighborIntensity(direction: Direction): Int {
-        return if (getBlockingSide() == direction) {
+        return if (calculateBlockingSide() == direction) {
             0
         } else {
             max(intensity - 1, 0)
@@ -130,19 +162,14 @@ class DoorVoxel(
         direction: Direction,
         intensity: Int
     ): Boolean {
-        if (getBlockingSide() == direction) {
-            return false
-        } else {
-            if (intensity > this.intensity) {
-                this.intensity = intensity
-                return true
-            } else {
-                return false
-            }
+        if (direction != blockingSide && intensity > this.intensity) {
+            this.intensity = intensity
+            return true
         }
+        return false
     }
 
-    fun getBlockingSide(): Direction {
+    fun calculateBlockingSide(): Direction {
         return if (this.opened) {
             if (this.hinge == DoorHingeSide.LEFT) {
                 this.facing.opposite.clockWise
@@ -154,3 +181,56 @@ class DoorVoxel(
         }
     }
 }
+
+//endregion
+
+//region TrapdoorVoxel
+@Serializable
+class TrapdoorVoxel(
+    override val position: @Serializable(with = BlockPosSerializer::class) BlockPos,
+    val half: Half,
+    val facing: Direction,
+    val opened: Boolean,
+) : VoxelState() {
+    val blockingDirection: Direction
+
+    init {
+        blockingDirection = calculateBlockingDirection()
+        require(facing.axis.isHorizontal)
+    }
+
+    override var intensity: Int = 0
+    override fun asOrigin(center: Vec3): List<Direction> {
+        this.intensity = getInitialIntensity()
+        return Direction.entries.filterNot { it == blockingDirection }
+    }
+
+    override fun getNeighborIntensity(direction: Direction): Int {
+        return if (direction == blockingDirection) {
+            0
+        } else {
+            max(this.intensity - 1, 0)
+        }
+    }
+
+    override fun updateIntensity(direction: Direction, intensity: Int): Boolean {
+        if (blockingDirection != direction && intensity > this.intensity) {
+            this.intensity = intensity
+            return true
+        }
+        return false
+    }
+
+    fun calculateBlockingDirection(): Direction {
+        return if (opened) {
+            facing.opposite
+        } else {
+            if (half == Half.TOP) {
+                Direction.UP
+            } else {
+                Direction.DOWN
+            }
+        }
+    }
+}
+//endregion
