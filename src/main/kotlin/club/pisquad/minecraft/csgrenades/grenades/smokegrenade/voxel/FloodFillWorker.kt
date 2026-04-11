@@ -35,7 +35,7 @@ class FloodFillWorker(
                 val target = centerBlockPos.relative(it)
                 val voxel = voxels[target] ?: return@run null
 
-                val needUpdate = voxel.updateNeighborIntensity(
+                val needUpdate = voxel.updateIntensity(
                     this.opposite,
                     centerVoxel.getNeighborIntensity(this)
                 )
@@ -64,7 +64,7 @@ class FloodFillWorker(
 
                     val voxel = voxels[target] ?: return@forEach
 
-                    val needUpdate = voxel.updateNeighborIntensity(it.opposite, intensity)
+                    val needUpdate = voxel.updateIntensity(it.opposite, intensity)
                     if (needUpdate) {
                         nextCycle.add(target)
                     }
