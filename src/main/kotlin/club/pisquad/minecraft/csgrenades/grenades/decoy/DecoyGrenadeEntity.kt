@@ -11,10 +11,10 @@ class DecoyGrenadeEntity(
 ) : ActivateAfterLandingGrenadeEntity(
     pEntityType,
     pLevel,
-    GrenadeType.DECOY,
 //    ModConfig.decoy.grenadeCommonConfig.fuseTime.get().toTick().toInt(),
     20 * 60
 ) {
     override val sounds = DecoyRegistries.sounds
     override val damageTypes = DecoyRegistries.damageTypes
+    override val grenadeType: GrenadeType = GrenadeType.DECOY
 }

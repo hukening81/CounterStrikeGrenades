@@ -150,5 +150,5 @@ abstract class CustomTrajectoryEntity(
 
     abstract fun onHitEntity(data: SubtickNode.EntityBounceData)
 
-    fun onTrajectoryComplete() {}
+    abstract fun onTrajectoryComplete()
 }

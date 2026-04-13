@@ -1,6 +1,5 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade
 
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateByFuseGrenadeEntity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
@@ -8,10 +7,9 @@ import net.minecraft.world.level.Level
 abstract class FireGrenadeEntity(
     entityType: EntityType<out FireGrenadeEntity>,
     level: Level,
-    grenadeType: GrenadeType,
     fuseTime: Int
 ) :
-    ActivateByFuseGrenadeEntity(entityType, level, grenadeType, fuseTime)
+    ActivateByFuseGrenadeEntity(entityType, level, fuseTime)
 
 //import club.pisquad.minecraft.csgrenades.*
 //import club.pisquad.minecraft.csgrenades.client.render.firegrenade.*

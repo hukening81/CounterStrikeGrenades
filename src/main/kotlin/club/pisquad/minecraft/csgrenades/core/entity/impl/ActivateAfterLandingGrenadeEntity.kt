@@ -1,13 +1,8 @@
 package club.pisquad.minecraft.csgrenades.core.entity.impl
 
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
-import net.minecraft.network.syncher.EntityDataAccessor
-import net.minecraft.network.syncher.EntityDataSerializers
-import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.Vec3
 
 
 /**
@@ -18,22 +13,10 @@ import net.minecraft.world.phys.Vec3
 abstract class ActivateAfterLandingGrenadeEntity(
     pEntityType: EntityType<out ActivateAfterLandingGrenadeEntity>,
     pLevel: Level,
-    grenadeType: GrenadeType,
     val delay: Int,
-) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
+) : CounterStrikeGrenadeEntity(pEntityType, pLevel) {
     var tickSinceLanding: Int = 0
 
-    companion object {
-        val isLandedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId<Boolean>(
-            ActivateAfterLandingGrenadeEntity::class.java,
-            EntityDataSerializers.BOOLEAN
-        )
-    }
-
-    override fun defineSynchedData() {
-        super.defineSynchedData()
-        this.entityData.define(isLandedAccessor, false)
-    }
 
     override fun tick() {
         super.tick()
@@ -48,12 +31,6 @@ abstract class ActivateAfterLandingGrenadeEntity(
                         this.activate()
                     }
                     tickSinceLanding++
-                } else {
-                    // super.onHitBlock() contains a mechanism to freeze the entity after landing on groud
-                    // we rely on that the check if we are landed
-                    if (this.deltaMovement == Vec3.ZERO) {
-                        this.entityData.set(isLandedAccessor, true)
-                    }
                 }
             }
         }

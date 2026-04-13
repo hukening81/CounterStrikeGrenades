@@ -1,6 +1,5 @@
 package club.pisquad.minecraft.csgrenades.core.entity.impl
 
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
@@ -13,9 +12,8 @@ import net.minecraft.world.level.Level
 abstract class ActivateByFuseGrenadeEntity(
     pEntityType: EntityType<out ActivateByFuseGrenadeEntity>,
     pLevel: Level,
-    grenadeType: GrenadeType,
     val fuseTime: Int,
-) : CounterStrikeGrenadeEntity(pEntityType, pLevel, grenadeType) {
+) : CounterStrikeGrenadeEntity(pEntityType, pLevel) {
 
     override fun tick() {
         super.tick()
