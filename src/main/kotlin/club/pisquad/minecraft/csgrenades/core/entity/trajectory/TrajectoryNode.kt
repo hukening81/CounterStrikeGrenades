@@ -5,6 +5,7 @@ import club.pisquad.minecraft.csgrenades.ModSettings.Entity.Physics.MINIMUM_VELO
 import club.pisquad.minecraft.csgrenades.isBetween
 import club.pisquad.minecraft.csgrenades.math.Segment
 import club.pisquad.minecraft.csgrenades.minus
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.BlockPosSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
@@ -25,11 +26,16 @@ class TickNode(
     val tick: Int,
     @Serializable(with = Vec3Serializer::class) override val position: Vec3,
     @Serializable(with = Vec3Serializer::class) override val velocity: Vec3,
-    val completed: Boolean = false,
+    var completed: Boolean = false,
     val subtickNodes: MutableList<SubtickNode> = mutableListOf(),
 ) : TrajectoryNode {
 
-    companion object;
+    companion object{
+        fun fromSyncMessage(msg: ServerGrenadeMovementSyncMessage): TickNode{
+            return TickNode(msg.tick,msg.position,msg.velocity,msg.completed)
+        }
+    }
+
 
     /**Calculates the subtick nodes within this tick
      * @return Next TickNode
@@ -137,7 +143,7 @@ class TickNode(
     }
 
     // Compare client node with server, returns whether it needs correction
-    // Only compare for position error since any velocity error will eventually represent as an position error
+    // Only compare for position error since any velocity error will eventually represent as a position error
     fun compareServerNode(node: TickNode): Boolean {
         return this.position.minus(node.position)
             .length() > POSITION_ERROR_TOLERANCE

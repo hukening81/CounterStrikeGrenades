@@ -2,7 +2,9 @@ package club.pisquad.minecraft.csgrenades.core.entity.trajectory
 
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.ModSettings.Entity.SERVER_TRAJECTORY_NODE_CACHE_SIZE
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
 import net.minecraft.client.Minecraft
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import kotlin.time.Clock
@@ -14,10 +16,16 @@ class Trajectory(
     val hitBlockCB: Function1<SubtickNode.BlockBounceData, Unit>,
     val hitEntityCB: Function1<SubtickNode.EntityBounceData, Unit>,
     val completeCB: Function0<Unit>,
+    val errorCB:Function1<TrajectoryError,Unit>
 ) {
+    companion object {
+        const val TRAJECTORY_MAX_TICK = 20 * 15;
+    }
+
     var beginTime: Instant = Clock.System.now()
     var initialized: Boolean = false
     val serverNodeCaches: ServerNodeCache = ServerNodeCache()
+
     val completed: Boolean
         get() {
             return nodes.last().completed
@@ -49,22 +57,27 @@ class Trajectory(
 
     fun tick(level: Level, invokeCB: Boolean = true): TickNode {
         if (!this.initialized) {
-            throw Exception("Use before initialization")
+            throw Exception("Used before initialization")
         }
         if (this.completed) {
             return this.nodes.last()
         }
 
-
         this.nodes.add(this.nodes.last().processTick(level))
 
-        // Do callbacks
+        if (this.currentTick>=TRAJECTORY_MAX_TICK){
+            this.nodes.last().completed = true
+            errorCB(TrajectoryError.MaxTrajectoryTickReached)
+            return this.nodes.last()
+        }
+
         if (invokeCB) {
             this.nodes.last().subtickNodes.forEach {
-                if (it.bounceData is SubtickNode.BlockBounceData) {
+                val data = it.bounceData
+                if (data is SubtickNode.BlockBounceData) {
                     this.hitBlockCB(it.bounceData)
-                } else if (it.bounceData is SubtickNode.EntityBounceData) {
-                    throw NotImplementedError()
+                } else if (data is SubtickNode.EntityBounceData) {
+                    this.hitEntityCB(it.bounceData)
                 }
             }
 
@@ -76,12 +89,22 @@ class Trajectory(
         return this.nodes.last()
     }
 
-    // Minecraft can't handle this!!!
+    // Minecraft can't hanlde this!
     fun tickUntilComplete(level: Level): Int {
-        repeat(10) {
+        while (!this.completed) {
             this.tick(level)
         }
         return this.currentTick
+    }
+
+    fun createSyncMessage(entity: Entity): ServerGrenadeMovementSyncMessage{
+        return ServerGrenadeMovementSyncMessage(
+            entity.id,
+            this.currentTick,
+            this.completed,
+            this.position,
+            this.velocity
+        )
     }
 
     /**Replace specific node with server's node and update nodes since
@@ -90,20 +113,21 @@ class Trajectory(
      * NOTE: on a single player setting, server is always ahead by one node, we have to compensate this
      * by allowing the client to be behind a few node
      * */
-    fun syncServerNode(id: Int, node: TickNode) {
-        ModLogger.trace("Syncing server node: tick(${node.tick}) id($id)")
+    fun sync(msg: ServerGrenadeMovementSyncMessage) {
+        ModLogger.trace("Syncing server node: tick(${msg.tick}) id(${msg.entityId})")
 
         // Cache future nodes
-        val clientNode = this.nodes.find { it.tick == node.tick }
+        val serverNode = TickNode.fromSyncMessage(msg)
+        val clientNode = this.nodes.find { it.tick ==msg.tick }
         if (clientNode == null) {
-            ModLogger.trace("Tick(${node.tick}) not found for $id, putting it in cache")
-            serverNodeCaches.add(node)
-        } else if (clientNode.compareServerNode(node)) {
+            ModLogger.trace("Tick(${msg.tick}) not found for ${msg.entityId}, putting it in cache")
+            serverNodeCaches.add(serverNode)
+        } else if (clientNode.compareServerNode(serverNode)) {
             // Do error correction
             // This will not invoke any callbacks
-            val count = this.nodes.last().tick - node.tick
+            val count = this.nodes.last().tick - serverNode.tick
 
-            ModLogger.trace("Tick(${node.tick} error for $id is too big, correcting $count nodes")
+            ModLogger.trace("Tick(${serverNode.tick} error for ${msg.entityId} is too big, correcting $count nodes")
 
             this.nodes.dropLast(count)
 
@@ -116,7 +140,15 @@ class Trajectory(
     }
 }
 
-// Only cahces future node
+sealed interface TrajectoryError{
+    object MaxTrajectoryTickReached: TrajectoryError{
+        fun getTrajectoryMaxTick(): Number{
+            return Trajectory.TRAJECTORY_MAX_TICK
+        }
+    }
+}
+
+// Only caches future node
 class ServerNodeCache {
     // add from back and remove from front
     private val queue: ArrayDeque<TickNode> = ArrayDeque()

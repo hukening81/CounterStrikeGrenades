@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.core.entity.trajectory
 
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.addGrenadeSizeOffset
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.minus
 import club.pisquad.minecraft.csgrenades.minusGrenadeSizeOffset
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
@@ -55,6 +56,7 @@ abstract class CustomTrajectoryEntity(
         this::onHitBlock,
         this::onHitEntity,
         this::onTrajectoryComplete,
+        this::onTrajectoryError,
     )
 
     @Serializable
@@ -113,14 +115,12 @@ abstract class CustomTrajectoryEntity(
         this.moveTo(node.position.minusGrenadeSizeOffset())
         this.deltaMovement = this.center.minus(lastPos)
 
-
-
         if (this.level().isClientSide) {
             if (!trajectory.initialized) {
                 ModLogger.warn("Client trajectory not initialized")
             }
         } else {
-            val radius = this.level().server!!.playerList.viewDistance.times(16).toDouble()
+            val radius = ModConfig.messageRange.get()
             ModPacketHandler.INSTANCE.send(
                 PacketDistributor.NEAR.with {
                     PacketDistributor.TargetPoint(
@@ -131,18 +131,14 @@ abstract class CustomTrajectoryEntity(
                         this.level().dimension(),
                     )
                 },
-                ServerGrenadeMovementSyncMessage(
-                    this.id,
-                    node,
-                ),
+                this.trajectory.createSyncMessage(this)
             )
         }
     }
 
-    fun syncServerMovement(id: Int, node: TickNode) {
-        this.trajectory.syncServerNode(id, node)
+    fun syncServerMovement(message: ServerGrenadeMovementSyncMessage) {
+        this.trajectory.sync(message)
     }
-
 
     /**Provide basic hook for playing sound events
      * */
@@ -151,4 +147,8 @@ abstract class CustomTrajectoryEntity(
     abstract fun onHitEntity(data: SubtickNode.EntityBounceData)
 
     abstract fun onTrajectoryComplete()
+    
+    fun onTrajectoryError(e: TrajectoryError){
+        println("Trajectory Error $e")
+    }
 }
