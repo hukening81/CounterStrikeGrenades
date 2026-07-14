@@ -121,6 +121,7 @@ abstract class CounterStrikeGrenadeEntity(
         if (this.isStopped) {
             return
         }
+        this.rotation.tick()
         this.runOnServer {
             val movementPredict = MovementPredictor.predict(this.level(), this.grenadePosition, this.grenadeVelocity)
             when (movementPredict) {
