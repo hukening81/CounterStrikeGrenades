@@ -34,10 +34,10 @@ object FlashBangBlindEffectConfig : GrenadeConfigBuilder {
             )
         ) { it is Double && it < 181 }
         fadingRange =
-            builder.defineInRange("fading_range", 50.0, 1.0, ModSettings.SERVER_MESSAGE_RANGE)
+            builder.defineInRange("fading_range", 50.0, 1.0, 500.0)
 
         maxRadius =
-            builder.defineInRange("max_radius", 50.0, 10.0, ModSettings.SERVER_MESSAGE_RANGE)
+            builder.defineInRange("max_radius", 50.0, 10.0, 500.0)
 
     }
 }

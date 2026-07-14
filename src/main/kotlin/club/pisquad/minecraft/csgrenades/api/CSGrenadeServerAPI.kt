@@ -7,15 +7,16 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
+import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
+import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.phys.Vec3
 import java.util.*
 
 object CSGrenadeServerAPI {
-    val sound = CSGrenadeServerSoundAPI
     val player = CSGrenadeServerPlayerAPI
     val entity = CSGrenadeEntityAPI
 
@@ -39,17 +40,17 @@ object CSGrenadeServerAPI {
          * Spawn a grenade with the provide context
          *
          * @param context
-         * @return spanwed entity if success
+         * @return spawned entity if success
          */
         fun spawnGrenade(
-            owner: ServerPlayer,
-            context: GrenadeSpawnContext,
-            removeItem: Boolean = true
+            owner: ServerPlayer, context: GrenadeSpawnContext, removeItem: Boolean = true
         ): CounterStrikeGrenadeEntity? {
             val level = owner.level() as ServerLevel
             val entityType = context.grenadeType.registries.get().entity.get()
             val entity = entityType.create(level) ?: return null
-            entity.initialize(context.ownerUuid, context.position, context.velocity)
+            entity.ownerUuid = owner.uuid
+            entity.grenadePosition = GrenadePosition.fromCenter(context.position)
+            entity.grenadeVelocity = GrenadeVelocity.fromBlocksPerTick(context.velocity)
 
             ModLogger.info("Spawning ${context.grenadeType} entity at ${context.position} with velocity ${context.velocity.length()} blocks per tick")
             level.addFreshEntity(entity)
@@ -58,17 +59,6 @@ object CSGrenadeServerAPI {
                 CSGrenadeServerPlayerAPI.removeGrenadeFromInventory(owner, context.grenadeType)
             }
             return entity
-        }
-    }
-
-
-    object CSGrenadeServerSoundAPI {
-        fun playHitBlockSound(grenade: GrenadeType, uuid: UUID, level: ServerLevel, position: Vec3) {
-            ModPacketHandler.sendMessageToPlayer(
-                level,
-                position,
-                ServerGrenadeBlockBounceSoundMessage(grenade, uuid, position)
-            )
         }
     }
 
@@ -89,6 +79,7 @@ object CSGrenadeServerAPI {
             return false
         }
 
+        @Suppress("unused")
         fun setInventoryCoolDown(player: ServerPlayer) {
             val amount = ModConfig.throwConfig.cooldown.get().toTick().toInt()
             player.inventory.items.forEach {
@@ -97,5 +88,14 @@ object CSGrenadeServerAPI {
                 }
             }
         }
+    }
+
+    fun sendGrenadeHitEntityMessage(level: ServerLevel, message: ServerGrenadeHitEntityMessage) {
+        ModPacketHandler.sendMessageToPlayer(level, message.hitPoint, message)
+    }
+
+    fun sendGrenadeHitBlockMessage(level: ServerLevel, message: ServerGrenadeHitBlockMessage) {
+        ModPacketHandler.sendMessageToPlayer(level, message.hitPoint, message)
+
     }
 }

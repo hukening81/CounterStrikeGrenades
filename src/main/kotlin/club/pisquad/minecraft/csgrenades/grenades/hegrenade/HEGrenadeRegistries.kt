@@ -7,6 +7,7 @@ import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.world.item.Item
 
 object HEGrenadeRegistries :
@@ -29,6 +30,7 @@ object HEGrenadeDamageTypes : GrenadeEntityDamageTypes {
 object HEGrenadeSoundEvents : GrenadeSoundEvents {
     override val draw = GrenadeSoundData.createDraw("hegrenade.draw")
     override val hitBlock = GrenadeSoundData.createHitBlock("hegrenade.hit_block")
+    override val hitEntity: GrenadeSoundData = ModSoundEvents.HIT_ENTITY
     val explode = DistanceSegmentedSoundData.createTwoPhasedExplosion(
         GrenadeSoundData.create("hegrenade.explode"),
         GrenadeSoundData.create("hegrenade.explode_distant")

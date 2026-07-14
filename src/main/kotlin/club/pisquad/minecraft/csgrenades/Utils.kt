@@ -1,6 +1,8 @@
 package club.pisquad.minecraft.csgrenades
 
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
@@ -196,21 +198,9 @@ fun Player.getEarPosition(): Vec3 {
 }
 
 fun ServerLevel.getPlayersWithinMessageRange(center: Vec3): List<Player> {
-    val range = ModSettings.SERVER_MESSAGE_RANGE
+    val range = ModConfig.messageRange.get()
     val box = AABB.ofSize(center, range, range, range)
     return this.getEntitiesOfClass(Player::class.java, box).toList()
-}
-
-fun <T : CounterStrikeGrenadeEntity> T.runOnServer(task: T.() -> Unit) {
-    if (!this.level().isClientSide) {
-        task(this)
-    }
-}
-
-fun <T : CounterStrikeGrenadeEntity> T.runOnClient(task: T.() -> Unit) {
-    if (this.level().isClientSide) {
-        task(this)
-    }
 }
 
 internal fun Boolean.toInt(): Int {
@@ -223,4 +213,22 @@ internal fun Boolean.toInt(): Int {
 
 fun horizontalDirections(): Set<Direction> {
     return Direction.entries.filter { it.axis.isHorizontal }.toSet()
+}
+
+internal fun Double.Companion.epsilon(): Double = 1.0E-7;
+
+internal fun Vec3.inverseAxis(axis: Direction.Axis): Vec3 {
+    return when (axis) {
+        Direction.Axis.X -> {
+            Vec3(-this.x, this.y, this.z)
+        }
+
+        Direction.Axis.Y -> {
+            Vec3(this.x, -this.y, this.z)
+        }
+
+        Direction.Axis.Z -> {
+            Vec3(this.x, this.y, -this.z)
+        }
+    }
 }

@@ -4,6 +4,9 @@ import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 
+const val SECONDS_PER_TICK: Double = 1 / 20.0
+const val TICKS_PER_SECOND: Double = 20.0
+
 fun Vec3.minus(other: Vec3): Vec3 = this.add(other.reverse())
 fun Vec3.minus(x: Double, y: Double, z: Double): Vec3 = this.add(-x, -y, -z)
 

@@ -1,20 +1,28 @@
 package club.pisquad.minecraft.csgrenades.core.entity
 
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.WithGrenadeType
+import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeServerAPI
-import club.pisquad.minecraft.csgrenades.api.CSGrenadesAPI
-import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
-import club.pisquad.minecraft.csgrenades.core.entity.trajectory.CustomTrajectoryEntity
-import club.pisquad.minecraft.csgrenades.core.entity.trajectory.SubtickNode
+import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitBlockEvent
+import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitEntityEvent
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitEntity
+import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
+import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
+import club.pisquad.minecraft.csgrenades.physics.MovementPredictor
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
+import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -23,13 +31,18 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.entity.IEntityAdditionalSpawnData
+import net.minecraftforge.fml.LogicalSide
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 interface GrenadeEntityData {
@@ -37,63 +50,122 @@ interface GrenadeEntityData {
     val damageTypes: GrenadeEntityDamageTypes
 }
 
+private interface GrenadeMovement {
+    var grenadePosition: GrenadePosition
+    var grenadeVelocity: GrenadeVelocity
+}
+
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out CounterStrikeGrenadeEntity>,
     pLevel: Level,
-) :
-    CustomTrajectoryEntity(pEntityType, pLevel), GrenadeEntityData, WithGrenadeType {
+) : Entity(pEntityType, pLevel), GrenadeEntityData, WithGrenadeType, GrenadeMovement, IEntityAdditionalSpawnData {
+
     lateinit var ownerUuid: UUID
+
     val rotation: GrenadeRotation
+
+    override var grenadePosition: GrenadePosition = GrenadePosition.ZERO
+        set(value) {
+            this.move(
+                MoverType.SELF,
+                value.worldPos.subtract(field.worldPos)
+            )
+            field = value
+        }
+    override var grenadeVelocity: GrenadeVelocity = GrenadeVelocity.ZERO
+        set(value) {
+            this.deltaMovement = value.blocksPerTick
+            field = value
+        }
 
     val owner: Player?
         get() {
             return level().players().find { it.uuid == this.ownerUuid }
         }
 
-
     init {
         isNoGravity = true
-        noPhysics = true
+//        noPhysics = true
         rotation = GrenadeRotation(this.id.toLong())
     }
 
     companion object {
         val isActivatedAccessor: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN)
-        val isLandedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId(
-            ActivateAfterLandingGrenadeEntity::class.java,
-            EntityDataSerializers.BOOLEAN
+        val isStoppedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId(
+            CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN
         )
     }
 
-    @Serializable
-    private data class SpawnData(
-        @Serializable(with = UUIDSerializer::class) val ownerUuid: UUID,
-    )
+    val isActivated: Boolean
+        get() {
+            return this.entityData.get(isActivatedAccessor)
+        }
+    val isStopped: Boolean
+        get() {
+            return this.entityData.get(isStoppedAccessor)
+        }
+    val center: Vec3
+        get() {
+            return this.grenadePosition.center
+        }
 
     override fun defineSynchedData() {
         this.entityData.define(isActivatedAccessor, false)
-        this.entityData.define(isLandedAccessor, false)
+        this.entityData.define(isStoppedAccessor, false)
     }
-
-    fun initialize(ownerUuid: UUID, position: Vec3, velocity: Vec3) {
-        initializeMovementState(position, velocity)
-        this.ownerUuid = ownerUuid
-    }
-
-
-    fun isActivated(): Boolean = this.entityData.get(isActivatedAccessor)
 
     override fun tick() {
         super.tick()
 
-        if (this.level().isClientSide) {
-            this.rotation.tick()
+        if (this.isStopped) {
+            return
+        }
+        this.runOnServer {
+            val movementPredict = MovementPredictor.predict(this.level(), this.grenadePosition, this.grenadeVelocity)
+            when (movementPredict) {
+                MovementPredictor.PredictResult.Error.MAX_SUBTICK_REACHED -> {
+                    ModLogger.error(this) {
+                        "failed to predict movement: MAX_SUBTICK_REACHED" +
+                                " server discarding entity"
+                    }
+                    this.discard()
+                }
+
+                is MovementPredictor.PredictResult.PredictSuccess -> {
+                    movementPredict.entityHits.forEach {
+                        this.onHitEntity(it)
+                    }
+                    movementPredict.blockHits.forEach {
+                        this.onHitBlock(it)
+                    }
+                    this.grenadePosition = movementPredict.position
+                    this.grenadeVelocity = movementPredict.velocity
+
+                    movementPredict.blockHits.lastOrNull()?.let {
+                        // Predict if the grenade has stopped
+                        if (it.direction == Direction.UP && this.grenadeVelocity.metersPerSecond.y.absoluteValue < 0.01) {
+                            // Snap to the ground
+                            this.grenadePosition = GrenadePosition.fromCenter(
+                                Vec3(
+                                    this.grenadePosition.center.x,
+                                    it.hitPoint.y,
+                                    this.grenadePosition.center.x,
+                                )
+                            )
+                            this.entityData.set(isStoppedAccessor, true)
+                            this.onStopped()
+                        }
+                    }
+                }
+            }
         }
     }
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
+        this.grenadePosition = GrenadePosition.fromWorldPos(this.position())
+        this.grenadeVelocity = GrenadeVelocity.fromBlocksPerTick(this.deltaMovement)
         CSGrenadeServerAPI.entity.register(this)
     }
 
@@ -107,21 +179,22 @@ abstract class CounterStrikeGrenadeEntity(
     override fun shouldBeSaved(): Boolean = false
 
     open fun activate() {
-        this.entityData.set(isActivatedAccessor, true)
-        ModLogger.debug(this) { "Firing GrenadeActivateEvent" }
-        MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
+        this.runOnServer {
+            this.entityData.set(isActivatedAccessor, true)
+            ModLogger.debug(this) { "Firing GrenadeActivateEvent" }
+            MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
+        }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun readSpawnData(additionalData: FriendlyByteBuf) {
-        super.readSpawnData(additionalData)
+//        super.readSpawnData(additionalData)
         val spawnData = ProtoBuf.decodeFromByteArray(SpawnData.serializer(), additionalData.readByteArray())
-        ownerUuid = spawnData.ownerUuid
+        ownerUuid = spawnData.ownerUUID
     }
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun writeSpawnData(buffer: FriendlyByteBuf) {
-        super.writeSpawnData(buffer)
         val spawnData = SpawnData(ownerUuid)
         buffer.writeByteArray(ProtoBuf.encodeToByteArray(SpawnData.serializer(), spawnData))
     }
@@ -139,41 +212,47 @@ abstract class CounterStrikeGrenadeEntity(
     }
 
     override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
-        return distance < ModSettings.SERVER_MESSAGE_RANGE.pow(2)
+        return distance < ModConfig.messageRange.get().pow(2)
     }
 
-    override fun onHitBlock(data: SubtickNode.BlockBounceData) {
-        ModLogger.info("{} hit block({}) at tick{}", this.grenadeType, data.blockPos, this.tickCount)
-        rotation.randomize()
-        if (this.level().isClientSide) {
-            // EMPTY
-        } else {
-            CSGrenadesAPI.server.sound.playHitBlockSound(
-                this.grenadeType,
-                this.uuid,
-                this.level() as ServerLevel,
-                data.position
-            )
+    override fun onSyncedDataUpdated(pKey: EntityDataAccessor<*>) {
+        super.onSyncedDataUpdated(pKey)
+        when (pKey) {
+            isStoppedAccessor -> {
+                this.runOnClient {
+                    if (this.isStopped) {
+                        this.onStopped()
+                    }
+                }
+            }
         }
     }
 
-    override fun onHitEntity(data: SubtickNode.EntityBounceData) {
-        ModLogger.info("{} hit entity({}) at tick{}", this.grenadeType, data.id, this.tickCount)
-        rotation.randomize()
-        if (this.level().isClientSide) {
-            // EMPTY
-        } else {
-//            playServerEntityHitSound(data.position)
-        }
+    /*This function is only meant to be run on the serer */
+    open fun onHitBlock(data: GrenadeHitBlock) {
+        ModLogger.info(this) { "Grenade hit block at ${data.hitPoint} (${data.direction})" }
+
+        val event = GrenadeHitBlockEvent.create(LogicalSide.SERVER, this, data)
+        MinecraftForge.EVENT_BUS.post(event)
+
+        val message = ServerGrenadeHitBlockMessage.create(this, data)
+        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
     }
 
-    override fun onTrajectoryComplete() {
-        // In current implementation, when a trajectory is completed, that means we have landed on the ground
-        onLanding()
+    /*This function is only meant to be run on the serer */
+    open fun onHitEntity(data: GrenadeHitEntity) {
+        ModLogger.info(this) { "Grenade hit entity(${data.entity}) at ${data.hitPoint} (${data.direction})" }
+
+        val event = GrenadeHitEntityEvent.create(LogicalSide.SERVER, this, data)
+        MinecraftForge.EVENT_BUS.post(event)
+
+        val message = ServerGrenadeHitEntityMessage.create(this, data)
+        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
     }
 
-    open fun onLanding() {
-        this.entityData.set(isLandedAccessor, true)
+
+    open fun onStopped() {
+
     }
 
     override fun hashCode(): Int {
@@ -189,4 +268,21 @@ abstract class CounterStrikeGrenadeEntity(
         return this.uuid == other.uuid
     }
 
+    @Serializable
+    data class SpawnData(
+        @Serializable(with = UUIDSerializer::class) val ownerUUID: UUID
+    )
+
+}
+
+fun <T : CounterStrikeGrenadeEntity> T.runOnServer(task: T.() -> Unit) {
+    if (!this.level().isClientSide) {
+        task(this)
+    }
+}
+
+fun <T : CounterStrikeGrenadeEntity> T.runOnClient(task: T.() -> Unit) {
+    if (this.level().isClientSide) {
+        task(this)
+    }
 }

@@ -21,19 +21,5 @@ data class ClientGrenadeThrowMessage(
             val removeItem = !player.isCreative
             CSGrenadesAPI.server.entity.spawnGrenade(player, msg.context, removeItem)
         }
-
-//        fun fromInputState(): ClientGrenadeThrowMessage? {
-//            val player = Minecraft.getInstance().player ?: return null
-//            val velocity = player.deltaMovement.add(calculateGrenadeSpeed() ?: return null)
-//            val position = player.getShootOrigin()
-//            val item = player.mainHandItem.item
-//            if (item !is CounterStrikeGrenadeItem) return null
-//            val grenadeType = item.grenadeType
-//
-//            val context = GrenadeSpawnContext(grenadeType, player.uuid, position, velocity)
-//
-//            return ClientGrenadeThrowMessage(context)
-//
-//        }
     }
 }

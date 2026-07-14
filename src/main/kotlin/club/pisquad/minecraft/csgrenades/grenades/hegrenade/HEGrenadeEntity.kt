@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateByFuseGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
 import club.pisquad.minecraft.csgrenades.grenades.hegrenade.messages.HEGrenadeActivatedMessage
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.toTick
@@ -22,13 +23,12 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
 
     override fun activate() {
         super.activate()
-        if (this.level().isClientSide) {
-            // EMPTY
-        } else {
+        this.runOnServer {
+            val center = this.grenadePosition.center
             ModPacketHandler.sendMessageToPlayer(
                 this.level() as ServerLevel,
-                this.center,
-                HEGrenadeActivatedMessage(this.center)
+                center,
+                HEGrenadeActivatedMessage(this.ownerUuid, this.center)
             )
             this.discard()
         }

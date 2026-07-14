@@ -13,6 +13,7 @@ import net.minecraftforge.registries.RegistryObject
 interface GrenadeSoundEvents {
     val draw: GrenadeSoundData
     val hitBlock: GrenadeSoundData
+    val hitEntity: GrenadeSoundData
     val `throw`: GrenadeSoundData
     val pinPullStart: GrenadeSoundData
     val pinPull: GrenadeSoundData
@@ -22,13 +23,7 @@ object ModSoundEvents {
     val SOUND_EVENTS: DeferredRegister<SoundEvent> =
         DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CounterStrikeGrenades.ID)
 
-//        val common = CommonSoundEvents
-//    val hegrenade = HEGrenadeSoundEvents
-//    val flashbang = FlashbangSoundEvents
-//    val decoy = DecoySoundEvents
-//    val smokegrenade = SmokeGrenadeSoundEvents
-//    val molotov = MolotovSoundEvents
-//    val incendiary = IncendiarySoundEvents
+    val HIT_ENTITY: GrenadeSoundData = GrenadeSoundData.create("common.hit_entity")
 
     fun register(bus: IEventBus) {
         ModLogger.info("Registering sound events")

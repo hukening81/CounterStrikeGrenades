@@ -25,6 +25,10 @@ class VoxelMap(
     val inner: Map<VoxelPos, Voxel>
 ) : Map<VoxelPos, Voxel> by inner {
 
+    companion object {
+        val EMPTY = VoxelMap(mapOf())
+    }
+
     val edges = lazy { this.keys.filter { this.isEdge(it) } }
     val specials = lazy {
         if (this.hasDebug.value) {

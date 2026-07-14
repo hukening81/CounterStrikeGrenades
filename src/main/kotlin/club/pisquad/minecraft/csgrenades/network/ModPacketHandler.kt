@@ -4,14 +4,14 @@ package club.pisquad.minecraft.csgrenades.network
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.ModSettings.SERVER_MESSAGE_RANGE
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangPacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeBlockBounceSoundMessage
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeMovementSyncMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -75,19 +75,26 @@ object ModPacketHandler {
             ClientGrenadeThrowMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_SERVER),
         )
+//        registerMessage(
+//            ServerGrenadeMovementSyncMessage::class.java,
+//            ServerGrenadeMovementSyncMessage::encoder,
+//            ServerGrenadeMovementSyncMessage::decoder,
+//            ServerGrenadeMovementSyncMessage::handler,
+//            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
+//        )
         registerMessage(
-            ServerGrenadeMovementSyncMessage::class.java,
-            ServerGrenadeMovementSyncMessage::encoder,
-            ServerGrenadeMovementSyncMessage::decoder,
-            ServerGrenadeMovementSyncMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
+            ServerGrenadeHitBlockMessage::class.java,
+            ServerGrenadeHitBlockMessage::encoder,
+            ServerGrenadeHitBlockMessage::decoder,
+            ServerGrenadeHitBlockMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         )
         registerMessage(
-            ServerGrenadeBlockBounceSoundMessage::class.java,
-            ServerGrenadeBlockBounceSoundMessage::encoder,
-            ServerGrenadeBlockBounceSoundMessage::decoder,
-            ServerGrenadeBlockBounceSoundMessage::handler,
-            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+            ServerGrenadeHitEntityMessage::class.java,
+            ServerGrenadeHitEntityMessage::encoder,
+            ServerGrenadeHitEntityMessage::decoder,
+            ServerGrenadeHitEntityMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
 
         HEGrenadePacketHandler.registerMessages(this)
@@ -108,7 +115,7 @@ object ModPacketHandler {
 
     fun sendMessageToPlayer(level: ServerLevel, position: Vec3, message: Any) {
         level.players().forEach {
-            if (it.position().distanceTo(position) < SERVER_MESSAGE_RANGE) {
+            if (it.position().distanceTo(position) < ModConfig.messageRange.get()) {
                 INSTANCE.send(PacketDistributor.PLAYER.with { it }, message)
             }
         }

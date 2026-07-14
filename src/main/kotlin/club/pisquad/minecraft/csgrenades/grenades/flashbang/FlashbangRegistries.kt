@@ -7,6 +7,7 @@ import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.world.item.Item
 
 
@@ -30,6 +31,7 @@ object FlashbangSoundEvents : GrenadeSoundEvents {
     val ring = GrenadeSoundData.create("flashbang.ring")
     val ringLoop = GrenadeSoundData.create("flashbang.ring_loop")
     override val hitBlock = GrenadeSoundData.createHitBlock("flashbang.hit_block")
+    override val hitEntity: GrenadeSoundData = ModSoundEvents.HIT_ENTITY
     override val `throw` = GrenadeSoundData.createThrow("flashbang.throw")
     override val pinPull = GrenadeSoundData.create("flashbang.pinpull")
     override val pinPullStart = GrenadeSoundData.create("flashbang.pinpull_start")

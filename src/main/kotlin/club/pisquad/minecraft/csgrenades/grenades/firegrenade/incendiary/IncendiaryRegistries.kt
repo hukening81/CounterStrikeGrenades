@@ -6,6 +6,7 @@ import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.world.item.Item
 
 
@@ -26,6 +27,7 @@ object IncendiaryDamageTypes : GrenadeEntityDamageTypes {
 
 object IncendiarySoundEvents : GrenadeSoundEvents {
     override val hitBlock = GrenadeSoundData.create("incendiary.hit_block")
+    override val hitEntity: GrenadeSoundData = ModSoundEvents.HIT_ENTITY
     val detonate = GrenadeSoundData.create("incendiary.detonate")
     val detonateDistant = GrenadeSoundData.create("incendiary.detonate_distant")
     val detonateAir = GrenadeSoundData.create("incendiary.detonate_air")

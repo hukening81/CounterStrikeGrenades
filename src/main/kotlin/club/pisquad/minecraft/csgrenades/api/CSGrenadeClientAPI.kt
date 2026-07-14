@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades.api
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ThrowType
 import club.pisquad.minecraft.csgrenades.api.data.GrenadeSpawnContext
+import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.getEarPosition
 import club.pisquad.minecraft.csgrenades.getShootOrigin
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
@@ -18,6 +19,10 @@ object CSGrenadeClientAPI {
     object CSGrenadeClientSoundAPI {
         fun playHitBlock(position: Vec3, grenade: GrenadeType): Boolean {
             return grenade.registries.get().sounds.hitBlock.play(position)
+        }
+
+        fun playHitEntity(position: Vec3, grenade: GrenadeType): Boolean {
+            return grenade.registries.get().sounds.hitEntity.play(position)
         }
 
         fun playDraw(grenade: GrenadeType): Boolean {

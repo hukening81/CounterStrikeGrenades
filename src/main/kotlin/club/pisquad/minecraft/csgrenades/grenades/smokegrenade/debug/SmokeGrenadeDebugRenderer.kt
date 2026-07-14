@@ -55,7 +55,7 @@ object SmokeGrenadeDebugRenderer {
 
         val renderTargets: Set<VoxelPos> = buildSet {
             smokes.forEach { smoke ->
-                val voxelMap = smoke.getVoxels() ?: return@forEach
+                val voxelMap = smoke.voxels ?: return@forEach
                 if (!voxelMap.hasDebug.value) {
                     return@forEach
                 }
@@ -129,7 +129,7 @@ object SmokeGrenadeDebugRenderer {
 
             val smokes = smokeGrenadeRenderTargets()
             smokes.forEach { smoke ->
-                val voxelMap = smoke.getVoxels() ?: return@buildSet
+                val voxelMap = smoke.voxels ?: return@buildSet
                 if (!voxelMap.hasDebug.value) {
                     return@forEach
                 }

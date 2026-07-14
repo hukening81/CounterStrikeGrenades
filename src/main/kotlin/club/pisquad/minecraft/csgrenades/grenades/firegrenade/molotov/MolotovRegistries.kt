@@ -6,6 +6,7 @@ import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.world.item.Item
 
 object MolotovRegistries :
@@ -38,6 +39,7 @@ object MolotovSoundEvents : GrenadeSoundEvents {
     override val `throw` = GrenadeSoundData.create("molotov.throw")
     val smash = GrenadeSoundData.create("molotov.smash")
     override val hitBlock = GrenadeSoundData.create("molotov.bounce")
+    override val hitEntity: GrenadeSoundData = ModSoundEvents.HIT_ENTITY
 
     override val pinPull = fireIdle
     override val pinPullStart = GrenadeSoundData.empty()

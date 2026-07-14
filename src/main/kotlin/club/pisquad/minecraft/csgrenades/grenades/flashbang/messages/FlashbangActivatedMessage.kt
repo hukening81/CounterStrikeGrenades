@@ -26,14 +26,16 @@ data class FlashbangActivatedMessage(
             val context = ctx.get()
             context.packetHandled = true
 
-            val localUUID = Minecraft.getInstance().player!!.uuid
+            context.enqueueWork {
+                val localUUID = Minecraft.getInstance().player!!.uuid
 
-            msg.blinds.forEach { (uuid, data) ->
-                FlashbangSoundManager.playExplosionSound(msg.position)
-                if (uuid == localUUID) {
-                    BlindEffectRenderManager.schedule(data)
-                } else {
-                    throw NotImplementedError()
+                msg.blinds.forEach { (uuid, data) ->
+                    FlashbangSoundManager.playExplosionSound(msg.position)
+                    if (uuid == localUUID) {
+                        BlindEffectRenderManager.schedule(data)
+                    } else {
+                        throw NotImplementedError()
+                    }
                 }
             }
         }

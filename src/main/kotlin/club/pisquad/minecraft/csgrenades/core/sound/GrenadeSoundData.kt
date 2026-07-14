@@ -47,7 +47,6 @@ class GrenadeSoundData(
         fun createHitBlock(name: String): GrenadeSoundData {
             return create(name, ModSettings.Sound.Volume.HIT_BLOCK)
         }
-
     }
 
     /**
@@ -94,7 +93,7 @@ class DistanceSegmentedSoundData(vararg val ranges: Pair<Double, GrenadeSoundDat
         ): DistanceSegmentedSoundData {
             return DistanceSegmentedSoundData(
                 Pair(ModSettings.Sound.EXPLOSION_SOUND_CHANGE_DISTANCE, explode),
-                Pair(ModSettings.SERVER_MESSAGE_RANGE, explodeDistant)
+                Pair(500.0, explodeDistant)
             )
         }
     }

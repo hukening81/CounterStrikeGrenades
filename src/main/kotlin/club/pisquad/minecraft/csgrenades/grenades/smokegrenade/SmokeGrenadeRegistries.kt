@@ -4,10 +4,11 @@ import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.CSGrenadeEntityDataSerializer
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
-import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.data.AttachedSmokeData
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
+import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.world.item.Item
 
@@ -29,7 +30,7 @@ object SmokeGrenadeRegistries :
     val serializers = SmokeGrenadeSerializers
 
     override fun registerSerializers() {
-        EntityDataSerializers.registerSerializer(serializers.smokeData)
+        EntityDataSerializers.registerSerializer(serializers.voxelMapSerializer)
     }
 }
 
@@ -42,6 +43,7 @@ object SmokeGrenadeSoundEvents : GrenadeSoundEvents {
     val can = GrenadeSoundData.create("smokegrenade.can")
     override val draw = GrenadeSoundData.create("smokegrenade.draw")
     override val hitBlock = GrenadeSoundData.create("smokegrenade.bounce")
+    override val hitEntity: GrenadeSoundData = ModSoundEvents.HIT_ENTITY
     override val `throw` = GrenadeSoundData.create("smokegrenade.throw")
     override val pinPull = GrenadeSoundData.create("smokegrenade.pinpull")
     override val pinPullStart = GrenadeSoundData.create("smokegrenade.pinpull_start")
@@ -51,5 +53,5 @@ object SmokeGrenadeSoundEvents : GrenadeSoundEvents {
 }
 
 object SmokeGrenadeSerializers {
-    val smokeData = CSGrenadeEntityDataSerializer(AttachedSmokeData.serializer())
+    val voxelMapSerializer = CSGrenadeEntityDataSerializer(VoxelMap.serializer())
 }
