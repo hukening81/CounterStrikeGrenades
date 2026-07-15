@@ -21,8 +21,8 @@ object HEGrenadeRegistries :
     )
 
 object HEGrenadeDamageTypes : GrenadeEntityDamageTypes {
-    val explosion = ModDamageTypes.registerSingle("hegrenade.explosion")
-    override val hit = ModDamageTypes.registerSingle("hegrenade.hit")
+    val explosion = ModDamageTypes.registerSingle("hegrenade/explosion")
+    override val hit = ModDamageTypes.registerSingle("hegrenade/hit")
     override val main = explosion
 
 }

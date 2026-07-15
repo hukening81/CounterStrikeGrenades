@@ -71,8 +71,6 @@ object PhysicsUtil {
                 )
             }
         }
-        println("Speed before bounce: ${velocity.metersPerSecond.length()}")
-        println("Speed after bounce: ${newV.metersPerSecond.length()}")
         return if (newV.metersPerSecond.length() < MINIMUM_VELOCITY_AFTER_BOUNCE) {
             GrenadeVelocity.ZERO
         } else if (direction == Direction.UP && newV.metersPerSecond.y<0.1){

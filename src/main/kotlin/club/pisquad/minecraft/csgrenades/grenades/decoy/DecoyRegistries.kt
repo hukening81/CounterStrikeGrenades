@@ -21,8 +21,8 @@ object DecoyRegistries :
         { DecoyGrenadeItem(Item.Properties()) })
 
 object DecoyDamageTypes : GrenadeEntityDamageTypes {
-    val explosion = ModDamageTypes.registerSingle("decoy.explosion")
-    override val hit = ModDamageTypes.registerSingle("decoy.hit")
+    val explosion = ModDamageTypes.registerSingle("decoy/explosion")
+    override val hit = ModDamageTypes.registerSingle("decoy/hit")
     override val main = explosion
 }
 

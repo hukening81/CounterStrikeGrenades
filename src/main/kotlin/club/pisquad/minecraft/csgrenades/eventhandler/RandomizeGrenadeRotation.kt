@@ -1,5 +1,7 @@
-package club.pisquad.minecraft.csgrenades.api.event
+package club.pisquad.minecraft.csgrenades.eventhandler
 
+import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitBlockEvent
+import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitEntityEvent
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod

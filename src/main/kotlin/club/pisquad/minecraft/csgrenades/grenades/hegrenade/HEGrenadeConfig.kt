@@ -18,10 +18,12 @@ object HEGrenadeConfig : GrenadeConfigBuilder {
 
 object HEGrenadeExplosionConfig : GrenadeConfigBuilder {
     lateinit var radius: ForgeConfigSpec.DoubleValue
-    lateinit var damageBoostNearHead: ForgeConfigSpec.DoubleValue
+    lateinit var damageAmount: ForgeConfigSpec.DoubleValue
+    lateinit var headDamageMultiplier: ForgeConfigSpec.DoubleValue
 
     override fun build(builder: ForgeConfigSpec.Builder) {
-        radius = builder.defineInRange("radius", 2.5, 1.0, 10.0)
-        damageBoostNearHead = builder.defineInRange("damage_boost_near_head", 1.5, 0.1, 10.0)
+        radius = builder.defineInRange("radius", 5.0, 1.0, 10.0)
+        damageAmount = builder.defineInRange("damage_amount",10.0,0.1,100.0)
+        headDamageMultiplier = builder.defineInRange("head_damage_multiplier", 1.5, 0.1, 10.0)
     }
 }

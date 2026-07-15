@@ -21,8 +21,8 @@ object MolotovRegistries :
 
 object MolotovDamageTypes : GrenadeEntityDamageTypes {
 
-    val fire = ModDamageTypes.registerSingle("molotov.fire")
-    override val hit = ModDamageTypes.registerSingle("molotov.hit")
+    val fire = ModDamageTypes.registerSingle("molotov/fire")
+    override val hit = ModDamageTypes.registerSingle("molotov/hit")
     override val main = fire
 }
 

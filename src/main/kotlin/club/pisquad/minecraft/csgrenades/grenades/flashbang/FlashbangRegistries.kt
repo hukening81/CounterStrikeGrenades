@@ -22,7 +22,7 @@ object FlashbangRegistries :
     )
 
 object FlashBangDamageTypes : GrenadeEntityDamageTypes {
-    override val hit = ModDamageTypes.registerSingle("flashbang.hit")
+    override val hit = ModDamageTypes.registerSingle("flashbang/hit")
     override val main = hit
 }
 

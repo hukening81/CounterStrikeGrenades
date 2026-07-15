@@ -2,12 +2,11 @@ package club.pisquad.minecraft.csgrenades.core.entity
 
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.WithGrenadeType
-import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeServerAPI
+import club.pisquad.minecraft.csgrenades.api.event.GrenadeActivatedEvent
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitBlockEvent
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitEntityEvent
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.event.GrenadeActivateEvent
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
@@ -179,11 +178,15 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun shouldBeSaved(): Boolean = false
 
+    open fun createActivatedEvent(side: LogicalSide): GrenadeActivatedEvent{
+        return GrenadeActivatedEvent(side,this.grenadeType,this.ownerUuid)
+    }
+
     open fun activate() {
         this.runOnServer {
             this.entityData.set(isActivatedAccessor, true)
             ModLogger.debug(this) { "Firing GrenadeActivateEvent" }
-            MinecraftForge.EVENT_BUS.post(GrenadeActivateEvent(this, this.grenadeType))
+            MinecraftForge.EVENT_BUS.post(this.createActivatedEvent(LogicalSide.SERVER))
         }
     }
 

@@ -8,8 +8,11 @@ import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.levelgen.structure.BoundingBox
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -230,5 +233,26 @@ internal fun Vec3.inverseAxis(axis: Direction.Axis): Vec3 {
         Direction.Axis.Z -> {
             Vec3(this.x, this.y, -this.z)
         }
+    }
+}
+
+internal fun LivingEntity.hurtCancelKnockback(source: DamageSource,amount: Double): Boolean{
+    val movement = this.deltaMovement
+    val result =  this.hurt(source,amount.toFloat())
+    this.deltaMovement = movement
+    return result
+}
+
+internal fun AABB.points():List<Vec3>{
+    val aabb = this
+    return buildList {
+        add(Vec3(aabb.minX,aabb.minY,aabb.minX))
+        add(Vec3(aabb.minX,aabb.minY,aabb.maxX))
+        add(Vec3(aabb.minX,aabb.maxY,aabb.minX))
+        add(Vec3(aabb.minX,aabb.maxY,aabb.maxX))
+        add(Vec3(aabb.maxX,aabb.minY,aabb.minX))
+        add(Vec3(aabb.maxX,aabb.minY,aabb.maxX))
+        add(Vec3(aabb.maxX,aabb.maxY,aabb.minX))
+        add(Vec3(aabb.maxX,aabb.maxY,aabb.maxX))
     }
 }

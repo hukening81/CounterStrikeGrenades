@@ -35,7 +35,7 @@ object SmokeGrenadeRegistries :
 }
 
 object SmokeGrenadeDamageTypes : GrenadeEntityDamageTypes {
-    override val hit = ModDamageTypes.registerSingle("smokegrenade.hit")
+    override val hit = ModDamageTypes.registerSingle("smokegrenade/hit")
     override val main = hit
 }
 

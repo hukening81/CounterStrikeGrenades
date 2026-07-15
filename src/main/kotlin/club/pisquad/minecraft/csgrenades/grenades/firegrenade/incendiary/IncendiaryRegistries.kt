@@ -20,8 +20,8 @@ object IncendiaryRegistries :
         { IncendiaryItem(Item.Properties()) })
 
 object IncendiaryDamageTypes : GrenadeEntityDamageTypes {
-    val fire = ModDamageTypes.registerSingle("incendiary.fire")
-    override val hit = ModDamageTypes.registerSingle("incendiary.hit")
+    val fire = ModDamageTypes.registerSingle("incendiary/fire")
+    override val hit = ModDamageTypes.registerSingle("incendiary/hit")
     override val main = fire
 }
 
