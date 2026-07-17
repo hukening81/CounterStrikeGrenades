@@ -1,8 +1,6 @@
 package club.pisquad.minecraft.csgrenades
 
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
-import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
@@ -12,7 +10,6 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.levelgen.structure.BoundingBox
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -218,7 +215,7 @@ fun horizontalDirections(): Set<Direction> {
     return Direction.entries.filter { it.axis.isHorizontal }.toSet()
 }
 
-internal fun Double.Companion.epsilon(): Double = 1.0E-7;
+internal fun Double.Companion.epsilon(): Double = 1.0E-7
 
 internal fun Vec3.inverseAxis(axis: Direction.Axis): Vec3 {
     return when (axis) {
@@ -236,23 +233,23 @@ internal fun Vec3.inverseAxis(axis: Direction.Axis): Vec3 {
     }
 }
 
-internal fun LivingEntity.hurtCancelKnockback(source: DamageSource,amount: Double): Boolean{
+internal fun LivingEntity.hurtCancelKnockback(source: DamageSource, amount: Double): Boolean {
     val movement = this.deltaMovement
-    val result =  this.hurt(source,amount.toFloat())
+    val result = this.hurt(source, amount.toFloat())
     this.deltaMovement = movement
     return result
 }
 
-internal fun AABB.points():List<Vec3>{
+internal fun AABB.points(): List<Vec3> {
     val aabb = this
     return buildList {
-        add(Vec3(aabb.minX,aabb.minY,aabb.minX))
-        add(Vec3(aabb.minX,aabb.minY,aabb.maxX))
-        add(Vec3(aabb.minX,aabb.maxY,aabb.minX))
-        add(Vec3(aabb.minX,aabb.maxY,aabb.maxX))
-        add(Vec3(aabb.maxX,aabb.minY,aabb.minX))
-        add(Vec3(aabb.maxX,aabb.minY,aabb.maxX))
-        add(Vec3(aabb.maxX,aabb.maxY,aabb.minX))
-        add(Vec3(aabb.maxX,aabb.maxY,aabb.maxX))
+        add(Vec3(aabb.minX, aabb.minY, aabb.minX))
+        add(Vec3(aabb.minX, aabb.minY, aabb.maxX))
+        add(Vec3(aabb.minX, aabb.maxY, aabb.minX))
+        add(Vec3(aabb.minX, aabb.maxY, aabb.maxX))
+        add(Vec3(aabb.maxX, aabb.minY, aabb.minX))
+        add(Vec3(aabb.maxX, aabb.minY, aabb.maxX))
+        add(Vec3(aabb.maxX, aabb.maxY, aabb.minX))
+        add(Vec3(aabb.maxX, aabb.maxY, aabb.maxX))
     }
 }

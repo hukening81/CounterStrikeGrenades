@@ -9,11 +9,12 @@ import net.minecraft.core.Direction
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
+import kotlin.math.roundToInt
 
 @Serializable
 class GrenadePosition private constructor(@Serializable(with = Vec3Serializer::class) val center: Vec3) {
     companion object {
-        val ZERO = GrenadePosition.fromCenter(Vec3.ZERO)
+        val ZERO = fromCenter(Vec3.ZERO)
 
         fun fromWorldPos(position: Vec3): GrenadePosition {
             return GrenadePosition(position.addGrenadeSizeOffset())
@@ -52,7 +53,7 @@ class GrenadePosition private constructor(@Serializable(with = Vec3Serializer::c
 @Serializable
 class GrenadeVelocity private constructor(@Serializable(with = Vec3Serializer::class) val metersPerSecond: Vec3) {
     companion object {
-        val ZERO = GrenadeVelocity.fromMetersPerSecond(Vec3.ZERO)
+        val ZERO = fromMetersPerSecond(Vec3.ZERO)
 
         fun fromBlocksPerTick(v: Vec3): GrenadeVelocity {
             return GrenadeVelocity(v.scale(20.0))
@@ -106,11 +107,23 @@ class GrenadeDuration private constructor(val seconds: Double) {
         fun fromTick(tick: Double): GrenadeDuration {
             return GrenadeDuration(tick.div(20))
         }
+
+        fun convertSecondToTick(seconds: Double): Double {
+            return fromSeconds(seconds).ticks
+        }
+
+        fun convertSecondToWholeTick(seconds: Double): Int {
+            return fromSeconds(seconds).wholeTick
+        }
     }
 
     val ticks: Double
         get() {
             return seconds.times(20)
+        }
+    val wholeTick: Int
+        get() {
+            return ticks.roundToInt()
         }
 }
 

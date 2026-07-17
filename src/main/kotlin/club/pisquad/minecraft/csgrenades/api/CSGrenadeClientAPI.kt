@@ -3,7 +3,6 @@ package club.pisquad.minecraft.csgrenades.api
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ThrowType
 import club.pisquad.minecraft.csgrenades.api.data.GrenadeSpawnContext
-import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.getEarPosition
 import club.pisquad.minecraft.csgrenades.getShootOrigin
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler

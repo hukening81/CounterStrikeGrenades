@@ -34,7 +34,7 @@ object ModSettings {
             const val DRAW: Double = 10.0
         }
 
-        object MaxSoundRange{
+        object MaxSoundRange {
             const val HIT = 25.0
             const val EXPLOSION = 250.0
         }

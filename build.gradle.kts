@@ -204,7 +204,7 @@ dependencies {
     // Use the latest version of Minecraft Forge
     minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
-    implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:7401617"))
+    implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:8141310"))
 
     "shade"("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinSerializationVersion") {
         exclude(group = "org.jetbrains", module = "annotations")

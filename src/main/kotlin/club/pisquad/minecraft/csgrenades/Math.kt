@@ -36,10 +36,10 @@ fun Vec3.isPointWithinPlaneRange(
     return this.isPointWithinPlaneRange(excludeAxis, aabb.minX, aabb.maxX, aabb.minY, aabb.maxY, aabb.minZ, aabb.maxZ)
 }
 
-fun Vec3.distanceToLine(from:Vec3,to:Vec3):Double{
+fun Vec3.distanceToLine(from: Vec3, to: Vec3): Double {
     val a = this.subtract(from)
     val b = to.subtract(from)
-    return a.cross(b).length()/b.length()
+    return a.cross(b).length() / b.length()
 }
 
 fun Double.clamp(v1: Double, v2: Double): Double {

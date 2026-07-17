@@ -6,7 +6,8 @@ import kotlin.math.floor
 
 object PhysicsUtil {
     private const val VERTICAL_ACCELERATION: Double = -9.8
-//    private const val VERTICAL_ACCELERATION_PER_TICK: Double = VERTICAL_ACCELERATION / 20
+
+    //    private const val VERTICAL_ACCELERATION_PER_TICK: Double = VERTICAL_ACCELERATION / 20
     private const val VERTICAL_ACCELERATION_PER_TICK: Double = -0.1
     private const val AIR_DRAG_COEFFICIENT: Double = 0.99
     private const val MINIMUM_VELOCITY_AFTER_BOUNCE = 0.1
@@ -73,10 +74,9 @@ object PhysicsUtil {
         }
         return if (newV.metersPerSecond.length() < MINIMUM_VELOCITY_AFTER_BOUNCE) {
             GrenadeVelocity.ZERO
-        } else if (direction == Direction.UP && newV.metersPerSecond.y<0.1){
+        } else if (direction == Direction.UP && newV.metersPerSecond.y < 0.1) {
             GrenadeVelocity.ZERO
-        }
-        else {
+        } else {
             newV
         }
     }

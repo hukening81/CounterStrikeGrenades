@@ -11,11 +11,7 @@ import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitEntity
-import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
-import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
-import club.pisquad.minecraft.csgrenades.physics.MovementPredictor
+import club.pisquad.minecraft.csgrenades.physics.*
 import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -178,8 +174,8 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun shouldBeSaved(): Boolean = false
 
-    open fun createActivatedEvent(side: LogicalSide): GrenadeActivatedEvent{
-        return GrenadeActivatedEvent(side,this.grenadeType,this.ownerUuid)
+    open fun createActivatedEvent(side: LogicalSide): GrenadeActivatedEvent {
+        return GrenadeActivatedEvent(side, this.grenadeType, this.ownerUuid)
     }
 
     open fun activate() {

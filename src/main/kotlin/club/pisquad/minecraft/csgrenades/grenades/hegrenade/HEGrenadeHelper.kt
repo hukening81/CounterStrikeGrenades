@@ -95,8 +95,8 @@ object HEGrenadeHelper {
             dimension.height / 2.0,
             dimension.width / 2.0
         )
-        val bodyDamage = calculateDamage(level, position,bodyAABB)
-        return max(headDamage,bodyDamage)
+        val bodyDamage = calculateDamage(level, position, bodyAABB)
+        return max(headDamage, bodyDamage)
     }
 
     fun blowUpNearbySmokeGrenade(level: ClientLevel, center: Vec3) {

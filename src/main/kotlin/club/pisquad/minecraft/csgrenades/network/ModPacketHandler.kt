@@ -5,6 +5,7 @@ package club.pisquad.minecraft.csgrenades.network
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.grenades.decoy.DecoyPacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangPacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadePacketHandler
@@ -101,6 +102,7 @@ object ModPacketHandler {
         FireGrenadePacketHandler.registerMessages(this)
         SmokeGrenadePacketHandler.registerMessages(this)
         FlashbangPacketHandler.registerMessages(this)
+        DecoyPacketHandler.registerMessages(this)
     }
 
     fun <M : Any> registerMessage(

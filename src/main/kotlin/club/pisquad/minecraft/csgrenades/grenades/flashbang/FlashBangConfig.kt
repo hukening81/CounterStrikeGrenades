@@ -1,6 +1,5 @@
 package club.pisquad.minecraft.csgrenades.grenades.flashbang
 
-import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.config.GrenadeCommonConfig
 import club.pisquad.minecraft.csgrenades.config.GrenadeConfigBuilder
 import net.minecraftforge.common.ForgeConfigSpec

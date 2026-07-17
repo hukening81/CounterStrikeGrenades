@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.eventbus.api.Event
 import net.minecraftforge.fml.LogicalSide
-import java.util.UUID
+import java.util.*
 
 open class CounterStrikeGrenadeEvent(
     val side: LogicalSide,

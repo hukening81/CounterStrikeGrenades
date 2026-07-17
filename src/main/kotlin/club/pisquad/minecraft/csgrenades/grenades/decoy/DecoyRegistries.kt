@@ -1,7 +1,6 @@
 package club.pisquad.minecraft.csgrenades.grenades.decoy
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.core.CounterStrikeGrenadeRegistries
 import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangRegistries

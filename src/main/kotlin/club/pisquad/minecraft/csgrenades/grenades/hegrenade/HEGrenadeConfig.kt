@@ -23,7 +23,7 @@ object HEGrenadeExplosionConfig : GrenadeConfigBuilder {
 
     override fun build(builder: ForgeConfigSpec.Builder) {
         radius = builder.defineInRange("radius", 5.0, 1.0, 10.0)
-        damageAmount = builder.defineInRange("damage_amount",10.0,0.1,100.0)
+        damageAmount = builder.defineInRange("damage_amount", 10.0, 0.1, 100.0)
         headDamageMultiplier = builder.defineInRange("head_damage_multiplier", 1.5, 0.1, 10.0)
     }
 }

@@ -3,7 +3,6 @@ package club.pisquad.minecraft.csgrenades.network.message
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
-import club.pisquad.minecraft.csgrenades.api.event.CounterStrikeGrenadeEvent
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitBlockEvent
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
@@ -19,7 +18,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.LogicalSide
 import net.minecraftforge.network.NetworkEvent
-import java.util.UUID
+import java.util.*
 import java.util.function.Supplier
 
 @Serializable

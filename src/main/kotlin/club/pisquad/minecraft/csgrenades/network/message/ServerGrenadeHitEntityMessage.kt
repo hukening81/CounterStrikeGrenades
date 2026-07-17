@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.LogicalSide
 import net.minecraftforge.network.NetworkEvent
-import java.util.UUID
+import java.util.*
 import java.util.function.Supplier
 
 @Serializable

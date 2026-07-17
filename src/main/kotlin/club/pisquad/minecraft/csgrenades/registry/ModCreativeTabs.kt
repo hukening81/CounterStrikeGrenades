@@ -14,6 +14,7 @@ object ModCreativeTabs {
     val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> =
         DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CounterStrikeGrenades.ID)
 
+    @Suppress("unused")
     val CSGRENADES_TAB: RegistryObject<CreativeModeTab> = CREATIVE_MODE_TABS.register("csgrenades_tab") {
         CreativeModeTab.builder()
             .icon { GrenadeType.HE_GRENADE.registries.get().item.get().defaultInstance }

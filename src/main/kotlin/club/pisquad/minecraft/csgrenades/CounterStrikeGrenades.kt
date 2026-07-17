@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades
 
+import club.pisquad.minecraft.csgrenades.compat.CSGrenadeCompatibility
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.registry.RegistryHelper
@@ -15,6 +16,9 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
 
     init {
         ModLogger.info("Initializing Mod -- Common Setup")
+
+        // Load this object and print loaded mods
+        CSGrenadeCompatibility.supportedMods
 
         RegistryHelper.commonSetup(context.modEventBus)
 

@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.LogicalSide
 import net.minecraftforge.network.NetworkEvent
-import java.util.UUID
+import java.util.*
 import java.util.function.Supplier
 
 /* Voxel data is stored as EntityData to allow easier syncing
