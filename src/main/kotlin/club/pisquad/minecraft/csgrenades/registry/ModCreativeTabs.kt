@@ -21,12 +21,6 @@ object ModCreativeTabs {
             .title(Component.translatable("itemGroup.csgrenades"))
             .displayItems { _, output ->
                 GrenadeType.entries.forEach { output.accept(it.registries.get().item.get()) }
-//                output.accept(ModItems.HEGRENADE_ITEM.get())
-//                output.accept(ModItems.SMOKE_GRENADE_ITEM.get())
-//                output.accept(ModItems.FLASH_BANG_ITEM.get())
-//                output.accept(ModItems.DECOY_GRENADE_ITEM.get())
-//                output.accept(ModItems.MOLOTOV_ITEM.get())
-//                output.accept(ModItems.INCENDIARY_ITEM.get())
             }
             .build()
     }

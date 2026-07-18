@@ -32,7 +32,6 @@ object ModEntities {
                 MobCategory.MISC,
             ).sized(ENTITY_SIZE, ENTITY_SIZE)
                 .updateInterval(1)
-//                .clientTrackingRange(ceil(SERVER_MESSAGE_RANGE).toInt())
                 .build(ResourceLocation(CounterStrikeGrenades.ID, name).toString())
         }
     }

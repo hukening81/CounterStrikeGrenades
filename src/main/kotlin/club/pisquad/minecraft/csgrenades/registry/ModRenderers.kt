@@ -18,11 +18,5 @@ object ModRenderers {
         GrenadeType.entries.forEach {
             EntityRenderers.register(it.registries.get().entity.get(), ::GrenadeEntityRenderer)
         }
-//        EntityRenderers.register(ModEntities.FLASH_BANG_ENTITY.get(), ::GrenadeEntityRenderer)
-//        EntityRenderers.register(ModEntities.SMOKE_GRENADE_ENTITY.get(), ::GrenadeEntityRenderer)
-//        EntityRenderers.register(ModEntities.HEGRENADE_ENTITY.get(), ::GrenadeEntityRenderer)
-//        EntityRenderers.register(ModEntities.INCENDIARY_ENTITY.get(), ::GrenadeEntityRenderer)
-//        EntityRenderers.register(ModEntities.MOLOTOV_ENTITY.get(), ::GrenadeEntityRenderer)
-//        EntityRenderers.register(ModEntities.DECOY_ENTITY.get(), ::GrenadeEntityRenderer)
     }
 }

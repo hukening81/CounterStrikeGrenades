@@ -76,13 +76,6 @@ object ModPacketHandler {
             ClientGrenadeThrowMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_SERVER),
         )
-//        registerMessage(
-//            ServerGrenadeMovementSyncMessage::class.java,
-//            ServerGrenadeMovementSyncMessage::encoder,
-//            ServerGrenadeMovementSyncMessage::decoder,
-//            ServerGrenadeMovementSyncMessage::handler,
-//            Optional.of(NetworkDirection.PLAY_TO_CLIENT),
-//        )
         registerMessage(
             ServerGrenadeHitBlockMessage::class.java,
             ServerGrenadeHitBlockMessage::encoder,
