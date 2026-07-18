@@ -9,7 +9,6 @@ import com.tacz.guns.api.entity.IGunOperator
 import com.tacz.guns.api.item.gun.FireMode
 import com.tacz.guns.client.sound.SoundPlayManager
 import com.tacz.guns.item.ModernKineticGunScriptAPI
-import com.tacz.guns.network.message.ServerMessageSound
 import com.tacz.guns.resource.modifier.custom.SilenceModifier
 import com.tacz.guns.sound.SoundManager
 import kotlinx.serialization.Serializable
@@ -133,32 +132,53 @@ sealed interface DecoyFakeSoundProvider {
                 val soundID = gunDisplay.getSounds(soundName) ?: return null
 
                 val fireMode = api.abstractGunItem.getFireMode(api.itemStack)
-                val pattern = if (fireMode == FireMode.BURST) {
-                    val interval = gunData.burstShootInterval / 1000.0
-                    val burstBulletCount = gunData.burstData.count
-                    DecoyHelper.generateFirePattern(
-                        DecoyConfig.soundDuration.get(),
-                        gunData.burstShootInterval / 1000.0,
-                        DecoyConfig.soundMinGroupInterval.get() + interval,
-                        DecoyConfig.soundMaxGroupInterval.get() + interval,
-                        IntRange(burstBulletCount, burstBulletCount),
-                        gunData.reloadData.cooldown.emptyTime.toDouble(),
-                        0.0,
-                        gunData.ammoAmount
-                    )
-                } else {
-                    @Suppress("UnstableApiUsage")
-                    val interval = DecoyHelper.rpmToSecondDelay(gunData.roundsPerMinute)
-                    DecoyHelper.generateFirePattern(
-                        DecoyConfig.soundDuration.get(),
-                        interval,
-                        DecoyConfig.soundMinGroupInterval.get() + interval,
-                        DecoyConfig.soundMaxGroupInterval.get() + interval,
-                        3..8,
-                        gunData.reloadData.cooldown.emptyTime.toDouble(),
-                        0.0,
-                        gunData.ammoAmount
-                    )
+
+                val pattern = when (fireMode) {
+                    FireMode.AUTO -> {
+                        val interval = DecoyHelper.rpmToSecondDelay(gunData.getRoundsPerMinute(FireMode.AUTO))
+                        DecoyHelper.generateFirePattern(
+                            DecoyConfig.soundDuration.get(),
+                            interval,
+                            DecoyConfig.soundMinGroupInterval.get() + interval,
+                            DecoyConfig.soundMaxGroupInterval.get() + interval,
+                            IntRange(2, 5),
+                            gunData.reloadData.cooldown.emptyTime.toDouble(),
+                            0.0,
+                            gunData.ammoAmount
+                        )
+                    }
+
+                    FireMode.SEMI -> {
+                        val interval = DecoyHelper.rpmToSecondDelay(gunData.getRoundsPerMinute(FireMode.SEMI))
+                        DecoyHelper.generateFirePattern(
+                            DecoyConfig.soundDuration.get(),
+                            interval,
+                            interval,
+                            DecoyConfig.soundMaxGroupInterval.get() + interval,
+                            IntRange(1, 1),
+                            gunData.reloadData.cooldown.emptyTime.toDouble(),
+                            0.0,
+                            gunData.ammoAmount
+                        )
+                    }
+
+                    FireMode.BURST -> {
+                        val interval = DecoyHelper.rpmToSecondDelay(gunData.burstData.bpm)
+                        val burstBulletCount = gunData.burstData.count
+                        DecoyHelper.generateFirePattern(
+                            DecoyConfig.soundDuration.get(),
+                            interval,
+                            DecoyConfig.soundMinGroupInterval.get() + interval,
+                            DecoyConfig.soundMaxGroupInterval.get() + interval,
+                            IntRange(burstBulletCount, burstBulletCount),
+                            gunData.reloadData.cooldown.emptyTime.toDouble(),
+                            0.0, gunData.ammoAmount
+                        )
+                    }
+
+                    FireMode.UNKNOWN -> {
+                        listOf()
+                    }
                 }
 
                 return Tacz(decoy.id, soundDistance, gunDisplayID, gunID, soundID, soundName, pattern)
@@ -177,15 +197,6 @@ sealed interface DecoyFakeSoundProvider {
             override fun tick(): Boolean {
                 val count = ticker.tick() ?: return false
                 val decoy = Minecraft.getInstance().player!!.level().getEntity(this.data.decoyID) ?: return true
-//                val message = ServerMessageSound(
-//                    decoy.id,
-//                    data.gunID,
-//                    data.soundName,
-//                    0.8f,
-//                    0.9f + Random.nextFloat() * 0.125f,
-//                    data.soundDistance
-//                )
-                println("TACZ Decoy player: firing for $count times")
                 repeat(count) {
                     SoundPlayManager.playClientSound(
                         decoy,
