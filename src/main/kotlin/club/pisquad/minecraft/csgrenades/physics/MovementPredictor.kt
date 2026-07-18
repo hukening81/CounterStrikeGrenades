@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import kotlin.math.absoluteValue
 
 object MovementPredictor {
     /*Predict the next tick*/
@@ -21,6 +22,7 @@ object MovementPredictor {
     ): PredictResult {
         var partialTick = 0.0
         var count = 0
+        println(velocity.metersPerSecond)
 
         val successResult =
             PredictResult.PredictSuccess(
@@ -30,11 +32,30 @@ object MovementPredictor {
                 mutableListOf(),
             )
 
+        val getTickDeltaBeforeVerticalStop = {
+            if (successResult.velocity.metersPerSecond.y > 0) {
+                val k =
+                    successResult.velocity.blocksPerTick.y / (-PhysicsUtil.VERTICAL_ACCELERATION_PER_TICK * (1 - partialTick)).absoluteValue
+                if (k < 1.0) {
+                    successResult.velocity.blocksPerTick.y / (-PhysicsUtil.VERTICAL_ACCELERATION_PER_TICK)
+                } else {
+                    1 - partialTick
+                }
+            } else {
+                1 - partialTick
+            }
+        }
+
         while (partialTick < 1.0) {
             val subtickResult =
-                predictSubtick(level, successResult.position, successResult.velocity, partialTick)
+                predictPartialTick(
+                    level,
+                    successResult.position,
+                    successResult.velocity,
+                    getTickDeltaBeforeVerticalStop()
+                )
             successResult.updateFromSubtick(subtickResult)
-            partialTick = subtickResult.partialTick
+            partialTick += subtickResult.tickDelta
             if (count++ > MAXIMUM_SUBTICK_PREDICT) {
                 return PredictResult.Error.MAX_SUBTICK_REACHED
             }
@@ -43,14 +64,14 @@ object MovementPredictor {
     }
 
 
-    private fun predictSubtick(
+    private fun predictPartialTick(
         level: Level,
         position: GrenadePosition,
         velocity: GrenadeVelocity,
-        partialTick: Double
+        tickDelta: Double
     ): PartialTickPredictResult {
         val from = position.center
-        val deltaMovement = velocity.blocksPerTick.scale(1 - partialTick)
+        val deltaMovement = velocity.blocksPerTick.scale(tickDelta)
         val to = from.add(deltaMovement)
 
         //region Detect block collision
@@ -68,7 +89,6 @@ object MovementPredictor {
                                 hitResult,
                                 from,
                                 velocity,
-                                partialTick
                             )
                         }
                     }
@@ -93,7 +113,7 @@ object MovementPredictor {
             val result = AABB.clip(boxes, from, to, BlockPos.ZERO)
             if (result != null) {
                 val result =
-                    PartialTickPredictResult.EntityHit.fromBlockHitResult(entity, result, from, velocity, partialTick)
+                    PartialTickPredictResult.EntityHit.fromBlockHitResult(entity, result, from, velocity)
                 if (entityPredictResult == null || entityPredictResult.distance > result.distance) {
                     entityPredictResult = result
                 }
@@ -113,7 +133,7 @@ object MovementPredictor {
         } else entityPredictResult ?: PartialTickPredictResult.Through.create(
             GrenadePosition.fromCenter(from),
             velocity,
-            partialTick
+            tickDelta
         )
     }
 
@@ -152,18 +172,18 @@ object MovementPredictor {
     sealed interface PartialTickPredictResult {
         val position: GrenadePosition
         val velocity: GrenadeVelocity
-        val partialTick: Double
+        val tickDelta: Double
 
         class Through(
             override val position: GrenadePosition,
             override val velocity: GrenadeVelocity,
-            override val partialTick: Double,
+            override val tickDelta: Double,
         ) : PartialTickPredictResult {
             companion object {
-                fun create(from: GrenadePosition, velocity: GrenadeVelocity, partialTick: Double): Through {
+                fun create(from: GrenadePosition, velocity: GrenadeVelocity, tickDelta: Double): Through {
                     return Through(
-                        from.move(velocity, GrenadeDuration.fromTick(1 - partialTick)),
-                        PhysicsUtil.updateVelocityPartialTick(velocity, 1 - partialTick),
+                        from.move(velocity, GrenadeDuration.fromTick(tickDelta)),
+                        PhysicsUtil.updateVelocityPartialTick(velocity, tickDelta),
                         Double.MAX_VALUE
                     )
                 }
@@ -175,7 +195,7 @@ object MovementPredictor {
             val distance: Double,
             override val position: GrenadePosition,
             override val velocity: GrenadeVelocity,
-            override val partialTick: Double
+            override val tickDelta: Double
         ) : PartialTickPredictResult {
             companion object {
                 fun fromBlockHitResult(
@@ -183,13 +203,12 @@ object MovementPredictor {
                     result: BlockHitResult,
                     from: Vec3,
                     velocity: GrenadeVelocity,
-                    partialTick: Double
                 ): EntityHit {
                     val distance = result.location.distanceTo(from)
-                    val partialTickDelta = distance / velocity.blocksPerTick.length()
+                    val tickDelta = distance / velocity.blocksPerTick.length()
                     val center =
-                        from.add(velocity.blocksPerTick.scale(partialTickDelta - Double.epsilon()))
-                    val velocityAtBounce = PhysicsUtil.updateVelocityPartialTick(velocity, partialTickDelta)
+                        from.add(velocity.blocksPerTick.scale(tickDelta - Double.epsilon()))
+                    val velocityAtBounce = PhysicsUtil.updateVelocityPartialTick(velocity, tickDelta)
 
                     val data = GrenadeHitEntity(entity, result.location, result.direction, velocityAtBounce)
                     return EntityHit(
@@ -197,7 +216,7 @@ object MovementPredictor {
                         distance,
                         GrenadePosition.fromCenter(center),
                         PhysicsUtil.bounceVelocity(velocityAtBounce, result.direction),
-                        partialTick + partialTickDelta
+                        tickDelta
                     )
                 }
             }
@@ -208,20 +227,19 @@ object MovementPredictor {
             val distance: Double,
             override val position: GrenadePosition,
             override val velocity: GrenadeVelocity,
-            override val partialTick: Double
+            override val tickDelta: Double
         ) : PartialTickPredictResult {
             companion object {
                 fun fromHitResult(
                     result: BlockHitResult,
                     from: Vec3,
                     velocity: GrenadeVelocity,
-                    partialTick: Double
                 ): BlockHit {
                     val deltaMovement = result.location.subtract(from)
                     val distance = deltaMovement.length()
-                    val partialTickDelta = distance / velocity.blocksPerTick.length()
+                    val tickDelta = distance / velocity.blocksPerTick.length()
                     val center = from.add(deltaMovement.scale(1 - Double.epsilon()))
-                    val velocityAtBounce = PhysicsUtil.updateVelocityPartialTick(velocity, partialTickDelta)
+                    val velocityAtBounce = PhysicsUtil.updateVelocityPartialTick(velocity, tickDelta)
                     val newVelocity = PhysicsUtil.bounceVelocity(velocityAtBounce, result.direction)
 
                     val data = GrenadeHitBlock(result.blockPos, result.location, result.direction, newVelocity)
@@ -230,7 +248,7 @@ object MovementPredictor {
                         distance,
                         GrenadePosition.fromCenter(center),
                         newVelocity,
-                        partialTick + partialTickDelta
+                        tickDelta
                     )
                 }
             }

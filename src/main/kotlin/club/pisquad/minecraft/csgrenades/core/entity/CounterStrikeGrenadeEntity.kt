@@ -118,6 +118,9 @@ abstract class CounterStrikeGrenadeEntity(
         }
         this.rotation.tick()
         this.runOnServer {
+            if (this.isStopped) {
+                return@runOnServer
+            }
             val movementPredict = MovementPredictor.predict(this.level(), this.grenadePosition, this.grenadeVelocity)
             when (movementPredict) {
                 MovementPredictor.PredictResult.Error.MAX_SUBTICK_REACHED -> {
@@ -140,15 +143,16 @@ abstract class CounterStrikeGrenadeEntity(
 
                     movementPredict.blockHits.lastOrNull()?.let {
                         // Predict if the grenade has stopped
-                        if (it.direction == Direction.UP && this.grenadeVelocity.metersPerSecond.y.absoluteValue < 0.01) {
+                        if (it.direction == Direction.UP && this.grenadeVelocity.blocksPerTick.y.absoluteValue < 0.05) {
                             // Snap to the ground
                             this.grenadePosition = GrenadePosition.fromCenter(
                                 Vec3(
                                     this.grenadePosition.center.x,
                                     it.hitPoint.y,
-                                    this.grenadePosition.center.x,
+                                    this.grenadePosition.center.z,
                                 )
                             )
+                            this.grenadeVelocity = GrenadeVelocity.ZERO
                             this.entityData.set(isStoppedAccessor, true)
                             this.onStopped()
                         }
