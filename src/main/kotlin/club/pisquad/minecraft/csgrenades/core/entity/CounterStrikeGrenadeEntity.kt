@@ -256,7 +256,9 @@ abstract class CounterStrikeGrenadeEntity(
 
 
     open fun onStopped() {
-
+        this.runOnClient {
+            this.rotation.makeFlat()
+        }
     }
 
     override fun hashCode(): Int {

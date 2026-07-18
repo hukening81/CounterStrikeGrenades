@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.client.render
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
+import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.registry.ModEntityModels
 import com.mojang.blaze3d.vertex.PoseStack
@@ -62,87 +63,6 @@ class GrenadeEntityRenderer<T>(
 
     private val itemRenderer: ItemRenderer = context.itemRenderer
 
-    //    override fun render(
-//        entity: T,
-//        entityYaw: Float,
-//        partialTicks: Float,
-//        poseStack: PoseStack,
-//        buffer: MultiBufferSource,
-//        packedLight: Int,
-//    ) {
-//        entity as CounterStrikeGrenadeEntity
-//        // Hide fire grenade model after it explodes
-//        if (entity is AbstractFireGrenadeEntity && entity.entityData.get(CounterStrikeGrenadeEntity.isActivatedAccessor)) {
-//            return
-//        }
-//        val positionCache = GrenadeRenderCacheHelper.get(entity.id) ?: return
-//
-//        poseStack.pushPose()
-//
-////        val itemStack = entity.getItem()
-////        if (!itemStack.isEmpty) {
-//            // 使用 lerp (线性插值) 来平滑地获取实体在两帧之间的旋转角度
-////            val visualYRot = Mth.rotLerp(partialTicks, entity.customYRotO, entity.customYRot)
-////            val visualXRot = Mth.rotLerp(partialTicks, entity.customXRotO, entity.customXRot)
-////            val visualZRot = Mth.rotLerp(partialTicks, entity.customZRotO, entity.customZRot)
-//
-//            // Translate the model to align its visual center with its physical center
-//            poseStack.translate(0.0, 0.125, 0.0)
-//
-//            // Smooth movement between ticks
-//
-//
-//
-//            // get precise position
-//
-//            // 关键：应用实体自身的三轴旋转
-////            poseStack.mulPose(Axis.YP.rotationDegrees(visualYRot))
-////            poseStack.mulPose(Axis.ZP.rotationDegrees(visualZRot)) // 使用Z轴
-////            poseStack.mulPose(Axis.XP.rotationDegrees(visualXRot))
-//
-//            // 修正模型大小
-//            poseStack.scale(0.5f, 0.5f, 0.5f)
-//
-//            // --- START MODIFICATION ---
-////            val itemName = itemStack.item.descriptionId.replaceFirst("item.csgrenades.", "")
-//            // Model path for items is usually "models/item/[item_name].json"
-//            // So for a thrown item, it would be "models/item/[item_name]_t.json"
-//            val resourceKey = entity.grenadeType.resourceKey
-//            val thrownModelLocation = ResourceLocation("csgrenades", "item/${resourceKey}_t")
-//
-//            val modelManager = Minecraft.getInstance().itemRenderer.itemModelShaper.modelManager
-//            val bakedModel: BakedModel? = modelManager.getModel(thrownModelLocation)
-//
-////            if (bakedModel != null && bakedModel != modelManager.missingModel && !bakedModel.isCustomRenderer) {
-////                itemRenderer.render(
-////                    itemStack,
-////                    ItemDisplayContext.FIXED,
-////                    false, // left-handed. Doesn't matter much for grenades unless there's specific rendering logic based on this
-////                    poseStack,
-////                    buffer,
-////                    packedLight,
-////                    OverlayTexture.NO_OVERLAY,
-////                    bakedModel,
-////                )
-////            } else {
-////                // Fallback to original rendering if custom model not found or is a custom renderer
-////                itemRenderer.renderStatic(
-////                    itemStack,
-////                    ItemDisplayContext.FIXED,
-////                    packedLight,
-////                    OverlayTexture.NO_OVERLAY,
-////                    poseStack,
-////                    buffer,
-////                    entity.level(),
-////                    entity.id,
-////                )
-////            }
-////            // --- END MODIFICATION ---
-////        }
-//
-//        poseStack.popPose()
-//        // super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight) // 移除super调用以消除阴影和“扭头”效果
-//    }
     override fun render(
         entity: T,
         entityYaw: Float,
@@ -157,13 +77,16 @@ class GrenadeEntityRenderer<T>(
         // Movement
         val d = entity.deltaMovement
         val x = Mth.lerp(partialTick.toDouble(), 0.0, d.x)
-        val y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
+        var y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
+        y += ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF
         val z = Mth.lerp(partialTick.toDouble(), 0.0, d.z)
         poseStack.translate(x, y, z)
 
         // Rotation
 
         poseStack.mulPose(Quaternionf(entity.rotation.getPartialTick(partialTick.toDouble())))
+
+        poseStack.scale(0.4f, 0.4f, 0.4f)
 
         val itemStack = getItemStack(entity.grenadeType)
 

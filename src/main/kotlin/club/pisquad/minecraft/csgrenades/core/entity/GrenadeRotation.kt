@@ -45,4 +45,10 @@ class GrenadeRotation(
         angularVelocity.normalize()
         angularVelocity.scale(ROTATION_SPEED)
     }
+
+    fun makeFlat() {
+        orientation = Quaterniond().rotateY(Math.toRadians(Random.nextDouble(0.0, 360.0))).rotateX(Math.toRadians(90.0))
+        orientationOld = orientation
+        angularVelocity = Vec3.ZERO
+    }
 }
