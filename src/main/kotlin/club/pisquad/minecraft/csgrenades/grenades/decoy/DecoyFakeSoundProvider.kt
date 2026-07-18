@@ -26,16 +26,25 @@ import kotlin.random.Random
 class DecoyFirePatternTicker(pattern: List<Int>) {
     val pattern: MutableList<Int> = pattern.toMutableList()
 
-    var waitingTimer: Int = 0
+    var waitingTimer: Int
+
+    init {
+        this.waitingTimer = if (this.pattern.isEmpty()) {
+            0
+        } else {
+            this.pattern.first()
+        }
+    }
 
     fun tick(): Int? {
         if (waitingTimer > 0) {
+            waitingTimer--
             return 0
         }
 
         var count = 1
 
-        while (waitingTimer != 0) {
+        while (waitingTimer == 0) {
             val i = pattern.removeFirstOrNull() ?: return null
             if (i == 0) {
                 count++
@@ -168,14 +177,15 @@ sealed interface DecoyFakeSoundProvider {
             override fun tick(): Boolean {
                 val count = ticker.tick() ?: return false
                 val decoy = Minecraft.getInstance().player!!.level().getEntity(this.data.decoyID) ?: return true
-                val message = ServerMessageSound(
-                    decoy.id,
-                    data.gunID,
-                    data.soundName,
-                    0.8f,
-                    0.9f + Random.nextFloat() * 0.125f,
-                    data.soundDistance
-                )
+//                val message = ServerMessageSound(
+//                    decoy.id,
+//                    data.gunID,
+//                    data.soundName,
+//                    0.8f,
+//                    0.9f + Random.nextFloat() * 0.125f,
+//                    data.soundDistance
+//                )
+                println("TACZ Decoy player: firing for $count times")
                 repeat(count) {
                     SoundPlayManager.playClientSound(
                         decoy,
