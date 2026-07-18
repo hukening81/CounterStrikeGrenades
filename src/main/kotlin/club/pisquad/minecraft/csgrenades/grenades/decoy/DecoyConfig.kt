@@ -12,7 +12,7 @@ object DecoyConfig : GrenadeConfigBuilder {
 
     override fun build(builder: ForgeConfigSpec.Builder) {
         common.build(builder)
-        soundDuration = builder.defineInRange("sound_duration", 5.0, 0.0, 60.0)
+        soundDuration = builder.defineInRange("sound_duration", 15.0, 0.0, 60.0)
         soundMinGroupInterval = builder.defineInRange("sound_min_group_interval", 1.0, 0.0, 60.0)
         soundMaxGroupInterval = builder.defineInRange("sound_max_group_interval", 1.0, 0.0, 60.0)
     }
