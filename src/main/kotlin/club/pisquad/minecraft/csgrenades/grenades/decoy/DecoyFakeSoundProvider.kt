@@ -1,8 +1,12 @@
 package club.pisquad.minecraft.csgrenades.grenades.decoy
 
+import club.pisquad.minecraft.csgrenades.compat.CSGrenadeCompatibility
+import club.pisquad.minecraft.csgrenades.compat.CSGrenadeSupportedMods
 import club.pisquad.minecraft.csgrenades.compat.tacz.TaczCompatibility
 import club.pisquad.minecraft.csgrenades.grenades.decoy.messages.ServerDecoyActivatedMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.ResourceLocationSerializer
+import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import com.tacz.guns.api.GunProperties
 import com.tacz.guns.api.TimelessAPI
 import com.tacz.guns.api.entity.IGunOperator
@@ -15,6 +19,9 @@ import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -66,21 +73,50 @@ sealed interface DecoyFakeSoundProvider {
 
     companion object {
         fun createProvider(decoy: DecoyGrenadeEntity, player: ServerPlayer): DecoyFakeSoundProvider {
-//            if (CSGrenadeCompatibility.isModLoaded(CSGrenadeSupportedMods.TACZ)) {
-//                Tacz.tryCreate(decoy, player)?.run {
-//                    return this
-//                }
-//            }
-//            return
-            return Tacz.tryCreate(decoy, player)!!
+            if (CSGrenadeCompatibility.isModLoaded(CSGrenadeSupportedMods.TACZ)) {
+                val result = Tacz.tryCreate(decoy, player)
+                if (result != null) {
+                    return result
+                }
+            }
+            return Vanilla(decoy.grenadePosition.center)
         }
     }
 
 
     @Serializable
-    class Vanilla : DecoyFakeSoundProvider {
+    class Vanilla(@Serializable(with = Vec3Serializer::class) val location: Vec3) : DecoyFakeSoundProvider {
         override fun getAudioPlayer(): DecoyFakeSoundPlayer {
-            TODO("Not yet implemented")
+            return SoundPlayer(location)
+        }
+
+        class SoundPlayer(val location: Vec3) : DecoyFakeSoundPlayer {
+            val waitTime = 20 * 5
+            var tickCount = 0
+
+            companion object {
+                val soundPool = listOf(SoundEvents.VILLAGER_YES)
+            }
+
+            override fun tick(): Boolean {
+                this.tickCount--
+                if (this.tickCount <= 0) {
+                    this.tickCount = waitTime
+                    val player = Minecraft.getInstance().player!!
+                    val level = player.level()
+                    level.playSound(
+                        player,
+                        this.location.x,
+                        this.location.y,
+                        this.location.z,
+                        soundPool.random(),
+                        SoundSource.PLAYERS,
+                        1.0f,
+                        1.0f
+                    )
+                }
+                return true
+            }
         }
     }
 
@@ -107,8 +143,7 @@ sealed interface DecoyFakeSoundProvider {
 
                 val silence: it.unimi.dsi.fastutil.Pair<Int, Boolean> = cacheProperty.getCache(SilenceModifier.ID)
 
-                @Suppress("UnstableApiUsage")
-                val soundDistance: Int = api.abstractGunItem.modifyProperty(
+                @Suppress("UnstableApiUsage") val soundDistance: Int = api.abstractGunItem.modifyProperty(
                     dataHolder,
                     itemStack,
                     player,
@@ -172,7 +207,8 @@ sealed interface DecoyFakeSoundProvider {
                             DecoyConfig.soundMaxGroupInterval.get() + interval,
                             IntRange(burstBulletCount, burstBulletCount),
                             gunData.reloadData.cooldown.emptyTime.toDouble(),
-                            0.0, gunData.ammoAmount
+                            0.0,
+                            gunData.ammoAmount
                         )
                     }
 
@@ -215,10 +251,14 @@ sealed interface DecoyFakeSoundProvider {
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 object DecoyClientSoundManager {
-    val activeAudioPlayers: MutableList<DecoyFakeSoundPlayer> = mutableListOf()
+    private class Entry(val player: DecoyFakeSoundPlayer) {
+        var lifetime: Int = 0
+    }
+
+    private val activeAudioPlayers: MutableMap<Int, Entry> = mutableMapOf()
 
     fun playSoundFromMessage(message: ServerDecoyActivatedMessage) {
-        activeAudioPlayers.add(message.provider.getAudioPlayer())
+        activeAudioPlayers.putIfAbsent(message.decoyID, Entry(message.provider.getAudioPlayer()))
     }
 
     @JvmStatic
@@ -227,6 +267,14 @@ object DecoyClientSoundManager {
         if (event.phase != TickEvent.Phase.END) {
             return
         }
-        activeAudioPlayers.removeIf { !it.tick() }
+        val keysForDelete = mutableListOf<Int>()
+        for (key in activeAudioPlayers.keys) {
+            val entry = activeAudioPlayers[key]!!
+            if (!entry.player.tick() || GrenadeDuration.fromTick(entry.lifetime.toDouble()).seconds > DecoyConfig.soundDuration.get()) {
+                keysForDelete.add(key)
+            }
+            entry.lifetime++
+        }
+        keysForDelete.forEach { activeAudioPlayers.remove(it) }
     }
 }

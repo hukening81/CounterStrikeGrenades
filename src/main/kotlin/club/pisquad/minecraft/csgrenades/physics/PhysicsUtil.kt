@@ -3,16 +3,13 @@ package club.pisquad.minecraft.csgrenades.physics
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.Vec3
 import kotlin.math.floor
-import kotlin.math.pow
 
 object PhysicsUtil {
-    const val VERTICAL_ACCELERATION: Double = -9.8
-
-    //    private const val VERTICAL_ACCELERATION_PER_TICK: Double = VERTICAL_ACCELERATION / 20
-    const val VERTICAL_ACCELERATION_PER_TICK: Double = -0.8 / 20.0
+    const val VERTICAL_ACCELERATION_PER_TICK: Double = -0.085
     const val AIR_DRAG_COEFFICIENT: Double = 0.99
     const val MINIMUM_VELOCITY_AFTER_BOUNCE = 0.1
 
+    @Suppress("unused")
     fun updateVelocity(velocity: GrenadeVelocity, duration: GrenadeDuration): GrenadeVelocity {
         val wholeSeconds = floor(duration.seconds).toInt()
         val fraction = duration.seconds - wholeSeconds
@@ -84,11 +81,5 @@ object PhysicsUtil {
         } else {
             newV
         }
-    }
-
-    fun combineWithFall(deltaMovement: Vec3, deltaTick: Double): Vec3 {
-//        val d = 0.5 * VERTICAL_ACCELERATION * (SECONDS_PER_TICK * deltaTick).pow(2)
-        val d = 0.0
-        return Vec3(deltaMovement.x, deltaMovement.y + d, deltaMovement.z)
     }
 }

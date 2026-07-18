@@ -9,6 +9,7 @@ import java.util.function.Supplier
 
 @Serializable
 class ServerDecoyActivatedMessage(
+    val decoyID: Int,
     val provider: DecoyFakeSoundProvider
 ) {
     companion object : CsGrenadeMessageHandler<ServerDecoyActivatedMessage>(ServerDecoyActivatedMessage::class) {

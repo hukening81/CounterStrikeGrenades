@@ -28,7 +28,7 @@ class DecoyGrenadeEntity(
         this.runOnServer {
             val owner = this.level().getPlayerByUUID(this.ownerUuid) ?: return@runOnServer
             val provider = DecoyFakeSoundProvider.createProvider(this, owner as ServerPlayer)
-            val message = ServerDecoyActivatedMessage(provider)
+            val message = ServerDecoyActivatedMessage(this.id, provider)
 
             ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.position(), message)
         }
