@@ -5,11 +5,7 @@ package club.pisquad.minecraft.csgrenades.network
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.config.ModConfig
-import club.pisquad.minecraft.csgrenades.grenades.decoy.DecoyPacketHandler
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangPacketHandler
-import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadePacketHandler
-import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
@@ -90,12 +86,7 @@ object ModPacketHandler {
             ServerGrenadeHitEntityMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
-
-        HEGrenadePacketHandler.registerMessages(this)
         FireGrenadePacketHandler.registerMessages(this)
-        SmokeGrenadePacketHandler.registerMessages(this)
-        FlashbangPacketHandler.registerMessages(this)
-        DecoyPacketHandler.registerMessages(this)
     }
 
     fun <M : Any> registerMessage(

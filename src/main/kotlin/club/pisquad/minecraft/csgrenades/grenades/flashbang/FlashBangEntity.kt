@@ -16,8 +16,8 @@ class FlashBangEntity(pEntityType: EntityType<out FlashBangEntity>, pLevel: Leve
     pEntityType, pLevel,
     FlashBangConfig.common.fuseTime.get().toTick().toInt(),
 ) {
-    override val sounds = FlashbangRegistries.sounds
-    override val damageTypes = FlashbangRegistries.damageTypes
+    override val sounds = FlashbangSounds
+    override val damageTypes = FlashBangDamageTypes
     override val grenadeType: GrenadeType = GrenadeType.FLASH_BANG
 
 

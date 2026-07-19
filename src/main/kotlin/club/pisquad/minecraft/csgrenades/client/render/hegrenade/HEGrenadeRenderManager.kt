@@ -13,8 +13,8 @@ data class HEGrenadeExplosionData(
     var position: Vec3,
 )
 
-// Effect rendering should not depends on the grenade entity itself since the entity is discarded when activate
-// Since we use particles for rendering he grenade, following logic all happen in the main thread
+// Effect rendering should not depend on the grenade entity itself since the entity is discarded when activate
+// Since we use particles for rendering hegrenade, following logic all happen in the main thread
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object HEGrenadeRenderManager {
     private val renderers: MutableList<HEGrenadeRenderer> = mutableListOf()

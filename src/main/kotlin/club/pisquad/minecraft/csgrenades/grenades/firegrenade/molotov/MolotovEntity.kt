@@ -6,10 +6,18 @@ import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-class MolotovEntity(pEntityType: EntityType<out MolotovEntity>, pLevel: Level) : FireGrenadeEntity(
-    pEntityType, pLevel, MolotovConfig.common.fuseTime.get().toTick().toInt(),
+class MolotovEntity(entityType: EntityType<out MolotovEntity>, pLevel: Level) : FireGrenadeEntity(
+    entityType, pLevel, MolotovConfig.common.fuseTime.get(),
 ) {
-    override val sounds = MolotovRegistries.sounds
-    override val damageTypes = MolotovRegistries.damageTypes
+    override val sounds = MolotovSounds
+    override val damageTypes = MolotovDamageTypes
     override val grenadeType: GrenadeType = GrenadeType.MOLOTOV
+
+    override fun popInAir() {
+        TODO("Not yet implemented")
+    }
+
+    override fun smashOnGround() {
+        TODO("Not yet implemented")
+    }
 }

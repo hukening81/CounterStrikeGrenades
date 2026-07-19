@@ -17,7 +17,7 @@ object ModItems {
         ITEMS.register(bus)
     }
 
-    fun <I : CounterStrikeGrenadeItem> registerSingle(name: String, factory: () -> I): RegistryObject<I> {
+    fun <I : CounterStrikeGrenadeItem> registerGrenadeItem(name: String, factory: () -> I): RegistryObject<I> {
         return ITEMS.register(name, factory)
     }
 }

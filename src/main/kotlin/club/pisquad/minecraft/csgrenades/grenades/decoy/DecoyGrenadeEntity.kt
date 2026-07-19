@@ -19,8 +19,8 @@ class DecoyGrenadeEntity(
     pLevel,
     GrenadeDuration.convertSecondToWholeTick(DecoyConfig.common.fuseTime.get())
 ) {
-    override val sounds = DecoyRegistries.sounds
-    override val damageTypes = DecoyRegistries.damageTypes
+    override val sounds = DecoySounds
+    override val damageTypes = DecoyDamageTypes
     override val grenadeType: GrenadeType = GrenadeType.DECOY
 
     override fun activate() {

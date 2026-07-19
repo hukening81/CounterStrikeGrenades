@@ -10,14 +10,7 @@ import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.ForgeRegistries
 import net.minecraftforge.registries.RegistryObject
 
-interface GrenadeSoundEvents {
-    val draw: GrenadeSoundData
-    val hitBlock: GrenadeSoundData
-    val hitEntity: GrenadeSoundData
-    val `throw`: GrenadeSoundData
-    val pinPullStart: GrenadeSoundData
-    val pinPull: GrenadeSoundData
-}
+
 
 object ModSoundEvents {
     val SOUND_EVENTS: DeferredRegister<SoundEvent> =

@@ -22,6 +22,11 @@ class GrenadeSoundData(
         get() = volumeD.toFloat()
 
     companion object {
+        val EMPTY_SOUND = GrenadeSoundData(
+            ModSoundEvents.registerSoundEvent("dev_null"),
+            0.0
+        )
+
         fun create(name: String, volume: Double = 10.0): GrenadeSoundData {
             return GrenadeSoundData(
                 ModSoundEvents.registerSoundEvent(name),
@@ -30,10 +35,7 @@ class GrenadeSoundData(
         }
 
         fun empty(): GrenadeSoundData {
-            return GrenadeSoundData(
-                ModSoundEvents.registerSoundEvent("dev_null"),
-                0.0
-            )
+            return EMPTY_SOUND
         }
 
         fun createDraw(name: String): GrenadeSoundData {

@@ -17,26 +17,26 @@ object CSGrenadeClientAPI {
 
     object CSGrenadeClientSoundAPI {
         fun playHitBlock(position: Vec3, grenade: GrenadeType): Boolean {
-            return grenade.registries.get().sounds.hitBlock.play(position)
+            return grenade.implementation.getCommonSounds().hitBlock.play(position)
         }
 
         fun playHitEntity(position: Vec3, grenade: GrenadeType): Boolean {
-            return grenade.registries.get().sounds.hitEntity.play(position)
+            return grenade.implementation.getCommonSounds().hitEntity.play(position)
         }
 
         fun playDraw(grenade: GrenadeType): Boolean {
             val position = Minecraft.getInstance().player?.getEarPosition() ?: return false
-            return grenade.registries.get().sounds.draw.play(position)
+            return grenade.implementation.getCommonSounds().draw.play(position)
         }
 
         fun playPinPullStart(grenade: GrenadeType): Boolean {
             val position = Minecraft.getInstance().player?.getEarPosition() ?: return false
-            return grenade.registries.get().sounds.pinPullStart.play(position)
+            return grenade.implementation.getCommonSounds().pinPullStart.play(position)
         }
 
         fun playPinPull(grenade: GrenadeType): Boolean {
             val position = Minecraft.getInstance().player?.getEarPosition() ?: return false
-            return grenade.registries.get().sounds.pinPull.play(position)
+            return grenade.implementation.getCommonSounds().pinPull.play(position)
         }
     }
 

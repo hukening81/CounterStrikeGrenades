@@ -11,9 +11,9 @@ import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.ForgeRegistries
 import net.minecraftforge.registries.RegistryObject
+import kotlin.reflect.KClass
 
 object ModEntities {
-    const val ENTITY_SIZE = GRENADE_ENTITY_SIZE.toFloat()
     val ENTITIES: DeferredRegister<EntityType<*>> =
         DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, CounterStrikeGrenades.ID)
 
@@ -22,17 +22,17 @@ object ModEntities {
         ENTITIES.register(bus)
     }
 
-    fun <T : CounterStrikeGrenadeEntity> registerSingle(
-        name: String,
+    fun <T : CounterStrikeGrenadeEntity> registerGrenadeEntity(
+        resourceKey: String,
         factory: EntityType.EntityFactory<T>
     ): RegistryObject<EntityType<T>> {
-        return ENTITIES.register(name) {
+        return ENTITIES.register(resourceKey) {
             EntityType.Builder.of(
                 factory,
                 MobCategory.MISC,
-            ).sized(ENTITY_SIZE, ENTITY_SIZE)
+            ).sized(GRENADE_ENTITY_SIZE.toFloat(), GRENADE_ENTITY_SIZE.toFloat())
                 .updateInterval(1)
-                .build(ResourceLocation(CounterStrikeGrenades.ID, name).toString())
+                .build(ResourceLocation(CounterStrikeGrenades.ID, resourceKey).toString())
         }
     }
 }

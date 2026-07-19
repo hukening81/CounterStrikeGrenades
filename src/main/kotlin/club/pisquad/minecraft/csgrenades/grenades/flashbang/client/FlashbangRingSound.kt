@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.flashbang.client
 
-import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangRegistries
+import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangImplementation
+import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangSounds
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.sounds.SoundSource
@@ -15,7 +16,7 @@ class FlashbangRingSound(
     val targetVolume: Float,
     private val startTime: Instant = Instant.now(),
 ) : AbstractTickableSoundInstance(
-    FlashbangRegistries.sounds.ring.soundEvent,
+    FlashbangSounds.ring.soundEvent,
     SoundSource.MASTER,
     RandomSource.createNewThreadLocalInstance(),
 ) {

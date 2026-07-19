@@ -12,7 +12,7 @@ object RegistryHelper {
         ModSoundEvents.register(modBus)
 
         GrenadeType.entries.forEach {
-            it.registries.get().registerSerializers()
+            it.implementation.registerEntityDataSerializers()
         }
     }
 }

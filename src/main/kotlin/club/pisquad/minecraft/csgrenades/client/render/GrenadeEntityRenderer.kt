@@ -109,6 +109,6 @@ class GrenadeEntityRenderer<T>(
     }
 
     private fun getItemStack(grenadeType: GrenadeType): ItemStack {
-        return ItemStack(grenadeType.registries.get().item.get())
+        return ItemStack(grenadeType.implementation.getItem().get())
     }
 }

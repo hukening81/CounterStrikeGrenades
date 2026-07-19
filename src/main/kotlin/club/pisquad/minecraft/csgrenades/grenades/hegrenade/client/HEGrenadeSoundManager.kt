@@ -1,6 +1,6 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade.client
 
-import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeRegistries
+import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeSounds
 import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.Vec3
 
@@ -11,6 +11,6 @@ object HEGrenadeSoundManager {
     fun playExplosionSound(position: Vec3): Boolean {
         val player = Minecraft.getInstance().player!!
         val distance = player.position().distanceTo(position)
-        return HEGrenadeRegistries.sounds.explode.play(position, distance)
+        return HEGrenadeSounds.explode.play(position, distance)
     }
 }

@@ -3,17 +3,18 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeEntity
 import kotlinx.coroutines.*
+import net.minecraft.world.phys.Vec3
 import kotlin.time.measureTimedValue
 
 class VoxelWorker(entity: SmokeGrenadeEntity) {
+    val center: Vec3 = entity.center
     val coroutineWorker: Deferred<RegionVoxelState>
 
     val floodFillWorker: FloodFillWorker
 
     init {
-        val center = entity.center
         val (state, duration) = measureTimedValue {
-            RegionVoxelState.fromCenter(entity.level(), center)
+            RegionVoxelState.fromCenter(entity.level(), this.center)
         }
         ModLogger.debug(duration, "Generate region state")
 
@@ -34,6 +35,6 @@ class VoxelWorker(entity: SmokeGrenadeEntity) {
 
     fun blockingUntilComplete(): VoxelMap {
         val result = runBlocking { coroutineWorker.await() }
-        return VoxelMap(result.mapValues { (_, value) -> value.toVoxel() })
+        return VoxelMap(this.center, result.mapValues { (_, value) -> value.toVoxel() })
     }
 }

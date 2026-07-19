@@ -22,6 +22,7 @@ open class GrenadeActivatedEvent(
     side: LogicalSide,
     grenadeType: GrenadeType,
     ownerUUID: UUID,
+    val location: Vec3
 ) :
     CounterStrikeGrenadeEvent(side, grenadeType, ownerUUID)
 

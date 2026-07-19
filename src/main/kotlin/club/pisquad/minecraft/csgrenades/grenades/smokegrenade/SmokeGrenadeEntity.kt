@@ -4,11 +4,8 @@ import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
-import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelWorker
 import club.pisquad.minecraft.csgrenades.toTick
-import net.minecraft.network.syncher.EntityDataAccessor
-import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -20,26 +17,12 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel
     ) {
     private var voxelWorker: VoxelWorker? = null
 
-    override val sounds = SmokeGrenadeRegistries.sounds
-    override val damageTypes = SmokeGrenadeRegistries.damageTypes
+    override val sounds = SmokeGrenadeSounds
+    override val damageTypes = SmokeGrenadeDamageTypes
     override val grenadeType: GrenadeType = GrenadeType.SMOKE_GRENADE
-
-    val voxels: VoxelMap
-        get() {
-            return this.entityData.get(voxelMapAccessor)
-        }
-
-    companion object {
-        val voxelMapAccessor: EntityDataAccessor<VoxelMap> =
-            SynchedEntityData.defineId(
-                SmokeGrenadeEntity::class.java,
-                SmokeGrenadeRegistries.serializers.voxelMapSerializer
-            )
-    }
 
     override fun defineSynchedData() {
         super.defineSynchedData()
-        this.entityData.define(voxelMapAccessor, VoxelMap.EMPTY)
     }
 
     override fun onStopped() {

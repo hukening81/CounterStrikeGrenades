@@ -7,13 +7,13 @@ import club.pisquad.minecraft.csgrenades.api.event.GrenadeActivatedEvent
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitBlockEvent
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitEntityEvent
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
+import club.pisquad.minecraft.csgrenades.core.GrenadeCommonSounds
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.physics.*
-import club.pisquad.minecraft.csgrenades.registry.GrenadeEntityDamageTypes
-import club.pisquad.minecraft.csgrenades.registry.GrenadeSoundEvents
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -41,8 +41,8 @@ import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 interface GrenadeEntityData {
-    val sounds: GrenadeSoundEvents
-    val damageTypes: GrenadeEntityDamageTypes
+    val sounds: GrenadeCommonSounds
+    val damageTypes: GrenadeCommonDamageTypes
 }
 
 private interface GrenadeMovement {
@@ -67,6 +67,7 @@ abstract class CounterStrikeGrenadeEntity(
             )
             field = value
         }
+
     override var grenadeVelocity: GrenadeVelocity = GrenadeVelocity.ZERO
         set(value) {
             this.deltaMovement = value.blocksPerTick
@@ -80,7 +81,6 @@ abstract class CounterStrikeGrenadeEntity(
 
     init {
         isNoGravity = true
-//        noPhysics = true
         rotation = GrenadeRotation(this.id.toLong())
     }
 
@@ -92,17 +92,26 @@ abstract class CounterStrikeGrenadeEntity(
         )
     }
 
-    val isActivated: Boolean
+    var isActivated: Boolean
         get() {
             return this.entityData.get(isActivatedAccessor)
         }
-    val isStopped: Boolean
+        set(value) {
+            this.entityData.set(isActivatedAccessor, value)
+        }
+    var isStopped: Boolean
         get() {
             return this.entityData.get(isStoppedAccessor)
         }
-    val center: Vec3
+        set(value) {
+            this.entityData.set(isStoppedAccessor, value)
+        }
+    var center: Vec3
         get() {
             return this.grenadePosition.center
+        }
+        set(value) {
+            this.grenadePosition = GrenadePosition.fromCenter(value)
         }
 
     override fun defineSynchedData() {
@@ -179,7 +188,7 @@ abstract class CounterStrikeGrenadeEntity(
     override fun shouldBeSaved(): Boolean = false
 
     open fun createActivatedEvent(side: LogicalSide): GrenadeActivatedEvent {
-        return GrenadeActivatedEvent(side, this.grenadeType, this.ownerUuid)
+        return GrenadeActivatedEvent(side, this.grenadeType, this.ownerUuid, this.center)
     }
 
     open fun activate() {
@@ -253,7 +262,6 @@ abstract class CounterStrikeGrenadeEntity(
         val message = ServerGrenadeHitEntityMessage.create(this, data)
         ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
     }
-
 
     open fun onStopped() {
         this.runOnClient {

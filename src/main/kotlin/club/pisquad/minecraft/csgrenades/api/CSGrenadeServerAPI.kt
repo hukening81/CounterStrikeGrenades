@@ -46,7 +46,11 @@ object CSGrenadeServerAPI {
             owner: ServerPlayer, context: GrenadeSpawnContext, removeItem: Boolean = true
         ): CounterStrikeGrenadeEntity? {
             val level = owner.level() as ServerLevel
-            val entityType = context.grenadeType.registries.get().entity.get()
+            val entityRegistryObject = context.grenadeType.implementation.getEntity()
+            if (!entityRegistryObject.isPresent) {
+                return null
+            }
+            val entityType = entityRegistryObject.get()
             val entity = entityType.create(level) ?: return null
             entity.ownerUuid = owner.uuid
             entity.grenadePosition = GrenadePosition.fromCenter(context.position)

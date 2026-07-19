@@ -31,7 +31,7 @@ object ModConfig {
 
         GrenadeType.entries.forEach {
             builder.push(it.resourceKey)
-            it.registries.get().config.build(builder)
+            it.implementation.buildConfig(builder)
             builder.pop()
         }
 

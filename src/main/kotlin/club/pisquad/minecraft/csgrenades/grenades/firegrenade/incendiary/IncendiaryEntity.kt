@@ -2,15 +2,22 @@ package club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeEntity
-import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-class IncendiaryEntity(pEntityType: EntityType<out IncendiaryEntity>, pLevel: Level) : FireGrenadeEntity(
-    pEntityType, pLevel,
-    IncendiaryConfig.common.fuseTime.get().toTick().toInt(),
+class IncendiaryEntity(entityType: EntityType<IncendiaryEntity>, pLevel: Level) : FireGrenadeEntity(
+    entityType, pLevel,
+    IncendiaryConfig.common.fuseTime.get(),
 ) {
-    override val sounds = IncendiaryRegistries.sounds
-    override val damageTypes = IncendiaryRegistries.damageTypes
+    override val sounds = IncendiarySounds
+    override val damageTypes = IncendiaryDamageTypes
     override val grenadeType: GrenadeType = GrenadeType.INCENDIARY
+
+    override fun popInAir() {
+        TODO("Not yet implemented")
+    }
+
+    override fun smashOnGround() {
+        TODO("Not yet implemented")
+    }
 }

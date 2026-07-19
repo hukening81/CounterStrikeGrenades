@@ -34,8 +34,6 @@ class FloodFillWorker(
         //region Squeeze
         val edges = voxels.getVoxelMap().edges.value.filter { pos ->
             // Test if any neighbor is spreadable
-            // Which means this voxel's spread is terminated by the shape checker/ or terminated by not able to spread
-            // Which means this voxel is the edge we are looking for
             Direction.entries.any { direction ->
                 val target = voxels[pos.relative(direction)] ?: return@filter false
                 target.intensity == 0 && target.triggerIntensityUpdate(direction.opposite, Int.MAX_VALUE)

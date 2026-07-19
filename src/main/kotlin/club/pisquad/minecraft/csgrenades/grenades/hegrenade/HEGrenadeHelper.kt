@@ -25,7 +25,7 @@ object HEGrenadeHelper {
             val location = grenade.center
             val level = grenade.level() as ServerLevel
             val grenadeType = grenade.grenadeType
-            val range = (grenadeType.registries.get().config as HEGrenadeConfig).explosion.radius.get()
+            val range = HEGrenadeConfig.explosion.radius.get()
 
             val entities = level.getEntitiesOfClass(
                 LivingEntity::class.java, AABB.ofSize(
@@ -33,7 +33,7 @@ object HEGrenadeHelper {
                 )
             )
 
-            val key = grenadeType.registries.get().damageTypes.main
+            val key = HEGrenadeDamageTypes.explosion
             val holder = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key)
 
 
