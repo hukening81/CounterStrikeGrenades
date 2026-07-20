@@ -12,7 +12,7 @@ import net.minecraftforge.eventbus.api.Event
 import net.minecraftforge.fml.LogicalSide
 import java.util.*
 
-open class CounterStrikeGrenadeEvent(
+open class CSGrenadeEvent(
     val side: LogicalSide,
     val grenadeType: GrenadeType,
     val ownerUUID: UUID,
@@ -24,7 +24,7 @@ open class GrenadeActivatedEvent(
     ownerUUID: UUID,
     val location: Vec3
 ) :
-    CounterStrikeGrenadeEvent(side, grenadeType, ownerUUID)
+    CSGrenadeEvent(side, grenadeType, ownerUUID)
 
 open class GrenadeHitBlockEvent(
     side: LogicalSide,
@@ -34,7 +34,7 @@ open class GrenadeHitBlockEvent(
     val blockPos: BlockPos,
     val hitPoint: Vec3,
     val velocity: GrenadeVelocity,
-) : CounterStrikeGrenadeEvent(side, grenadeType, ownerUUID) {
+) : CSGrenadeEvent(side, grenadeType, ownerUUID) {
     companion object {
         fun create(
             side: LogicalSide,
@@ -62,7 +62,7 @@ open class GrenadeHitEntityEvent(
     val entity: Entity?,
     val hitPoint: Vec3,
     val velocity: GrenadeVelocity,
-) : CounterStrikeGrenadeEvent(side, grenadeType, ownerUUID) {
+) : CSGrenadeEvent(side, grenadeType, ownerUUID) {
     companion object {
         fun create(
             side: LogicalSide,

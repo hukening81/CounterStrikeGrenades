@@ -6,15 +6,23 @@ import club.pisquad.minecraft.csgrenades.api.data.GrenadeSpawnContext
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
+import club.pisquad.minecraft.csgrenades.hurtCancelKnockback
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
 import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
 import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
 import club.pisquad.minecraft.csgrenades.toTick
+import net.minecraft.core.Holder
+import net.minecraft.core.registries.Registries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Attackable
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 object CSGrenadeServerAPI {
     val player = CSGrenadeServerPlayerAPI
@@ -34,7 +42,6 @@ object CSGrenadeServerAPI {
         fun get(grenadeType: GrenadeType): List<CounterStrikeGrenadeEntity> {
             return grenades.filter { it.value.grenadeType == grenadeType }.map { it.value }
         }
-
 
         /**
          * Spawn a grenade with the provide context
@@ -92,6 +99,15 @@ object CSGrenadeServerAPI {
                 }
             }
         }
+    }
+
+
+    fun dealHitDamage(grenade: CounterStrikeGrenadeEntity, target: LivingEntity, damageAmount: Double) {
+        val damageTypeKey = grenade.grenadeType.implementation.getCommonDamageTypes().hit
+        val registry = grenade.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()
+        val damageType = Holder.direct(registry.get(damageTypeKey)!!)
+
+        target.hurtCancelKnockback(DamageSource(damageType, target, grenade, grenade.center), damageAmount)
     }
 
     fun sendGrenadeHitEntityMessage(level: ServerLevel, message: ServerGrenadeHitEntityMessage) {

@@ -10,8 +10,8 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonSounds
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntitySoundMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.physics.*
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -28,6 +28,7 @@ import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -142,7 +143,15 @@ abstract class CounterStrikeGrenadeEntity(
 
                 is MovementPredictor.PredictResult.PredictSuccess -> {
                     movementPredict.entityHits.forEach {
-                        this.onHitEntity(it)
+                        this.grenadeVelocity = it.velocity
+                        this.center = it.hitPoint
+                        val handleResult = this.onHitEntity(it)
+                        if (handleResult.shouldPlaySound) {
+                            ServerGrenadeHitEntitySoundMessage.createAndSend(this, it)
+                        }
+                        if (handleResult.damageAmount > 0 && it.entity is LivingEntity) {
+                            CSGrenadeServerAPI.dealHitDamage(this, it.entity, handleResult.damageAmount)
+                        }
                     }
                     movementPredict.blockHits.forEach {
                         this.onHitBlock(it)
@@ -241,19 +250,17 @@ abstract class CounterStrikeGrenadeEntity(
         }
     }
 
-    /*This function is only meant to be run on the serer */
-    open fun onHitBlock(data: GrenadeHitBlock) {
+    open fun onHitBlock(data: GrenadeHitBlock): HitBlockHandleResult {
         ModLogger.info(this) { "Grenade hit block at ${data.hitPoint} (${data.direction})" }
 
         val event = GrenadeHitBlockEvent.create(LogicalSide.SERVER, this, data)
         MinecraftForge.EVENT_BUS.post(event)
 
-        val message = ServerGrenadeHitBlockMessage.create(this, data)
-        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
+//        val message = ServerGrenadeHitBlockMessage.create(this, data)
+//        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
     }
 
-    /*This function is only meant to be run on the serer */
-    open fun onHitEntity(data: GrenadeHitEntity) {
+    open fun onHitEntity(data: GrenadeHitEntity): HitEntityHandleResult {
         ModLogger.info(this) { "Grenade hit entity(${data.entity}) at ${data.hitPoint} (${data.direction})" }
 
         val event = GrenadeHitEntityEvent.create(LogicalSide.SERVER, this, data)
@@ -300,3 +307,15 @@ fun <T : CounterStrikeGrenadeEntity> T.runOnClient(task: T.() -> Unit) {
         task(this)
     }
 }
+
+@Serializable
+data class HitBlockHandleResult(
+    var shouldStop: Boolean = false,
+    var shouldPlaySound: Boolean = true
+)
+
+@Serializable
+data class HitEntityHandleResult(
+    val damageAmount: Double = 1,
+    val shouldPlaySound: Boolean = true
+)

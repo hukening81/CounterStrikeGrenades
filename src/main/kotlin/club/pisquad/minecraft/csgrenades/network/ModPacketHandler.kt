@@ -8,7 +8,9 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadePacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ClientGrenadeThrowMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockSoundMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntitySoundMessage
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -77,6 +79,20 @@ object ModPacketHandler {
             ServerGrenadeHitBlockMessage::encoder,
             ServerGrenadeHitBlockMessage::decoder,
             ServerGrenadeHitBlockMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        )
+        registerMessage(
+            ServerGrenadeHitBlockSoundMessage::class.java,
+            ServerGrenadeHitBlockSoundMessage::encoder,
+            ServerGrenadeHitBlockSoundMessage::decoder,
+            ServerGrenadeHitBlockSoundMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        )
+        registerMessage(
+            ServerGrenadeHitEntitySoundMessage::class.java,
+            ServerGrenadeHitEntitySoundMessage::encoder,
+            ServerGrenadeHitEntitySoundMessage::decoder,
+            ServerGrenadeHitEntitySoundMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         )
         registerMessage(

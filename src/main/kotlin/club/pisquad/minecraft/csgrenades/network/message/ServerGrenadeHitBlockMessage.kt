@@ -2,9 +2,9 @@ package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
-import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitBlockEvent
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.HitBlockHandleResult
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.BlockPosSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
@@ -22,16 +22,13 @@ import java.util.*
 import java.util.function.Supplier
 
 @Serializable
-class ServerGrenadeHitBlockMessage(
+data class ServerGrenadeHitBlockMessage(
     val grenade: Int, val grenadeType: GrenadeType,
-
     @Serializable(with = UUIDSerializer::class) val ownerUUID: UUID,
-
     @Serializable(with = BlockPosSerializer::class) val blockPos: BlockPos,
-
     @Serializable(with = Vec3Serializer::class) val hitPoint: Vec3,
-
-    val velocity: GrenadeVelocity
+    val velocity: GrenadeVelocity,
+    val handleResult: HitBlockHandleResult,
 ) {
     companion object : CsGrenadeMessageHandler<ServerGrenadeHitBlockMessage>(ServerGrenadeHitBlockMessage::class) {
         override fun handler(
@@ -55,13 +52,22 @@ class ServerGrenadeHitBlockMessage(
                     msg.velocity
                 )
                 MinecraftForge.EVENT_BUS.post(event)
-                CSGrenadeClientAPI.sound.playHitBlock(msg.hitPoint, msg.grenadeType)
             }
         }
 
-        fun create(grenade: CounterStrikeGrenadeEntity, data: GrenadeHitBlock): ServerGrenadeHitBlockMessage {
+        fun create(
+            grenade: CounterStrikeGrenadeEntity,
+            data: GrenadeHitBlock,
+            handleResult: HitBlockHandleResult,
+        ): ServerGrenadeHitBlockMessage {
             return ServerGrenadeHitBlockMessage(
-                grenade.id, grenade.grenadeType, grenade.ownerUuid, data.blockPos, data.hitPoint, data.velocity
+                grenade.id,
+                grenade.grenadeType,
+                grenade.ownerUuid,
+                data.blockPos,
+                data.hitPoint,
+                data.velocity,
+                handleResult
             )
         }
     }

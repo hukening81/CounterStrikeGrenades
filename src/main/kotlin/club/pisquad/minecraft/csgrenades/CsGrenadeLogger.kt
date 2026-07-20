@@ -28,6 +28,12 @@ object ModLogger {
         }
     }
 
+    fun warn(entity: CounterStrikeGrenadeEntity, msg: () -> String) {
+        if (logger.isWarnEnabled) {
+            logger.trace(constructEntityLogString(entity, msg))
+        }
+    }
+
     fun debug(entity: CounterStrikeGrenadeEntity, msg: () -> String) {
         if (logger.isDebugEnabled) {
             logger.debug(constructEntityLogString(entity, msg))

@@ -19,17 +19,19 @@ import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.item.Item
 import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.registries.RegistryObject
+import org.apache.http.client.entity.EntityBuilder
 import java.util.Optional
 
-object SmokeGrenadeImplementation :
-    GrenadeImplementation {
+object SmokeGrenadeImplementation : GrenadeImplementation {
     override val resourceKey: String = "smokegrenade"
 
     lateinit var entity: RegistryObject<EntityType<SmokeGrenadeEntity>>
+    lateinit var smokeRegionEntity: RegistryObject<EntityType<SmokeRegionEntity>>
     lateinit var item: RegistryObject<SmokeGrenadeItem>
 
     override fun getCommonSounds(): GrenadeCommonSounds {
@@ -53,11 +55,16 @@ object SmokeGrenadeImplementation :
     }
 
     override fun registerItems(modItems: ModItems) {
-        modItems.registerGrenadeItem(resourceKey) { SmokeGrenadeItem(Item.Properties().stacksTo(1)) }
+        item = modItems.registerGrenadeItem(resourceKey) { SmokeGrenadeItem(Item.Properties().stacksTo(1)) }
     }
 
     override fun registerEntities(modEntities: ModEntities) {
-        modEntities.registerGrenadeEntity(resourceKey, ::SmokeGrenadeEntity)
+        entity = modEntities.registerGrenadeEntity(resourceKey, ::SmokeGrenadeEntity)
+        smokeRegionEntity = modEntities.ENTITIES.register("smokeregion") {
+            EntityType.Builder.of(::SmokeRegionEntity, MobCategory.MISC).sized(10f, 10f)
+                .updateInterval(1)
+                .build("smokeregion")
+        }
     }
 
     override fun registerNetworkMessages(modPacketHandler: ModPacketHandler) {
