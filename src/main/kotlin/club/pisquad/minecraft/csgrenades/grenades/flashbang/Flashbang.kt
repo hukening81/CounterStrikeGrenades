@@ -18,7 +18,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Item
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.registries.RegistryObject
-import java.util.Optional
+import java.util.*
 
 const val FLASHBANG_RESOURCE_KEY = "flashbang"
 

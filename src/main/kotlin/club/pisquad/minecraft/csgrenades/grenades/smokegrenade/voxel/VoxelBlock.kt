@@ -5,9 +5,18 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.AbstractChestBlock
+import net.minecraft.world.level.block.BedBlock
+import net.minecraft.world.level.block.CrossCollisionBlock
+import net.minecraft.world.level.block.FenceGateBlock
+import net.minecraft.world.level.block.StairBlock
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.state.properties.*
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.ChestType
+import net.minecraft.world.level.block.state.properties.DoorHingeSide
+import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.SlabType
+import net.minecraft.world.level.block.state.properties.StairsShape
 import java.util.*
 
 sealed interface VoxelBlock {

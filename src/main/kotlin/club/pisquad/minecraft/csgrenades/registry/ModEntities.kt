@@ -11,7 +11,6 @@ import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.ForgeRegistries
 import net.minecraftforge.registries.RegistryObject
-import kotlin.reflect.KClass
 
 object ModEntities {
     val ENTITIES: DeferredRegister<EntityType<*>> =

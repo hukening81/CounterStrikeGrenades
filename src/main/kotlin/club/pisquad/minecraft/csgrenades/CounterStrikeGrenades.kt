@@ -43,7 +43,7 @@ class CounterStrikeGrenades(context: FMLJavaModLoadingContext) {
     }
 
     companion object {
-        const val ID = "csgrenades"
+        public const val ID: String = "csgrenades"
 
         @JvmStatic
         @SubscribeEvent

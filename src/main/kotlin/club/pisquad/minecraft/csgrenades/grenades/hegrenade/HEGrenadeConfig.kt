@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
-import club.pisquad.minecraft.csgrenades.config.GrenadeCommonConfig
 import club.pisquad.minecraft.csgrenades.config.ConfigBuilder
+import club.pisquad.minecraft.csgrenades.config.GrenadeCommonConfig
 import net.minecraftforge.common.ForgeConfigSpec
 
 object HEGrenadeConfig : ConfigBuilder {

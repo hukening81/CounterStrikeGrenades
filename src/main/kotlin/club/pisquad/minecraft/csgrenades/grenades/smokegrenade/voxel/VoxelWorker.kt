@@ -2,7 +2,12 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel
 
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeEntity
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import net.minecraft.world.phys.Vec3
 import kotlin.time.measureTimedValue
 

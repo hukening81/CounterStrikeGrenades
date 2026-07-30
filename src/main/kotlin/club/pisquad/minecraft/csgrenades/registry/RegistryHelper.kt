@@ -1,6 +1,5 @@
 package club.pisquad.minecraft.csgrenades.registry
 
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import net.minecraftforge.eventbus.api.IEventBus
 
 object RegistryHelper {

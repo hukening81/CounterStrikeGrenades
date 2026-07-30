@@ -5,7 +5,6 @@ import club.pisquad.minecraft.csgrenades.api.event.GrenadeActivatedEvent
 import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeExplosionData
 import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeRenderManager
 import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeHelper
-import club.pisquad.minecraft.csgrenades.isPositionInSmoke
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer

@@ -11,9 +11,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.Vec3
 
 object CSGrenadeClientAPI {
-    val sound = CSGrenadeClientSoundAPI
-    val player = CSGrenadeClientPlayerAPI
-    val network = CSGrenadeClientNetworkAPI
+    public val sound: CSGrenadeClientSoundAPI = CSGrenadeClientSoundAPI
+    public val player: CSGrenadeClientPlayerAPI = CSGrenadeClientPlayerAPI
+    public val network: CSGrenadeClientNetworkAPI = CSGrenadeClientNetworkAPI
 
     object CSGrenadeClientSoundAPI {
         fun playHitBlock(position: Vec3, grenade: GrenadeType): Boolean {

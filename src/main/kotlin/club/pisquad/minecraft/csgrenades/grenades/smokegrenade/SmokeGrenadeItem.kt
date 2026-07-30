@@ -2,7 +2,6 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
-import net.minecraft.world.item.Item
 
 abstract class SmokeGrenadeItem : CounterStrikeGrenadeItem(Properties().stacksTo(1)) {
     abstract val variant: SmokeGrenadeVariant

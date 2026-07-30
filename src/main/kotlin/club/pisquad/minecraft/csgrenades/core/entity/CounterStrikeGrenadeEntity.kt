@@ -13,8 +13,11 @@ import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntitySoundMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
-import club.pisquad.minecraft.csgrenades.physics.*
-import com.sun.nio.sctp.HandlerResult
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitEntity
+import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
+import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
+import club.pisquad.minecraft.csgrenades.physics.MovementPredictor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -30,7 +33,6 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3

@@ -7,7 +7,12 @@ import club.pisquad.minecraft.csgrenades.isBetween
 import net.minecraft.core.Direction
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.cbrt
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 class FloodFillWorker(

@@ -1,7 +1,6 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.command.GrenadeCommandBuilder
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.debug.SmokeGrenadeDebugOptions
 import com.mojang.brigadier.CommandDispatcher

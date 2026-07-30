@@ -2,7 +2,6 @@ package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.core.entity.GrenadeEntityData
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
