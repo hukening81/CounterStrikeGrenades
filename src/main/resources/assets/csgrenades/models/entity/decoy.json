@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "csgrenades:item/decoy_3d",
-		"particle": "csgrenades:item/decoy_3d"
+		"0": "csgrenades:item/decoy",
+		"particle": "csgrenades:item/decoy"
 	},
 	"elements": [
 		{

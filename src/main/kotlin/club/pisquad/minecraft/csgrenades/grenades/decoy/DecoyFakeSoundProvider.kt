@@ -79,7 +79,7 @@ sealed interface DecoyFakeSoundProvider {
                     return result
                 }
             }
-            return Vanilla(decoy.grenadePosition.center)
+            return Vanilla(decoy.center)
         }
     }
 

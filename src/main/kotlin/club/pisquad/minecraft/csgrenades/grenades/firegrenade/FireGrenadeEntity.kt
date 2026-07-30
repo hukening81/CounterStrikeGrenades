@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade
 
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.HitBlockHandleResult
 import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
@@ -28,8 +29,8 @@ abstract class FireGrenadeEntity(
         }
     }
 
-    override fun onHitBlock(data: GrenadeHitBlock) {
-        super.onHitBlock(data)
+    override fun onHitBlock(data: GrenadeHitBlock): HitBlockHandleResult {
+        val result = super.onHitBlock(data)
         this.runOnServer {
             if (data.direction == Direction.UP) {
                 this.isStopped = true
@@ -37,6 +38,7 @@ abstract class FireGrenadeEntity(
                 this.smashOnGround()
             }
         }
+        return result
     }
 
     abstract fun popInAir()

@@ -13,7 +13,7 @@ object SmokeGrenadeCommands : GrenadeCommandBuilder {
     override fun build(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
             Commands.literal(CounterStrikeGrenades.ID).then(
-                Commands.literal(GrenadeType.SMOKE_GRENADE.resourceKey)
+                Commands.literal("smokegrenade")
                     .then(
                         Commands.literal("debug").then(
                             Commands.literal("showVoxelOutline").then(

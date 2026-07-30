@@ -9,17 +9,18 @@ import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel: Level) :
+abstract class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel: Level) :
     ActivateAfterLandingGrenadeEntity(
         pEntityType,
         pLevel,
         SmokeGrenadeConfig.common.fuseTime.get().toTick().toInt(),
     ) {
+    abstract val variant: SmokeGrenadeVariant
+
     private var voxelWorker: VoxelWorker? = null
 
     override val sounds = SmokeGrenadeSounds
     override val damageTypes = SmokeGrenadeDamageTypes
-    override val grenadeType: GrenadeType = GrenadeType.SMOKE_GRENADE
 
     override fun defineSynchedData() {
         super.defineSynchedData()
@@ -39,4 +40,16 @@ class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity>, pLevel
             ModLogger.info(this) { "Voxel calculation done, none empty voxel count:{}".format(voxelMap.size) }
         }
     }
+}
+
+class TSmokeGrenadeEntity(entity: EntityType<out TSmokeGrenadeEntity>, level: Level) :
+    SmokeGrenadeEntity(entity, level) {
+    override val grenadeType: GrenadeType = GrenadeType.T_SMOKE
+    override val variant: SmokeGrenadeVariant = SmokeGrenadeVariant.T
+}
+
+class CTSmokeGrenadeEntity(entity: EntityType<out CTSmokeGrenadeEntity>, level: Level) :
+    SmokeGrenadeEntity(entity, level) {
+    override val grenadeType: GrenadeType = GrenadeType.CT_SMOKE
+    override val variant: SmokeGrenadeVariant = SmokeGrenadeVariant.CT
 }

@@ -1,6 +1,8 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages
 
+import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeVariant
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.event.SmokeGrenadeActivatedEvent
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
@@ -19,6 +21,8 @@ import java.util.function.Supplier
 @Serializable
 class SmokeGrenadeActivatedMessage(
     val grenade: Int,
+    val grenadeType: GrenadeType,
+    val variant: SmokeGrenadeVariant,
     @Serializable(with = UUIDSerializer::class) val ownerUUID: UUID,
     val voxels: VoxelMap,
 ) {
@@ -32,8 +36,11 @@ class SmokeGrenadeActivatedMessage(
                     SmokeGrenadeActivatedEvent(
                         LogicalSide.CLIENT,
                         msg.ownerUUID,
+                        msg.grenadeType,
+                        msg.voxels.center,
+                        msg.variant,
                         this,
-                        msg.voxels
+                        msg.voxels,
                     )
                 )
             }

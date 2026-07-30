@@ -16,10 +16,13 @@ data class ClientGrenadeThrowMessage(
     companion object : CsGrenadeMessageHandler<ClientGrenadeThrowMessage>(ClientGrenadeThrowMessage::class) {
         override fun handler(msg: ClientGrenadeThrowMessage, ctx: Supplier<NetworkEvent.Context>) {
             val context = ctx.get()
-            val player = context.sender ?: return
+            context.packetHandled = true
+            context.enqueueWork {
+                val player = context.sender ?: return@enqueueWork
 
-            val removeItem = !player.isCreative
-            CSGrenadesAPI.server.entity.spawnGrenade(player, msg.context, removeItem)
+                val removeItem = !player.isCreative
+                CSGrenadesAPI.server.entity.spawnGrenade(player, msg.context, removeItem)
+            }
         }
     }
 }

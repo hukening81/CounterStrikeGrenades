@@ -2,8 +2,8 @@
 	"format_version": "1.9.0",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "csgrenades:item/smokegrenade_3d",
-		"particle": "csgrenades:item/smokegrenade_3d"
+		"0": "csgrenades:item/smoke_ct",
+		"particle": "csgrenades:item/smoke_ct"
 	},
 	"elements": [
 		{

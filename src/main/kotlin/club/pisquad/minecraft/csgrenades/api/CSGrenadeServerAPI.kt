@@ -18,11 +18,8 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.entity.Attackable
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 object CSGrenadeServerAPI {
     val player = CSGrenadeServerPlayerAPI
@@ -53,15 +50,15 @@ object CSGrenadeServerAPI {
             owner: ServerPlayer, context: GrenadeSpawnContext, removeItem: Boolean = true
         ): CounterStrikeGrenadeEntity? {
             val level = owner.level() as ServerLevel
-            val entityRegistryObject = context.grenadeType.implementation.getEntity()
+            val entityRegistryObject = context.grenadeType.properties.entity
             if (!entityRegistryObject.isPresent) {
                 return null
             }
             val entityType = entityRegistryObject.get()
             val entity = entityType.create(level) ?: return null
             entity.ownerUuid = owner.uuid
-            entity.grenadePosition = GrenadePosition.fromCenter(context.position)
-            entity.grenadeVelocity = GrenadeVelocity.fromBlocksPerTick(context.velocity)
+            entity.setPos(GrenadePosition.fromCenter(context.position).worldPos)
+            entity.deltaMovement = GrenadeVelocity.fromBlocksPerTick(context.velocity).blocksPerTick
 
             ModLogger.info("Spawning ${context.grenadeType} entity at ${context.position} with velocity ${context.velocity.length()} blocks per tick")
             level.addFreshEntity(entity)
@@ -103,7 +100,7 @@ object CSGrenadeServerAPI {
 
 
     fun dealHitDamage(grenade: CounterStrikeGrenadeEntity, target: LivingEntity, damageAmount: Double) {
-        val damageTypeKey = grenade.grenadeType.implementation.getCommonDamageTypes().hit
+        val damageTypeKey = grenade.grenadeType.properties.damageTypes.hit
         val registry = grenade.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()
         val damageType = Holder.direct(registry.get(damageTypeKey)!!)
 

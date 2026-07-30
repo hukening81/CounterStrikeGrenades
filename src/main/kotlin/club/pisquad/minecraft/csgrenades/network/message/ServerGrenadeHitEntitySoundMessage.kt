@@ -27,7 +27,7 @@ class ServerGrenadeHitEntitySoundMessage(
             val context = ctx.get()
             context.packetHandled = true
             context.enqueueWork {
-                msg.grenadeType.implementation.getCommonSounds().hitEntity.play(msg.position)
+                msg.grenadeType.properties.sounds.hitEntity.play(msg.position)
             }
 
         }

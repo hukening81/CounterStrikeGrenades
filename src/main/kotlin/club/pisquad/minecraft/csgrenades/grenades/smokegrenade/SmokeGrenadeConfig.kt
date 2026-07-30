@@ -1,11 +1,11 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.config.GrenadeCommonConfig
-import club.pisquad.minecraft.csgrenades.config.GrenadeConfigBuilder
+import club.pisquad.minecraft.csgrenades.config.ConfigBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 
 
-object SmokeGrenadeConfig : GrenadeConfigBuilder {
+object SmokeGrenadeConfig : ConfigBuilder {
     val spread = SmokeSpreadConfig
 
     val common = GrenadeCommonConfig(0.5)
@@ -19,7 +19,7 @@ object SmokeGrenadeConfig : GrenadeConfigBuilder {
     }
 }
 
-object SmokeSpreadConfig : GrenadeConfigBuilder {
+object SmokeSpreadConfig : ConfigBuilder {
     lateinit var smokeWidth: ForgeConfigSpec.DoubleValue
     lateinit var smokeHeight: ForgeConfigSpec.DoubleValue
     lateinit var maxFall: ForgeConfigSpec.DoubleValue

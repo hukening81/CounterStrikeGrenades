@@ -14,6 +14,7 @@ import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityM
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntitySoundMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.physics.*
+import com.sun.nio.sctp.HandlerResult
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -54,26 +55,11 @@ private interface GrenadeMovement {
 abstract class CounterStrikeGrenadeEntity(
     pEntityType: EntityType<out CounterStrikeGrenadeEntity>,
     pLevel: Level,
-) : Entity(pEntityType, pLevel), GrenadeEntityData, WithGrenadeType, GrenadeMovement, IEntityAdditionalSpawnData {
+) : Entity(pEntityType, pLevel), GrenadeEntityData, WithGrenadeType, IEntityAdditionalSpawnData {
 
     lateinit var ownerUuid: UUID
 
     val rotation: GrenadeRotation
-
-    override var grenadePosition: GrenadePosition = GrenadePosition.ZERO
-        set(value) {
-            this.move(
-                MoverType.SELF,
-                value.worldPos.subtract(field.worldPos)
-            )
-            field = value
-        }
-
-    override var grenadeVelocity: GrenadeVelocity = GrenadeVelocity.ZERO
-        set(value) {
-            this.deltaMovement = value.blocksPerTick
-            field = value
-        }
 
     val owner: Player?
         get() {
@@ -109,10 +95,10 @@ abstract class CounterStrikeGrenadeEntity(
         }
     var center: Vec3
         get() {
-            return this.grenadePosition.center
+            return GrenadePosition.fromWorldPos(this.position()).center
         }
         set(value) {
-            this.grenadePosition = GrenadePosition.fromCenter(value)
+            this.setPos(GrenadePosition.fromCenter(value).worldPos)
         }
 
     override fun defineSynchedData() {
@@ -122,7 +108,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun tick() {
         super.tick()
-
+        println("MY LOCATION ${this.center}")
         if (this.isStopped) {
             return
         }
@@ -131,7 +117,10 @@ abstract class CounterStrikeGrenadeEntity(
             if (this.isStopped) {
                 return@runOnServer
             }
-            val movementPredict = MovementPredictor.predict(this.level(), this.grenadePosition, this.grenadeVelocity)
+            val movementPredict = MovementPredictor.predict(
+                this.level(), GrenadePosition.fromWorldPos(this.position()),
+                GrenadeVelocity.fromBlocksPerTick(this.deltaMovement)
+            )
             when (movementPredict) {
                 MovementPredictor.PredictResult.Error.MAX_SUBTICK_REACHED -> {
                     ModLogger.error(this) {
@@ -143,7 +132,7 @@ abstract class CounterStrikeGrenadeEntity(
 
                 is MovementPredictor.PredictResult.PredictSuccess -> {
                     movementPredict.entityHits.forEach {
-                        this.grenadeVelocity = it.velocity
+                        this.deltaMovement = it.velocity.blocksPerTick
                         this.center = it.hitPoint
                         val handleResult = this.onHitEntity(it)
                         if (handleResult.shouldPlaySound) {
@@ -156,21 +145,22 @@ abstract class CounterStrikeGrenadeEntity(
                     movementPredict.blockHits.forEach {
                         this.onHitBlock(it)
                     }
-                    this.grenadePosition = movementPredict.position
-                    this.grenadeVelocity = movementPredict.velocity
+                    this.setPos(movementPredict.position.worldPos)
+                    this.deltaMovement = movementPredict.velocity.blocksPerTick
 
                     movementPredict.blockHits.lastOrNull()?.let {
                         // Predict if the grenade has stopped
-                        if (it.direction == Direction.UP && this.grenadeVelocity.blocksPerTick.y.absoluteValue < 0.05) {
+                        if (it.direction == Direction.UP && this.deltaMovement.y.absoluteValue < 0.05) {
                             // Snap to the ground
-                            this.grenadePosition = GrenadePosition.fromCenter(
+                            val center = this.center
+                            this.center =
                                 Vec3(
-                                    this.grenadePosition.center.x,
+                                    center.x,
                                     it.hitPoint.y,
-                                    this.grenadePosition.center.z,
-                                )
-                            )
-                            this.grenadeVelocity = GrenadeVelocity.ZERO
+                                    center.z,
+
+                                    )
+                            this.deltaMovement = Vec3.ZERO
                             this.entityData.set(isStoppedAccessor, true)
                             this.onStopped()
                         }
@@ -182,8 +172,6 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
-        this.grenadePosition = GrenadePosition.fromWorldPos(this.position())
-        this.grenadeVelocity = GrenadeVelocity.fromBlocksPerTick(this.deltaMovement)
         CSGrenadeServerAPI.entity.register(this)
     }
 
@@ -258,6 +246,8 @@ abstract class CounterStrikeGrenadeEntity(
 
 //        val message = ServerGrenadeHitBlockMessage.create(this, data)
 //        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
+
+        return HitBlockHandleResult()
     }
 
     open fun onHitEntity(data: GrenadeHitEntity): HitEntityHandleResult {
@@ -268,6 +258,8 @@ abstract class CounterStrikeGrenadeEntity(
 
         val message = ServerGrenadeHitEntityMessage.create(this, data)
         ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
+
+        return HitEntityHandleResult()
     }
 
     open fun onStopped() {
@@ -316,6 +308,6 @@ data class HitBlockHandleResult(
 
 @Serializable
 data class HitEntityHandleResult(
-    val damageAmount: Double = 1,
+    val damageAmount: Double = 1.0,
     val shouldPlaySound: Boolean = true
 )

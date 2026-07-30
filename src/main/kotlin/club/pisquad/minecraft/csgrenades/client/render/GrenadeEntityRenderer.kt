@@ -4,7 +4,9 @@ import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.registry.ModEntityModels
+import com.mojang.authlib.minecraft.client.MinecraftClient
 import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -14,6 +16,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.MinecartItem
 import org.joml.Quaternionf
 
 //@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -109,6 +112,6 @@ class GrenadeEntityRenderer<T>(
     }
 
     private fun getItemStack(grenadeType: GrenadeType): ItemStack {
-        return ItemStack(grenadeType.implementation.getItem().get())
+        return ItemStack(grenadeType.properties.item.get())
     }
 }

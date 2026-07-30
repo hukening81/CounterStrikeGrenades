@@ -24,7 +24,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
     override fun activate() {
         super.activate()
         this.runOnServer {
-            val center = this.grenadePosition.center
+            val center = this.center
             ModPacketHandler.sendMessageToPlayer(
                 this.level() as ServerLevel,
                 center,

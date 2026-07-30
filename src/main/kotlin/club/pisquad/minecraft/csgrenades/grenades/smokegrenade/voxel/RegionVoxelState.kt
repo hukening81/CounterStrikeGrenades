@@ -37,7 +37,7 @@ class RegionVoxelState(
 
     fun getVoxelMap(): VoxelMap {
         val voxels = this.filterNonEmpty()
-        return VoxelMap(buildMap {
+        return VoxelMap(this.center, buildMap {
             voxels.forEach { (pos, voxel) ->
                 put(pos, voxel.toVoxel())
             }

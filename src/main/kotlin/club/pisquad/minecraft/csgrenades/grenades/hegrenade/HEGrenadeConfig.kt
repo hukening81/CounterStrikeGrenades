@@ -1,10 +1,10 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
 import club.pisquad.minecraft.csgrenades.config.GrenadeCommonConfig
-import club.pisquad.minecraft.csgrenades.config.GrenadeConfigBuilder
+import club.pisquad.minecraft.csgrenades.config.ConfigBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 
-object HEGrenadeConfig : GrenadeConfigBuilder {
+object HEGrenadeConfig : ConfigBuilder {
     val common = GrenadeCommonConfig(2.5)
     val explosion = HEGrenadeExplosionConfig
     override fun build(builder: ForgeConfigSpec.Builder) {
@@ -16,7 +16,7 @@ object HEGrenadeConfig : GrenadeConfigBuilder {
     }
 }
 
-object HEGrenadeExplosionConfig : GrenadeConfigBuilder {
+object HEGrenadeExplosionConfig : ConfigBuilder {
     lateinit var radius: ForgeConfigSpec.DoubleValue
     lateinit var damageAmount: ForgeConfigSpec.DoubleValue
     lateinit var headDamageMultiplier: ForgeConfigSpec.DoubleValue

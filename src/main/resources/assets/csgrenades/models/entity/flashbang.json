@@ -6,8 +6,8 @@
     32
   ],
   "textures": {
-    "0": "csgrenades:item/flashbang_3d",
-    "particle": "csgrenades:item/flashbang_3d"
+    "0": "csgrenades:item/flashbang",
+    "particle": "csgrenades:item/flashbang"
   },
   "elements": [
     {

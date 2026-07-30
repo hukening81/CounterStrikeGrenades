@@ -22,7 +22,7 @@ class ServerGrenadeHitBlockSoundMessage(
             val context = ctx.get()
             context.packetHandled = true
             context.enqueueWork {
-                msg.grenadeType.implementation.getCommonSounds().hitBlock.play(msg.position)
+                msg.grenadeType.properties.sounds.hitBlock.play(msg.position)
             }
 
         }

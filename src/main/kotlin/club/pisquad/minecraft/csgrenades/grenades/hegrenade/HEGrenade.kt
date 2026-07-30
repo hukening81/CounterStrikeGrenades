@@ -1,8 +1,9 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonSounds
-import club.pisquad.minecraft.csgrenades.core.GrenadeImplementation
+import club.pisquad.minecraft.csgrenades.core.GrenadeProperties
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.core.sound.DistanceSegmentedSoundData
@@ -14,49 +15,19 @@ import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.item.Item
-import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.registries.RegistryObject
-import java.util.Optional
+import java.util.*
 
-object HEGrenadeImplementation :
-    GrenadeImplementation {
-    override val resourceKey: String = "hegrenade"
+const val HE_GRENADE_RESOURCE_KEY = "hegrenade"
 
-    lateinit var entity: RegistryObject<EntityType<HEGrenadeEntity>>
-    lateinit var item: RegistryObject<HEGrenadeItem>
+object HEGrenadeRegistryHelper {
+    val entity = ModEntities.registerGrenadeEntity(HE_GRENADE_RESOURCE_KEY, ::HEGrenadeEntity)
+    val item = ModItems.registerGrenadeItem(HE_GRENADE_RESOURCE_KEY) { HEGrenadeItem() }
 
-    override fun getCommonSounds(): GrenadeCommonSounds {
-        return HEGrenadeSounds
-    }
-
-    override fun getCommonDamageTypes(): GrenadeCommonDamageTypes {
-        return HEGrenadeDamageTypes
-    }
-
-    override fun getEntity(): RegistryObject<out EntityType<out CounterStrikeGrenadeEntity>> {
-        return entity
-    }
-
-    override fun getItem(): RegistryObject<out CounterStrikeGrenadeItem> {
-        return item
-    }
-
-    override fun buildConfig(builder: ForgeConfigSpec.Builder) {
-        HEGrenadeConfig.build(builder)
-    }
-
-    override fun registerItems(modItems: ModItems) {
-        modItems.registerGrenadeItem(resourceKey) { HEGrenadeItem(Item.Properties().stacksTo(1)) }
-    }
-
-    override fun registerEntities(modEntities: ModEntities) {
-        modEntities.registerGrenadeEntity(resourceKey, ::HEGrenadeEntity)
-    }
-
-    override fun registerNetworkMessages(modPacketHandler: ModPacketHandler) {
-        modPacketHandler.registerMessage(
+    init {
+        ModConfig.addSection("hegrenade", HEGrenadeConfig)
+        ModPacketHandler.registerMessage(
             HEGrenadeActivatedMessage::class.java,
             HEGrenadeActivatedMessage.Companion::encoder,
             HEGrenadeActivatedMessage.Companion::decoder,
@@ -64,14 +35,18 @@ object HEGrenadeImplementation :
             Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
     }
+}
 
-    override fun registerEntityDataSerializers() {
-    }
+object HEGrenadeProperties : GrenadeProperties {
+    override val entity: RegistryObject<out EntityType<out CounterStrikeGrenadeEntity>> = HEGrenadeRegistryHelper.entity
+    override val item: RegistryObject<out CounterStrikeGrenadeItem> = HEGrenadeRegistryHelper.item
+    override val resourceKey: String = HE_GRENADE_RESOURCE_KEY
+    override val sounds: GrenadeCommonSounds = HEGrenadeSounds
+    override val damageTypes: GrenadeCommonDamageTypes = HEGrenadeDamageTypes
 }
 
 object HEGrenadeDamageTypes : GrenadeCommonDamageTypes {
     override val hit = ModDamageTypes.registerSingle("hegrenade/hit")
-
     val explosion = ModDamageTypes.registerSingle("hegrenade/explosion")
 }
 

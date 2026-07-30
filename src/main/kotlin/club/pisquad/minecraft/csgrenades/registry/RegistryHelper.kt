@@ -10,9 +10,5 @@ object RegistryHelper {
         ModParticles.register(modBus)
         ModCreativeTabs.register(modBus)
         ModSoundEvents.register(modBus)
-
-        GrenadeType.entries.forEach {
-            it.implementation.registerEntityDataSerializers()
-        }
     }
 }

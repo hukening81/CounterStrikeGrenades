@@ -2,8 +2,8 @@
 	"format_version": "1.9.0",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "csgrenades:item/molotov_3d",
-		"particle": "csgrenades:item/molotov_3d"
+		"0": "csgrenades:item/molotov",
+		"particle": "csgrenades:item/molotov"
 	},
 	"elements": [
 		{

@@ -1,10 +1,10 @@
 package club.pisquad.minecraft.csgrenades.grenades.flashbang
 
+import club.pisquad.minecraft.csgrenades.config.ConfigBuilder
 import club.pisquad.minecraft.csgrenades.config.GrenadeCommonConfig
-import club.pisquad.minecraft.csgrenades.config.GrenadeConfigBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 
-object FlashBangConfig : GrenadeConfigBuilder {
+object FlashBangConfig : ConfigBuilder {
     val common = GrenadeCommonConfig(1.4)
     val blindEffect = FlashBangBlindEffectConfig
     override fun build(builder: ForgeConfigSpec.Builder) {
@@ -15,7 +15,7 @@ object FlashBangConfig : GrenadeConfigBuilder {
     }
 }
 
-object FlashBangBlindEffectConfig : GrenadeConfigBuilder {
+object FlashBangBlindEffectConfig : ConfigBuilder {
     lateinit var ranges: ForgeConfigSpec.ConfigValue<List<Double>>
     lateinit var fadingRange: ForgeConfigSpec.DoubleValue
     lateinit var maxRadius: ForgeConfigSpec.DoubleValue

@@ -1,10 +1,10 @@
 package club.pisquad.minecraft.csgrenades.grenades.decoy
 
+import club.pisquad.minecraft.csgrenades.config.ConfigBuilder
 import club.pisquad.minecraft.csgrenades.config.GrenadeCommonConfig
-import club.pisquad.minecraft.csgrenades.config.GrenadeConfigBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 
-object DecoyConfig : GrenadeConfigBuilder {
+object DecoyConfig: ConfigBuilder {
     val common = GrenadeCommonConfig()
     lateinit var soundDuration: ForgeConfigSpec.DoubleValue
     lateinit var soundMinGroupInterval: ForgeConfigSpec.DoubleValue

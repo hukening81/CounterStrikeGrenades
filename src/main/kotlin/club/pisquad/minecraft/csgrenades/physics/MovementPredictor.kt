@@ -22,7 +22,6 @@ object MovementPredictor {
     ): PredictResult {
         var partialTick = 0.0
         var count = 0
-        println(velocity.metersPerSecond)
 
         val successResult =
             PredictResult.PredictSuccess(

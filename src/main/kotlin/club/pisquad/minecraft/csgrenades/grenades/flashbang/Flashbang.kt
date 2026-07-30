@@ -1,8 +1,9 @@
 package club.pisquad.minecraft.csgrenades.grenades.flashbang
 
+import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonSounds
-import club.pisquad.minecraft.csgrenades.core.GrenadeImplementation
+import club.pisquad.minecraft.csgrenades.core.GrenadeProperties
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.core.sound.DistanceSegmentedSoundData
@@ -15,49 +16,19 @@ import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Item
-import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.registries.RegistryObject
 import java.util.Optional
 
+const val FLASHBANG_RESOURCE_KEY = "flashbang"
 
-object FlashbangImplementation :
-    GrenadeImplementation {
-    override val resourceKey: String = "flashbang"
+object FlashbangRegistryHelper {
+    val entity = ModEntities.registerGrenadeEntity(FLASHBANG_RESOURCE_KEY, ::FlashBangEntity)
+    val item = ModItems.registerGrenadeItem(FLASHBANG_RESOURCE_KEY) { FlashBangItem(Item.Properties().stacksTo(2)) }
 
-    lateinit var entity: RegistryObject<EntityType<FlashBangEntity>>
-    lateinit var item: RegistryObject<FlashBangItem>
-
-    override fun getCommonSounds(): GrenadeCommonSounds {
-        return FlashbangSounds
-    }
-
-    override fun getCommonDamageTypes(): GrenadeCommonDamageTypes {
-        return FlashBangDamageTypes
-    }
-
-    override fun getEntity(): RegistryObject<out EntityType<out CounterStrikeGrenadeEntity>> {
-        return entity
-    }
-
-    override fun getItem(): RegistryObject<out CounterStrikeGrenadeItem> {
-        return item
-    }
-
-    override fun buildConfig(builder: ForgeConfigSpec.Builder) {
-        FlashBangConfig.build(builder)
-    }
-
-    override fun registerItems(modItems: ModItems) {
-        item = modItems.registerGrenadeItem(resourceKey) { FlashBangItem(Item.Properties().stacksTo(2)) }
-    }
-
-    override fun registerEntities(modEntities: ModEntities) {
-        entity = modEntities.registerGrenadeEntity(resourceKey, ::FlashBangEntity)
-    }
-
-    override fun registerNetworkMessages(modPacketHandler: ModPacketHandler) {
-        modPacketHandler.registerMessage(
+    init {
+        ModConfig.addSection("flashbang", FlashBangConfig)
+        ModPacketHandler.registerMessage(
             FlashbangActivatedMessage::class.java,
             FlashbangActivatedMessage::encoder,
             FlashbangActivatedMessage::decoder,
@@ -65,9 +36,14 @@ object FlashbangImplementation :
             Optional.of(NetworkDirection.PLAY_TO_CLIENT),
         )
     }
+}
 
-    override fun registerEntityDataSerializers() {
-    }
+object FlashbangProperties : GrenadeProperties {
+    override val entity: RegistryObject<out EntityType<out CounterStrikeGrenadeEntity>> = FlashbangRegistryHelper.entity
+    override val item: RegistryObject<out CounterStrikeGrenadeItem> = FlashbangRegistryHelper.item
+    override val resourceKey: String = FLASHBANG_RESOURCE_KEY
+    override val sounds: GrenadeCommonSounds = FlashbangSounds
+    override val damageTypes: GrenadeCommonDamageTypes = FlashBangDamageTypes
 }
 
 object FlashBangDamageTypes : GrenadeCommonDamageTypes {

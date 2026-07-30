@@ -14,9 +14,10 @@ import net.minecraftforge.fml.common.Mod
 object ModRenderers {
     @JvmStatic
     @SubscribeEvent
+    @Suppress("unused")
     fun registerEntityRenderers(event: EntityRenderersEvent.RegisterRenderers) {
         GrenadeType.entries.forEach {
-            EntityRenderers.register(it.registries.get().entity.get(), ::GrenadeEntityRenderer)
+            EntityRenderers.register(it.properties.entity.get(), ::GrenadeEntityRenderer)
         }
     }
 }

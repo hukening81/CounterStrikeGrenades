@@ -1,18 +1,33 @@
 package club.pisquad.minecraft.csgrenades.config
 
-import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.config.sections.PhysicsConfig
 import club.pisquad.minecraft.csgrenades.config.sections.ThrowConfig
 import net.minecraftforge.common.ForgeConfigSpec
 
-object ModConfig {
-    val SPEC: ForgeConfigSpec
+interface ConfigBuilder {
+    fun build(builder: ForgeConfigSpec.Builder) {}
+}
 
-    val messageRange: ForgeConfigSpec.DoubleValue
+object ModConfig {
+    lateinit var SPEC: ForgeConfigSpec
+
+    lateinit var messageRange: ForgeConfigSpec.DoubleValue
+
+    var hasBuilt = false
     val physics = PhysicsConfig
     val throwConfig = ThrowConfig
 
-    init {
+    val sections: MutableList<Pair<String, ConfigBuilder>> = mutableListOf()
+
+    fun addSection(name: String, builder: ConfigBuilder) {
+        if (hasBuilt) {
+            throw Exception("Add config section after the config has already built, this is not an intended behaviour")
+        }
+        this.sections.add(Pair(name, builder))
+    }
+
+    fun build(): ForgeConfigSpec {
+        hasBuilt = true
         val builder = ForgeConfigSpec.Builder()
         builder.comment("Configuration entries for Counter Strike Grenade")
         builder.comment("")
@@ -29,13 +44,13 @@ object ModConfig {
         physics.build(builder)
         throwConfig.build(builder)
 
-        GrenadeType.entries.forEach {
-            builder.push(it.resourceKey)
-            it.implementation.buildConfig(builder)
+        sections.sortedBy { it.first }.forEach {
+            builder.push(it.first)
+            it.second.build(builder)
             builder.pop()
         }
 
-
         SPEC = builder.build()
+        return SPEC
     }
 }

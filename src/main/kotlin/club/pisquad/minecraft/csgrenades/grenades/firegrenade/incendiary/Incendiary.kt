@@ -2,62 +2,27 @@ package club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary
 
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonSounds
-import club.pisquad.minecraft.csgrenades.core.GrenadeImplementation
+import club.pisquad.minecraft.csgrenades.core.GrenadeProperties
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeRegistryHelper
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
-import club.pisquad.minecraft.csgrenades.registry.ModEntities
-import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.item.Item
-import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.registries.RegistryObject
 
 
-object IncendiaryImplementation :
-    GrenadeImplementation {
-    override val resourceKey: String = "incendiary"
+const val INCENDIARY_RESOURCE_KEY = "incendiary"
 
-    lateinit var entity: RegistryObject<EntityType<IncendiaryEntity>>
-    lateinit var item: RegistryObject<IncendiaryItem>
 
-    override fun getCommonSounds(): GrenadeCommonSounds {
-        return IncendiarySounds
-    }
-
-    override fun getCommonDamageTypes(): GrenadeCommonDamageTypes {
-        return IncendiaryDamageTypes
-    }
-
-    override fun getEntity(): RegistryObject<out EntityType<out CounterStrikeGrenadeEntity>> {
-        return entity
-    }
-
-    override fun getItem(): RegistryObject<out CounterStrikeGrenadeItem> {
-        return item
-    }
-
-    override fun buildConfig(builder: ForgeConfigSpec.Builder) {
-        IncendiaryConfig.build(builder)
-    }
-
-    override fun registerItems(modItems: ModItems) {
-        item = modItems.registerGrenadeItem(resourceKey) { IncendiaryItem(Item.Properties().stacksTo(1)) }
-    }
-
-    override fun registerEntities(modEntities: ModEntities) {
-        entity = modEntities.registerGrenadeEntity(resourceKey, ::IncendiaryEntity)
-    }
-
-    override fun registerNetworkMessages(modPacketHandler: ModPacketHandler) {
-
-    }
-
-    override fun registerEntityDataSerializers() {
-    }
+object IncendiaryProperties : GrenadeProperties {
+    override val entity: RegistryObject<out EntityType<out CounterStrikeGrenadeEntity>> =
+        FireGrenadeRegistryHelper.incendiaryEntity
+    override val item: RegistryObject<out CounterStrikeGrenadeItem> = FireGrenadeRegistryHelper.incendiaryItem
+    override val resourceKey: String = INCENDIARY_RESOURCE_KEY
+    override val sounds: GrenadeCommonSounds = IncendiarySounds
+    override val damageTypes: GrenadeCommonDamageTypes = IncendiaryDamageTypes
 }
 
 object IncendiaryDamageTypes : GrenadeCommonDamageTypes {
