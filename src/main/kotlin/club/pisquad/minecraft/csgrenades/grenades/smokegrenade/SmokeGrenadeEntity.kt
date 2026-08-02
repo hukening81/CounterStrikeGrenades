@@ -6,6 +6,7 @@ import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGr
 import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelWorker
 import club.pisquad.minecraft.csgrenades.toTick
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -38,6 +39,12 @@ abstract class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity
         this.runOnServer {
             val voxelMap = voxelWorker!!.blockingUntilComplete()
             ModLogger.info(this) { "Voxel calculation done, none empty voxel count:{}".format(voxelMap.size) }
+            SmokeGrenadeUtils.spawnSmokeRegionEntity(
+                this.level() as ServerLevel,
+                this.ownerUuid,
+                this.variant,
+                voxelMap,
+            )
         }
     }
 }

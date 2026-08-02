@@ -37,7 +37,7 @@ class FloodFillWorker(
         //endregion
 
         //region Squeeze
-        val edges = voxels.getVoxelMap().edges.value.filter { pos ->
+        val edges = voxels.getVoxelMap().edges.filter { pos ->
             // Test if any neighbor is spreadable
             Direction.entries.any { direction ->
                 val target = voxels[pos.relative(direction)] ?: return@filter false

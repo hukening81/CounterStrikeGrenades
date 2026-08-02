@@ -110,7 +110,6 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun tick() {
         super.tick()
-        println("MY LOCATION ${this.center}")
         if (this.isStopped) {
             return
         }

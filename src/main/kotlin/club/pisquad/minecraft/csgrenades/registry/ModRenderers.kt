@@ -12,12 +12,28 @@ import net.minecraftforge.fml.common.Mod
 
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = [Dist.CLIENT])
 object ModRenderers {
+    @Volatile
+    private var hasRegistered: Boolean = false
+
+    private val registerEntityRendererTasks: MutableSet<() -> Unit> = mutableSetOf()
+
+    fun addDefferedRegisterEntityRendererTask(task: () -> Unit) {
+        this.registerEntityRendererTasks.add(task)
+    }
+
     @JvmStatic
     @SubscribeEvent
     @Suppress("unused")
     fun registerEntityRenderers(event: EntityRenderersEvent.RegisterRenderers) {
+        hasRegistered = true
+
+        this.registerEntityRendererTasks.forEach {
+            it()
+        }
+
         GrenadeType.entries.forEach {
             EntityRenderers.register(it.properties.entity.get(), ::GrenadeEntityRenderer)
         }
+
     }
 }

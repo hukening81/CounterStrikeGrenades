@@ -3,6 +3,7 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel
 import club.pisquad.minecraft.csgrenades.math.Quadrant
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
@@ -33,16 +34,21 @@ class VoxelMap(
     companion object {
     }
 
-    val edges = lazy { this.keys.filter { this.isEdge(it) } }
+    @Transient
+    val edges: List<VoxelPos> by lazy { this.keys.filter { this.isEdge(it) } }
+
+    @Transient
     val specials = lazy {
-        if (this.hasDebug.value) {
+        if (this.hasDebug) {
             this.filter { (pos, voxel) -> voxel.debug!!.special }.keys
         } else {
             emptyList()
         }
     }
-    val boundingBox = lazy {
-        val firstWorldPos = this.edges.value.first().toWorldPos()
+
+    @Transient
+    val boundingBox: AABB by lazy {
+        val firstWorldPos = this.edges.first().toWorldPos()
         var minX = firstWorldPos.x
         var maxX = firstWorldPos.x
         var minY = firstWorldPos.y
@@ -50,7 +56,7 @@ class VoxelMap(
         var minZ = firstWorldPos.z
         var maxZ = firstWorldPos.z
 
-        this.edges.value.forEach {
+        this.edges.forEach {
             val worldPos = it.toWorldPos()
             minX = min(minX, worldPos.x)
             maxX = max(maxX, worldPos.x)
@@ -62,7 +68,8 @@ class VoxelMap(
         return@lazy AABB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    val hasDebug = lazy { this.values.all { it.debug != null } }
+    @Transient
+    val hasDebug: Boolean by lazy { this.values.all { it.debug != null } }
 
     fun isEdge(position: VoxelPos): Boolean {
         return if (this.containsKey(position)) {
