@@ -1,10 +1,10 @@
 package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
-import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
 import club.pisquad.minecraft.csgrenades.distanceToLine
 import club.pisquad.minecraft.csgrenades.epsilon
 import club.pisquad.minecraft.csgrenades.hurtCancelKnockback
 import club.pisquad.minecraft.csgrenades.points
+import club.pisquad.minecraft.csgrenades.runOnServer
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.registries.Registries
 import net.minecraft.server.level.ServerLevel

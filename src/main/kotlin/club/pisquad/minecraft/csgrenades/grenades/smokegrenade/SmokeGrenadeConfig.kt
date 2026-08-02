@@ -6,12 +6,13 @@ import net.minecraftforge.common.ForgeConfigSpec
 
 
 object SmokeGrenadeConfig : ConfigBuilder {
-    val spread = SmokeSpreadConfig
-
     val common = GrenadeCommonConfig(0.5)
+    val spread = SmokeSpreadConfig
+    lateinit var duration: ForgeConfigSpec.DoubleValue
 
     override fun build(builder: ForgeConfigSpec.Builder) {
         common.build(builder)
+        this.duration = builder.defineInRange("duration", 25.0, 0.0, 120.0)
 
         builder.push("spread")
         spread.build(builder)

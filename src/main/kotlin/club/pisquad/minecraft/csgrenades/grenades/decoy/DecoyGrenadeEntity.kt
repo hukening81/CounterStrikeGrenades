@@ -2,10 +2,10 @@ package club.pisquad.minecraft.csgrenades.grenades.decoy
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
-import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
 import club.pisquad.minecraft.csgrenades.grenades.decoy.messages.ServerDecoyActivatedMessage
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
+import club.pisquad.minecraft.csgrenades.runOnServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.EntityType

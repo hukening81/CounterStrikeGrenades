@@ -3,8 +3,8 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.ModLogger
 import club.pisquad.minecraft.csgrenades.core.entity.impl.ActivateAfterLandingGrenadeEntity
-import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelWorker
+import club.pisquad.minecraft.csgrenades.runOnServer
 import club.pisquad.minecraft.csgrenades.toTick
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType

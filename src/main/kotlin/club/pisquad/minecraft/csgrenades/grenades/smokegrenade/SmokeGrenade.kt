@@ -10,24 +10,30 @@ import club.pisquad.minecraft.csgrenades.core.GrenadeProperties
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.ServerSmokeDisperseMessage
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.renderer.SmokeRegionRenderer
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModRenderers
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.client.renderer.entity.EntityRenderers
+import net.minecraft.core.particles.SimpleParticleType
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
+import net.minecraftforge.network.NetworkDirection
 import net.minecraftforge.registries.RegistryObject
+import java.util.*
 
 public const val T_SMOKE_RESOURCE_KEY = "smoke_t"
 public const val CT_SMOKE_RESOURCE_KEY = "smoke_ct"
 
-enum class SmokeGrenadeVariant {
-    T, CT
+enum class SmokeGrenadeVariant(val particle: RegistryObject<SimpleParticleType>) {
+    T(SmokeParticleRegistry.SMOKE_PARTICLE_T),
+    CT(SmokeParticleRegistry.SMOKE_PARTICLE_CT),
 }
 
 object SmokeRegistryHelper {
@@ -54,6 +60,13 @@ object SmokeRegistryHelper {
         ModRenderers.addDefferedRegisterEntityRendererTask {
             EntityRenderers.register(this.smokeRegionEntity.get(), ::SmokeRegionRenderer)
         }
+        ModPacketHandler.registerMessage(
+            ServerSmokeDisperseMessage::class.java,
+            ServerSmokeDisperseMessage::encoder,
+            ServerSmokeDisperseMessage::decoder,
+            ServerSmokeDisperseMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        )
     }
 }
 

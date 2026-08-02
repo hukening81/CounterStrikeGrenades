@@ -19,6 +19,8 @@ import club.pisquad.minecraft.csgrenades.physics.GrenadeHitEntity
 import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
 import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
 import club.pisquad.minecraft.csgrenades.physics.MovementPredictor
+import club.pisquad.minecraft.csgrenades.runOnClient
+import club.pisquad.minecraft.csgrenades.runOnServer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -289,17 +291,7 @@ abstract class CounterStrikeGrenadeEntity(
 
 }
 
-fun <T : CounterStrikeGrenadeEntity> T.runOnServer(task: T.() -> Unit) {
-    if (!this.level().isClientSide) {
-        task(this)
-    }
-}
 
-fun <T : CounterStrikeGrenadeEntity> T.runOnClient(task: T.() -> Unit) {
-    if (this.level().isClientSide) {
-        task(this)
-    }
-}
 
 @Serializable
 data class HitBlockHandleResult(

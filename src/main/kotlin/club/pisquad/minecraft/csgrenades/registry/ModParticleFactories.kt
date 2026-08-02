@@ -15,6 +15,7 @@ object ModParticleFactories {
     private val registerTasks: MutableSet<(RegisterParticleProvidersEvent) -> Unit> = mutableSetOf()
 
     fun addRegisterTask(task: (RegisterParticleProvidersEvent) -> Unit) {
+        require(!this.hasRegistered)
         this.registerTasks.add(task)
     }
 

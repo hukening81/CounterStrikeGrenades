@@ -7,6 +7,7 @@ import net.minecraft.core.Vec3i
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -17,10 +18,17 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-/**
- *Since KFF is not mapping those methods correctly
- */
+fun <T : Entity> T.runOnServer(task: T.() -> Unit) {
+    if (!this.level().isClientSide) {
+        task(this)
+    }
+}
 
+fun <T : Entity> T.runOnClient(task: T.() -> Unit) {
+    if (this.level().isClientSide) {
+        task(this)
+    }
+}
 fun Vec3.toVec3i(): Vec3i = Vec3i(x.toInt(), y.toInt(), z.toInt())
 
 fun Vec3.snapToAxis(): Direction {

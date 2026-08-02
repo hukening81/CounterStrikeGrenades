@@ -10,13 +10,15 @@ import net.minecraft.client.particle.ParticleRenderType
 import net.minecraft.client.particle.SpriteSet
 import net.minecraft.client.particle.TextureSheetParticle
 import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.world.phys.Vec3
+import kotlin.math.max
 
-private const val T_PATCILE_KEY = "smoke_particle_t"
-private const val CT_PATCILE_KEY = "smoke_particle_ct"
+private const val T_PARTICLE_KEY = "smoke_particle_t"
+private const val CT_PARTICLE_KEY = "smoke_particle_ct"
 
 object SmokeParticleRegistry {
-    val SMOKE_PARTICLE_T = ModParticles.PARTICLE_TYPES.register(T_SMOKE_RESOURCE_KEY) { SimpleParticleType(true) }
-    val SMOKE_PARTICLE_CT = ModParticles.PARTICLE_TYPES.register(CT_SMOKE_RESOURCE_KEY) { SimpleParticleType(true) }
+    val SMOKE_PARTICLE_T = ModParticles.PARTICLE_TYPES.register(T_PARTICLE_KEY) { SimpleParticleType(true) }
+    val SMOKE_PARTICLE_CT = ModParticles.PARTICLE_TYPES.register(CT_PARTICLE_KEY) { SimpleParticleType(true) }
 
     init {
         ModParticleFactories.addRegisterTask {
@@ -37,30 +39,39 @@ object SmokeParticleRegistry {
 
 class SmokeGrenadeParticle(
     level: ClientLevel,
-    x: Double,
-    y: Double,
-    z: Double,
-    xSpeed: Double,
-    ySpeed: Double,
-    zSpeed: Double,
-) : TextureSheetParticle(level, x, y, z, xSpeed, ySpeed, zSpeed) {
-    private var opacityTime: Int = 0
+    val position: Vec3,
+) : TextureSheetParticle(
+    level,
+    position.x, position.y, position.z, 0.0, 0.0, 0.0
+) {
+
+    @Transient
+    var hideTimer: Int = 0
 
     init {
         this.gravity = 0f
         this.setParticleSpeed(0.0, 0.0, 0.0)
-        this.lifetime = 200
-        this.scale(4f)
+        this.scale(1.5f)
     }
 
     override fun tick() {
-        super.tick()
-        if (this.opacityTime > 0) {
-            this.alpha = 0f
-            this.opacityTime--
-        } else {
+        // We don't need its advanced features
+//         super.tick()
+
+        if (this.age++ > this.lifetime) {
+            this.remove()
+        }
+
+        if (this.hideTimer > 0) {
+            this.hideTimer--
+            return
+        } else if (this.hideTimer == 0) {
             this.alpha = 1f
         }
+    }
+
+    fun hide(timeout: Int) {
+        this.hideTimer = max(this.hideTimer, timeout)
     }
 
     override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
@@ -83,7 +94,7 @@ class SmokeParticleFactory(
         ySpeed: Double,
         zSpeed: Double,
     ): SmokeGrenadeParticle {
-        val particle = SmokeGrenadeParticle(level, x, y, z, 0.0, 0.0, 0.0)
+        val particle = SmokeGrenadeParticle(level, Vec3(x, y, z))
         particle.pickSprite(this.spriteSet)
         return particle
     }

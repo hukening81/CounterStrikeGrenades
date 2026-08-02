@@ -47,38 +47,38 @@ class SmokeRegionRenderer(context: EntityRendererProvider.Context) : EntityRende
     }
 }
 
-
-@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
-object SmokeRegionParticleRenderer {
-
-    @JvmStatic
-    @SubscribeEvent
-    fun onTick(event: TickEvent.LevelTickEvent) {
-        if (event.side != LogicalSide.CLIENT) {
-            return
-        }
-        val center = Minecraft.getInstance().player!!.position()
-        val renderDistance = Minecraft.getInstance().options.renderDistance().get() * 16.0
-        val level = event.level as ClientLevel
-        val smokeRegions = level.getEntitiesOfClass(
-            SmokeRegionEntity::class.java,
-            AABB.ofSize(center, renderDistance, renderDistance, renderDistance)
-        ).forEach {
-            this.renderSingle(it)
-        }
-    }
-
-    fun renderSingle(entity: SmokeRegionEntity) {
-        entity.voxelMap.forEach { pos, voxel ->
-            val center = pos.center
-            val particle = Minecraft.getInstance().particleEngine.createParticle(
-                ParticleTypes.ASH,
-                center.x, center.y, center.z, 0.0, 0.0, 0.0
-            )
-            if (particle != null) {
-                particle.lifetime = 1
-                particle.scale(10f)
-            }
-        }
-    }
-}
+//
+//@Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
+//object SmokeRegionParticleRenderer {
+//
+//    @JvmStatic
+//    @SubscribeEvent
+//    fun onTick(event: TickEvent.LevelTickEvent) {
+//        if (event.side != LogicalSide.CLIENT) {
+//            return
+//        }
+//        val center = Minecraft.getInstance().player!!.position()
+//        val renderDistance = Minecraft.getInstance().options.renderDistance().get() * 16.0
+//        val level = event.level as ClientLevel
+//        val smokeRegions = level.getEntitiesOfClass(
+//            SmokeRegionEntity::class.java,
+//            AABB.ofSize(center, renderDistance, renderDistance, renderDistance)
+//        ).forEach {
+//            this.renderSingle(it)
+//        }
+//    }
+//
+//    fun renderSingle(entity: SmokeRegionEntity) {
+//        entity.voxelMap.forEach { pos, voxel ->
+//            val center = pos.center
+//            val particle = Minecraft.getInstance().particleEngine.createParticle(
+//                ParticleTypes.ASH,
+//                center.x, center.y, center.z, 0.0, 0.0, 0.0
+//            )
+//            if (particle != null) {
+//                particle.lifetime = 1
+//                particle.scale(10f)
+//            }
+//        }
+//    }
+//}

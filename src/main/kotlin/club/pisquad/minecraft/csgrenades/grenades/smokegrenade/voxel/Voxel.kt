@@ -61,9 +61,9 @@ class VoxelMap(
             minX = min(minX, worldPos.x)
             maxX = max(maxX, worldPos.x)
             minY = min(minY, worldPos.y)
-            maxY = max(maxY, worldPos.y)
-            minZ = min(minZ, worldPos.z)
-            maxZ = max(maxZ, worldPos.z)
+            maxY = max(maxY, worldPos.y + 0.5)
+            minZ = min(minZ, worldPos.z + 0.5)
+            maxZ = max(maxZ, worldPos.z + 0.5)
         }
         return@lazy AABB(minX, minY, minZ, maxX, maxY, maxZ)
     }

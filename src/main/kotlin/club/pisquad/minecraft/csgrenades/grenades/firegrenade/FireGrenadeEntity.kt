@@ -2,9 +2,9 @@ package club.pisquad.minecraft.csgrenades.grenades.firegrenade
 
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.entity.HitBlockHandleResult
-import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
+import club.pisquad.minecraft.csgrenades.runOnServer
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level

@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.core.entity.impl
 
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.core.entity.runOnServer
+import club.pisquad.minecraft.csgrenades.runOnServer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
