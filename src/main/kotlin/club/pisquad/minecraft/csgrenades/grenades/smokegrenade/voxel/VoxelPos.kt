@@ -3,8 +3,10 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel
 import club.pisquad.minecraft.csgrenades.math.Quadrant
 import club.pisquad.minecraft.csgrenades.toInt
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import kotlin.math.floor
 
@@ -43,6 +45,8 @@ data class VoxelPos(
     val center: Vec3
         get() = this.toWorldPos().add(CENTER_OFFSET)
 
+    @Transient
+    val boundibgBox = AABB.ofSize(this.center, 0.5, 0.5, 0.5)
 
     fun relative(direction: Direction, distance: Int = 1): VoxelPos {
         return when (direction) {

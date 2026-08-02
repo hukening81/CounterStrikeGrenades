@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.AbstractChestBlock
 import net.minecraft.world.level.block.BedBlock
 import net.minecraft.world.level.block.CrossCollisionBlock
 import net.minecraft.world.level.block.FenceGateBlock
+import net.minecraft.world.level.block.SnowLayerBlock
 import net.minecraft.world.level.block.StairBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
@@ -35,8 +36,9 @@ object VoxelBlockDelegator {
         add(SignVoxelBlock)
         add(BedVoxelBlock)
         add(FenceGateVoxelBlock)
-        add(ChessVoxelBlock)
+        add(ChestVoxelBlock)
         add(AirVoxelBlock)
+        add(SnowLayersVoxelBlock)
     }
 
     fun delegate(context: VoxelBlockContext): VoxelBlock {
@@ -395,7 +397,7 @@ object FenceGateVoxelBlock : VoxelBlock {
     }
 }
 
-object ChessVoxelBlock : VoxelBlock {
+object ChestVoxelBlock : VoxelBlock {
     override fun check(context: VoxelBlockContext): Boolean {
         return context.blockState.block is AbstractChestBlock<*>
     }
@@ -434,6 +436,46 @@ object ChessVoxelBlock : VoxelBlock {
 
             ChestType.RIGHT -> {
                 facing.clockWise
+            }
+        }
+    }
+}
+
+object SnowLayersVoxelBlock : VoxelBlock {
+    override fun check(context: VoxelBlockContext): Boolean {
+        return context.blockState.block is SnowLayerBlock
+    }
+
+    override fun voxels(context: VoxelBlockContext): Map<Quadrant, ComputeVoxel> {
+        val layer = context.blockState.getValue(BlockStateProperties.LAYERS)
+        return if (layer > 6) {
+            SolidVoxelBlock.voxels(context)
+        } else if (layer > 2) {
+            buildMap {
+                Quadrant.Regions.UP.forEach {
+                    put(
+                        it,
+                        ComputeVoxel.create(context.position, it, ComputeVoxel.Connectivity.exclude(Direction.DOWN))
+                    )
+                }
+                Quadrant.Regions.DOWN.forEach {
+                    put(it, ComputeVoxel.create(context.position, it, ComputeVoxel.Connectivity.NONE))
+                }
+            }
+        } else {
+            buildMap {
+                Quadrant.Regions.UP.forEach {
+                    put(
+                        it,
+                        ComputeVoxel.create(context.position, it, ComputeVoxel.Connectivity.ALL)
+                    )
+                }
+                Quadrant.Regions.DOWN.forEach {
+                    put(
+                        it,
+                        ComputeVoxel.create(context.position, it, ComputeVoxel.Connectivity.exclude(Direction.DOWN))
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.core.entity
 
 import club.pisquad.minecraft.csgrenades.ModLogger
+import club.pisquad.minecraft.csgrenades.ModSettings
 import club.pisquad.minecraft.csgrenades.WithGrenadeType
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeServerAPI
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeActivatedEvent
@@ -157,9 +158,8 @@ abstract class CounterStrikeGrenadeEntity(
                             this.center =
                                 Vec3(
                                     center.x,
-                                    it.hitPoint.y,
+                                    it.hitPoint.y + ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF,
                                     center.z,
-
                                     )
                             this.deltaMovement = Vec3.ZERO
                             this.entityData.set(isStoppedAccessor, true)

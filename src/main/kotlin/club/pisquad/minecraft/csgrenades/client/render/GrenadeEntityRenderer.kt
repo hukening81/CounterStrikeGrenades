@@ -78,7 +78,7 @@ class GrenadeEntityRenderer<T>(
         val d = entity.deltaMovement
         val x = Mth.lerp(partialTick.toDouble(), 0.0, d.x)
         var y = Mth.lerp(partialTick.toDouble(), 0.0, d.y)
-        y += ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF
+        y += ModSettings.Entity.GRENADE_ENTITY_SIZE_HALF/2.0
         val z = Mth.lerp(partialTick.toDouble(), 0.0, d.z)
         poseStack.translate(x, y, z)
 
