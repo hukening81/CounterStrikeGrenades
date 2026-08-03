@@ -34,8 +34,9 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
     var hasInitialized = false
 
     lateinit var ownerUUID: UUID
-
     lateinit var voxelMap: VoxelMap
+
+    var debugMode: VoxelDebugMode = VoxelDebugMode.NONE
 
     var smokeID: Int = 0
     var variant = SmokeGrenadeVariant.T
@@ -85,7 +86,7 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
     override fun writeSpawnData(buffer: FriendlyByteBuf) {
         this.activateTime = Clock.System.now().toEpochMilliseconds()
         val data = SpawnData(
-            this.ownerUUID, this.variant, this.voxelMap, this.activateTime, this.randomSeed,
+            this.ownerUUID, this.variant, this.voxelMap, this.activateTime, this.randomSeed, this.debugMode
         )
         buffer.writeByteArray(ProtoBuf.encodeToByteArray(SpawnData.serializer(), data))
     }
@@ -99,14 +100,17 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
         this.voxelMap = data.voxelMap
         this.boundingBox = voxelMap.boundingBox
         this.activateTime = data.activateTime
-        this.hasInitialized = true
         this.randomSeed = data.randomSeed
+        this.debugMode = data.debugMode
+        this.hasInitialized = true
 
         // When `readSpawnData` is called, it means this entity is loaded/reloaded from the server.
         // We will need to respawn those particles.
         // Can't use `onAddedToWorld` because it is called before `readSpawnData` and we need additional information
         // to spawn thoese particles
-        this.createClientSideParticles()
+        if (this.debugMode == VoxelDebugMode.NONE) {
+            this.createClientSideParticles()
+        }
     }
 
     override fun shouldBeSaved(): Boolean = false
@@ -175,5 +179,7 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
         val voxelMap: VoxelMap,
         val activateTime: Long,
         val randomSeed: Long,
+        val debugMode: VoxelDebugMode
     )
+
 }

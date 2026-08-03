@@ -42,11 +42,6 @@ object InputHandler {
             token = TaskRunner.add(task)
         }
     }
-
-//    fun getCurrentStrength(): Double? {
-//        val task = (TaskRunner.getOrNull(token ?: return null) ?: return null) as ThrowActionTask
-//        return task.strength
-//    }
 }
 
 class ThrowActionTask(
@@ -57,10 +52,6 @@ class ThrowActionTask(
     private var prevStage: ThrowActionStage = ThrowActionStage.BEGIN
     private var lastJumpKeyPress: Long = 0
     private var lastButtonState: ButtonState = ButtonState.empty()
-//
-//    var strength: Double = 0.0
-//    private val strengthTransitionSpeed: Double =
-//        1.0.div(ModConfig.throwConfig.strength_transition_time.get()).div(20.0)
 
     override var state = Unit
     override fun runTask(s: Unit): Pair<Unit, Boolean> {

@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModSettings
+import club.pisquad.minecraft.csgrenades.command.ModCommands
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.CSGrenadeEntityDataSerializer
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
@@ -68,6 +69,7 @@ object SmokeRegistryHelper {
             Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         )
         registerSmokeProjectileInteractionHandlers()
+        ModCommands.addRegisterTask(SmokeGrenadeCommands::register)
     }
 }
 

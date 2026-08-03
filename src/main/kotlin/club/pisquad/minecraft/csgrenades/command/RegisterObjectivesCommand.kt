@@ -7,14 +7,16 @@ import com.mojang.brigadier.context.CommandContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 
-object RegisterObjectivesCommand {
+internal object RegisterObjectivesCommand {
     fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
             Commands.literal("csgrenades").then(
                 Commands.literal("scoreboard").then(
                     Commands.literal("init")
                         .executes(RegisterObjectivesCommand::scoreboardInit),
-                ),
+                ).requires {
+                    it.hasPermission(1)
+                },
             ),
         )
     }

@@ -1,5 +1,5 @@
-package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.debug
-
+package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.renderer
+//
 //import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 //import club.pisquad.minecraft.csgrenades.GrenadeType
 //import club.pisquad.minecraft.csgrenades.api.GrenadeEntityTracker

@@ -19,10 +19,10 @@ object SmokeGrenadeUtils {
         entity.variant = variant
         entity.voxelMap = voxelMap
         entity.boundingBox = voxelMap.boundingBox
+        entity.debugMode = SmokeGrenadeOptions.voxelDebugMode
         entity.hasInitialized = true
 
         entity.setPos(voxelMap.center)
-
 
         level.addFreshEntity(entity)
         return entity

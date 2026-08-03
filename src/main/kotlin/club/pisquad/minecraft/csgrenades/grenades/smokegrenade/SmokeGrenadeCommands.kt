@@ -1,30 +1,40 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
-import club.pisquad.minecraft.csgrenades.command.GrenadeCommandBuilder
-import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.debug.SmokeGrenadeDebugOptions
-import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.arguments.BoolArgumentType
+import com.mojang.brigadier.Command
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
+import net.minecraftforge.event.RegisterCommandsEvent
 
-object SmokeGrenadeCommands : GrenadeCommandBuilder {
-    override fun build(dispatcher: CommandDispatcher<CommandSourceStack>) {
-        dispatcher.register(
+
+object SmokeGrenadeCommands {
+    fun register(event: RegisterCommandsEvent) {
+        event.dispatcher.register(
             Commands.literal(CounterStrikeGrenades.ID).then(
-                Commands.literal("smokegrenade")
-                    .then(
-                        Commands.literal("debug").then(
-                            Commands.literal("showVoxelOutline").then(
-                                Commands.argument("state", BoolArgumentType.bool()).executes { context ->
-                                    SmokeGrenadeDebugOptions.Outline.showOutline =
-                                        BoolArgumentType.getBool(context, "state")
-                                    0
-                                }
-                            )
-                        )
-                    )
+                Commands.literal("smoke").then(
+                    buildCommandFromEnum("voxelDebug", VoxelDebugMode::class.java) {
+                        SmokeGrenadeOptions.voxelDebugMode = it
+                    }.requires { it.hasPermission(3) }
+                )
             )
         )
     }
+}
+
+fun <T : Enum<T>> buildCommandFromEnum(
+    sectionName: String,
+    enumClass: Class<T>,
+    cb: (T) -> Unit
+): LiteralArgumentBuilder<CommandSourceStack> {
+    var baseCommand = Commands.literal(sectionName)
+    enumClass.enumConstants.forEach { variant ->
+        baseCommand = baseCommand.then(
+            Commands.literal(variant.name.lowercase()).executes {
+                cb(variant)
+                Command.SINGLE_SUCCESS
+            }
+        )
+    }
+    return baseCommand
 }

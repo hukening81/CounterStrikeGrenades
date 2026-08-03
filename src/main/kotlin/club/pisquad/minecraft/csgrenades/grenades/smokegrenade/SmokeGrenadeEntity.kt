@@ -37,7 +37,8 @@ abstract class SmokeGrenadeEntity(pEntityType: EntityType<out SmokeGrenadeEntity
     override fun activate() {
         super.activate()
         this.runOnServer {
-            val voxelMap = voxelWorker!!.blockingUntilComplete()
+            val voxelMap =
+                voxelWorker!!.blockingUntilComplete(SmokeGrenadeOptions.voxelDebugMode != VoxelDebugMode.NONE)
             ModLogger.info(this) { "Voxel calculation done, none empty voxel count:{}".format(voxelMap.size) }
             SmokeGrenadeUtils.spawnSmokeRegionEntity(
                 this.level() as ServerLevel,

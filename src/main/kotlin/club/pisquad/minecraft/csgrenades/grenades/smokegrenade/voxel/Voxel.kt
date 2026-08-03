@@ -35,14 +35,14 @@ class VoxelMap(
     }
 
     @Transient
-    val edges: List<VoxelPos> by lazy { this.keys.filter { this.isEdge(it) } }
+    val edges: Set<VoxelPos> by lazy { this.keys.filter { this.isEdge(it) }.toSet() }
 
     @Transient
-    val specials = lazy {
+    val specials: Set<VoxelPos> by lazy {
         if (this.hasDebug) {
             this.filter { (pos, voxel) -> voxel.debug!!.special }.keys
         } else {
-            emptyList()
+            emptySet()
         }
     }
 
@@ -156,12 +156,14 @@ class ComputeVoxel(
         }
     }
 
-    fun toVoxel(): Voxel {
+    fun toVoxel(debug: Boolean = false): Voxel {
+        val debugInfo = if (debug) {
+            VoxelDebug(this.special, this.parent)
+        } else {
+            null
+        }
         return Voxel(
-            this.position, VoxelDebug(
-                this.special,
-                this.parent
-            )
+            this.position, debugInfo
         )
     }
 }
