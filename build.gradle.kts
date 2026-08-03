@@ -79,6 +79,8 @@ configure<UserDevExtension> {
             property("mixin.env.remapRefMap", "true")
             property("mixin.env.refMapRemappingFile", "$projectDir/build/createSrgToMcp/output.srg")
 
+            jvmArgs("-XX:+AllowEnhancedClassRedefinition")
+
             if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
 
                 // NOTE(hukening81): This is mainly for my use case, since native glfw has some issue under wayland that will crash the test instance.
@@ -177,6 +179,7 @@ repositories {
                 url = uri("https://api.modrinth.com/maven")
             }
         }
+        forRepositories(fg.repository)
         filter {
             includeGroup("maven.modrinth")
         }
@@ -204,7 +207,10 @@ dependencies {
     // Use the latest version of Minecraft Forge
     minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
-    implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:8141310"))
+//    implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:8141310"))
+    implementation(fg.deobf("maven.modrinth:timeless-and-classics-zero:1.1.8-hotfix"))
+//    compileOnly(fg.deobf("maven.modrinth:timeless-and-classics-zero:1.1.8-hotfix"))
+//    runtimeOnly(fg.deobf("maven.modrinth:timeless-and-classics-zero:1.1.8-hotfix"))
 
     "shade"("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinSerializationVersion") {
         exclude(group = "org.jetbrains", module = "annotations")

@@ -67,6 +67,7 @@ object SmokeRegistryHelper {
             ServerSmokeDisperseMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         )
+        registerSmokeProjectileInteractionHandlers()
     }
 }
 

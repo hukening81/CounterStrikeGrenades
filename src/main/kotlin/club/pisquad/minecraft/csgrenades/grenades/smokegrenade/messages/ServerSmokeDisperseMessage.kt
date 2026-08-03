@@ -1,11 +1,12 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages
 
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeParticle
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeRegionEntity
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.Particle
+import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.network.NetworkEvent
 import java.util.function.Supplier
@@ -21,6 +22,7 @@ class ServerSmokeDisperseMessage(
             ctx: Supplier<NetworkEvent.Context>
         ) {
             val context = ctx.get()
+            context.packetHandled = true
             context.enqueueWork {
                 val level = Minecraft.getInstance().level?:return@enqueueWork
                 val entity = level.getEntity(msg.entityID)?:return@enqueueWork
@@ -28,8 +30,6 @@ class ServerSmokeDisperseMessage(
                     return@enqueueWork
                 }
                 entity.applyPatch(msg.patch)
-
-            context.packetHandled = true
         }
     }
     }
@@ -37,16 +37,31 @@ class ServerSmokeDisperseMessage(
 
 @Serializable
 sealed interface SmokePatch {
-    fun apply(particles: Iterable<Particle>)
+    fun apply(particles: Iterable<SmokeGrenadeParticle>)
 
     @Serializable
     class Projectile(
         @Serializable(with = Vec3Serializer::class) val origin: Vec3,
-        @Serializable(with = Vec3Serializer::class) val direction: Vec3,
+        @Serializable(with = Vec3Serializer::class) val destination: Vec3,
         val radius: Double
     ) : SmokePatch {
-        override fun apply(particles: Iterable<Particle>) {
-            TODO("Not yet implemented")
+        override fun apply(particles: Iterable<SmokeGrenadeParticle>) {
+            val axis = this.destination.subtract(this.origin)
+            particles.forEach {
+                val t = it.position.subtract(this.origin).dot(axis) / axis.lengthSqr()
+                if (t < 0.0 || t > 1.0) {
+                    return@forEach
+                }
+                val p = this.origin.add(axis.scale(t))
+                val d = p.distanceTo(it.position)
+
+                if (d > this.radius) {
+                    return@forEach
+                }
+
+                val hideTime = Mth.lerp(d / this.radius, 20.0, 10.0).toInt()
+                it.hide(hideTime)
+            }
         }
     }
 
@@ -55,8 +70,15 @@ sealed interface SmokePatch {
         @Serializable(with = Vec3Serializer::class) val center: Vec3,
         val radius: Double,
     ) : SmokePatch {
-        override fun apply(particles: Iterable<Particle>) {
-            TODO("Not yet implemented")
+        override fun apply(particles: Iterable<SmokeGrenadeParticle>) {
+            particles.forEach {
+                val distance = it.position.distanceTo(this.center)
+                if (distance > this.radius) {
+                    return@forEach
+                }
+                val hideTime = Mth.lerp(distance / this.radius, 20.0, 10.0).toInt()
+                it.hide(hideTime)
+            }
         }
     }
 }

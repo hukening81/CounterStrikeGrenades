@@ -9,10 +9,12 @@ object SmokeGrenadeConfig : ConfigBuilder {
     val common = GrenadeCommonConfig(0.5)
     val spread = SmokeSpreadConfig
     lateinit var duration: ForgeConfigSpec.DoubleValue
+    lateinit var bulletHoleSize: ForgeConfigSpec.DoubleValue
 
     override fun build(builder: ForgeConfigSpec.Builder) {
         common.build(builder)
         this.duration = builder.defineInRange("duration", 25.0, 0.0, 120.0)
+        this.bulletHoleSize = builder.defineInRange("bullet_hole_size", 0.25, 0.0, 10.0)
 
         builder.push("spread")
         spread.build(builder)

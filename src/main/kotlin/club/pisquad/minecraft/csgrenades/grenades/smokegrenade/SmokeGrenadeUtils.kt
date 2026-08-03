@@ -18,8 +18,8 @@ object SmokeGrenadeUtils {
         entity.ownerUUID = ownerUUID
         entity.variant = variant
         entity.voxelMap = voxelMap
-
         entity.boundingBox = voxelMap.boundingBox
+        entity.hasInitialized = true
 
         entity.setPos(voxelMap.center)
 

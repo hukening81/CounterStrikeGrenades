@@ -72,6 +72,7 @@ class SmokeGrenadeParticle(
 
     fun hide(timeout: Int) {
         this.hideTimer = max(this.hideTimer, timeout)
+        this.alpha = 0f
     }
 
     override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT

@@ -5,11 +5,11 @@ import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelPos
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
+import club.pisquad.minecraft.csgrenades.runOnServer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
 import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.Particle
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
@@ -43,10 +43,29 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
 
     var activateTime: Long = 0
 
-    val trackedParticles: MutableSet<Particle> = mutableSetOf()
+    val trackedParticles: MutableSet<SmokeGrenadeParticle> = mutableSetOf()
 
     init {
         noPhysics = true
+    }
+
+    companion object {
+        // Only supported on server
+        val trackedRegions: MutableSet<SmokeRegionEntity> = mutableSetOf()
+    }
+
+    override fun onAddedToWorld() {
+        super.onAddedToWorld()
+        this.runOnServer {
+            SmokeRegionEntity.trackedRegions.add(this)
+        }
+    }
+
+    override fun onRemovedFromWorld() {
+        super.onRemovedFromWorld()
+        this.runOnServer {
+            SmokeRegionEntity.trackedRegions.remove(this)
+        }
     }
 
     override fun defineSynchedData() {
@@ -92,11 +111,12 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
 
     override fun shouldBeSaved(): Boolean = false
     override fun makeBoundingBox(): AABB {
-        return if (!this.hasInitialized) {
+        this.boundingBox = if (!this.hasInitialized) {
             super.makeBoundingBox()
         } else {
             this.voxelMap.boundingBox
         }
+        return this.boundingBox
     }
 
     private fun createClientSideParticles() {
@@ -132,7 +152,7 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
                     )
                     if (particle != null) {
                         particle.lifetime = lifeTime
-                        add(particle)
+                        add(particle as SmokeGrenadeParticle)
                     }
                 }
             }
