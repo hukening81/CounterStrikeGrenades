@@ -2,10 +2,11 @@ package club.pisquad.minecraft.csgrenades.grenades.hegrenade
 
 import club.pisquad.minecraft.csgrenades.distanceToLine
 import club.pisquad.minecraft.csgrenades.epsilon
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeRegionEntity
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.SmokePatch
 import club.pisquad.minecraft.csgrenades.hurtCancelKnockback
 import club.pisquad.minecraft.csgrenades.points
 import club.pisquad.minecraft.csgrenades.runOnServer
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.registries.Registries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.Mth
@@ -99,15 +100,15 @@ object HEGrenadeHelper {
         return max(headDamage, bodyDamage)
     }
 
-    fun blowUpNearbySmokeGrenade(level: ClientLevel, center: Vec3) {
-//        val smokeRadius = ModConfig.SmokeGrenade.SMOKE_RADIUS.get()
-//        val heDamageRadius = ModConfig.HEGrenade.DAMAGE_RADIUS.get()
-//        val smokeFallingHeight = ModConfig.SmokeGrenade.SMOKE_MAX_FALLING_HEIGHT.get()
-//        level.getEntitiesOfClass(
-//            SmokeGrenadeEntity::class.java,
-//            AABB(BlockPos.containing(center)).inflate(heDamageRadius + smokeRadius, smokeFallingHeight.toDouble() + heDamageRadius, heDamageRadius + smokeRadius),
-//        ).forEach {
-////            it.clearSmokeWithinRange(center, heDamageRadius + 2.5, true)
-//        }
+    fun blowUpNearbySmokeGrenade(grenade: HEGrenadeEntity) {
+        val radius = HEGrenadeConfig.explosion.smokeClearRadius.get()
+        val center = grenade.center
+        val patch = SmokePatch.Explosion(center, radius)
+        val bb = AABB.ofSize(center, radius, radius, radius)
+        SmokeRegionEntity.trackedRegions.forEach {
+            if (bb.intersects(it.boundingBox)) {
+                it.applyPatch(patch)
+            }
+        }
     }
 }

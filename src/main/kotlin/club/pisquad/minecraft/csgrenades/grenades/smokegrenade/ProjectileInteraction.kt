@@ -3,12 +3,9 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.compat.CSGrenadeCompatibility
 import club.pisquad.minecraft.csgrenades.compat.CSGrenadeSupportedMods
-import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.ServerSmokeDisperseMessage
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.SmokePatch
-import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import com.tacz.guns.entity.EntityKineticBullet
 import net.minecraft.client.Minecraft
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.projectile.AbstractArrow
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.entity.projectile.ThrownTrident
@@ -97,8 +94,7 @@ private object Vanilla {
                 ).isPresent()
             ) {
                 val patch = SmokePatch.Projectile(entity.position(), destination, size)
-                val message = ServerSmokeDisperseMessage(region.id, patch)
-                ModPacketHandler.sendMessageToPlayer(region.level() as ServerLevel, region.position(), message)
+                region.applyPatch(patch)
             }
         }
     }

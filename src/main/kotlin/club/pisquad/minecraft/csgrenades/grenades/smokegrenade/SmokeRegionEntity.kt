@@ -1,10 +1,13 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.ServerSmokeDisperseMessage
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.SmokePatch
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelPos
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
+import club.pisquad.minecraft.csgrenades.runOnClient
 import club.pisquad.minecraft.csgrenades.runOnServer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -14,6 +17,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
@@ -169,7 +173,13 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
     }
 
     fun applyPatch(patch: SmokePatch) {
-        patch.apply(this.trackedParticles)
+        this.runOnServer {
+            val message = ServerSmokeDisperseMessage(this.id, patch)
+            ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.position(), message)
+        }
+        this.runOnClient {
+            patch.apply(this.trackedParticles)
+        }
     }
 
     @Serializable

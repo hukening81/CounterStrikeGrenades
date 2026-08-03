@@ -30,6 +30,7 @@ class HEGrenadeEntity(pEntityType: EntityType<out HEGrenadeEntity>, pLevel: Leve
                 center,
                 HEGrenadeActivatedMessage(this.ownerUuid, this.center)
             )
+            HEGrenadeHelper.blowUpNearbySmokeGrenade(this)
             HEGrenadeHelper.dealDamage(this)
             this.discard()
         }

@@ -2,9 +2,8 @@ package club.pisquad.minecraft.csgrenades.grenades.hegrenade.messages
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeActivatedEvent
-import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeExplosionData
-import club.pisquad.minecraft.csgrenades.client.render.hegrenade.HEGrenadeRenderManager
-import club.pisquad.minecraft.csgrenades.grenades.hegrenade.HEGrenadeHelper
+import club.pisquad.minecraft.csgrenades.grenades.hegrenade.client.HEGrenadeExplosionRenderer
+import club.pisquad.minecraft.csgrenades.grenades.hegrenade.client.HEGrenadeSoundManager
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
@@ -31,6 +30,9 @@ class HEGrenadeActivatedMessage(
 
         override fun handler(msg: HEGrenadeActivatedMessage, ctx: Supplier<NetworkEvent.Context>) {
             val context = ctx.get()
+            context.packetHandled = true
+
+            context.enqueueWork {
 
             MinecraftForge.EVENT_BUS.post(
                 GrenadeActivatedEvent(
@@ -40,14 +42,11 @@ class HEGrenadeActivatedMessage(
                 )
             )
 
-            val level = Minecraft.getInstance().level ?: return
-            HEGrenadeRenderManager.render(HEGrenadeExplosionData(msg.position))
+                val level = Minecraft.getInstance().level?:return@enqueueWork
+                HEGrenadeExplosionRenderer.renderSingle(msg.position)
 
-//            HEGrenadeSoundManager.playExplosionSound(msg.position)
-
-
-            HEGrenadeHelper.blowUpNearbySmokeGrenade(level, msg.position)
-            context.packetHandled = true
+                HEGrenadeSoundManager.playExplosionSound(msg.position)
+            }
         }
     }
 }

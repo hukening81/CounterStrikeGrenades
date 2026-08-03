@@ -76,7 +76,7 @@ sealed interface SmokePatch {
                 if (distance > this.radius) {
                     return@forEach
                 }
-                val hideTime = Mth.lerp(distance / this.radius, 20.0, 10.0).toInt()
+                val hideTime = Mth.lerp(distance / this.radius, 40.0, 10.0).toInt()
                 it.hide(hideTime)
             }
         }
