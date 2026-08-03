@@ -11,9 +11,9 @@ import java.util.*
 @Mod.EventBusSubscriber(
     modid = CounterStrikeGrenades.ID,
     bus = Mod.EventBusSubscriber.Bus.FORGE,
-    value = [Dist.CLIENT, Dist.DEDICATED_SERVER]
+    value = [Dist.CLIENT]
 )
-object TaskRunner {
+object ClientTaskRunner {
     private val tasks: MutableMap<RegistrationToken, RunnableTask<out Any>> = mutableMapOf()
 
     typealias RegistrationToken = UUID
@@ -30,15 +30,6 @@ object TaskRunner {
 
     fun getOrNull(token: RegistrationToken): RunnableTask<out Any>? {
         return tasks[token]
-    }
-
-    @JvmStatic
-    @SubscribeEvent
-    fun onServerTick(event: TickEvent.ServerTickEvent) {
-        if (event.phase != TickEvent.Phase.END) {
-            return
-        }
-        tick()
     }
 
     @JvmStatic

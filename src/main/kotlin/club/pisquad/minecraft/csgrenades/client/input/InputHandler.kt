@@ -3,8 +3,8 @@ package club.pisquad.minecraft.csgrenades.client.input
 import club.pisquad.minecraft.csgrenades.*
 import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import club.pisquad.minecraft.csgrenades.config.ModConfig
+import club.pisquad.minecraft.csgrenades.core.ClientTaskRunner
 import club.pisquad.minecraft.csgrenades.core.RunnableTask
-import club.pisquad.minecraft.csgrenades.core.TaskRunner
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import com.electronwill.nightconfig.core.conversion.InvalidValueException
 import com.mojang.blaze3d.platform.InputConstants
@@ -18,7 +18,7 @@ import org.lwjgl.glfw.GLFW
 @Mod.EventBusSubscriber(modid = CounterStrikeGrenades.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 object InputHandler {
 
-    var token: TaskRunner.RegistrationToken? = null
+    var token: ClientTaskRunner.RegistrationToken? = null
     var lastUse: Long = 0
 
     @JvmStatic
@@ -31,7 +31,7 @@ object InputHandler {
         if (InputUtils.buttonState.any()
             && InputUtils.isHoldingGrenade
             && !InputUtils.screenState
-            && (token == null || TaskRunner.isDone(token!!))
+            && (token == null || ClientTaskRunner.isDone(token!!))
             && (currentTime - lastUse).div(1000) > InputUtils.cooldown
         ) {
             val task = ThrowActionTask(
@@ -39,7 +39,7 @@ object InputHandler {
                 InputUtils.holdingGrenadeType!!,
                 InputUtils.selectedSlot
             )
-            token = TaskRunner.add(task)
+            token = ClientTaskRunner.add(task)
         }
     }
 }
