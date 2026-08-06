@@ -2,6 +2,8 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel
 
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils.SmokeShapeHelper
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.utils.VoxelBlockContext
+import club.pisquad.minecraft.csgrenades.utils.VoxelBlockDelegator
 import kotlinx.serialization.Serializable
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3

@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.math
 
+import club.pisquad.minecraft.csgrenades.utils.Segment
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3

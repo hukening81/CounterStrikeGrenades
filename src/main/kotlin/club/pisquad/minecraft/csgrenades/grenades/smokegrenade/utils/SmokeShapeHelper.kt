@@ -2,7 +2,7 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.utils
 
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeConfig
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelPos
-import club.pisquad.minecraft.csgrenades.math.Quadrant
+import club.pisquad.minecraft.csgrenades.utils.Quadrant
 import club.pisquad.minecraft.csgrenades.minus
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.Vec2

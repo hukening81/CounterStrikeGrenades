@@ -1,15 +1,14 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel
 
-import club.pisquad.minecraft.csgrenades.math.Quadrant
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
+import club.pisquad.minecraft.csgrenades.utils.GridConnectivity
+import club.pisquad.minecraft.csgrenades.utils.Quadrant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import java.util.*
-import java.util.function.IntFunction
 import kotlin.math.max
 import kotlin.math.min
 
@@ -48,7 +47,7 @@ class VoxelMap(
 
     @Transient
     val boundingBox: AABB by lazy {
-        val firstWorldPos = this.edges.first().toWorldPos()
+        val firstWorldPos = this.edges.first().worldPos()
         var minX = firstWorldPos.x
         var maxX = firstWorldPos.x
         var minY = firstWorldPos.y
@@ -57,7 +56,7 @@ class VoxelMap(
         var maxZ = firstWorldPos.z
 
         this.edges.forEach {
-            val worldPos = it.toWorldPos()
+            val worldPos = it.worldPos()
             minX = min(minX, worldPos.x)
             maxX = max(maxX, worldPos.x)
             minY = min(minY, worldPos.y)
@@ -89,7 +88,7 @@ class VoxelDebug(
 
 class ComputeVoxel(
     val position: VoxelPos,
-    val connectivity: Connectivity,
+    val connectivity: GridConnectivity,
     val special: Boolean = true,
     var intensity: Int = 0,
     val spreadDecay: Int = 1,
@@ -99,7 +98,7 @@ class ComputeVoxel(
         fun create(
             blockPos: BlockPos,
             quadrant: Quadrant,
-            connectivity: Connectivity,
+            connectivity: GridConnectivity,
             special: Boolean = true
         ): ComputeVoxel {
             return ComputeVoxel(
@@ -107,34 +106,6 @@ class ComputeVoxel(
                 connectivity,
                 special
             )
-        }
-    }
-
-    class Connectivity private constructor(
-        private val inner: EnumSet<Direction>
-    ) : Set<Direction> by inner {
-
-        @Deprecated("??")
-        override fun <T : Any?> toArray(generator: IntFunction<Array<out T?>?>): Array<out T?>? {
-            return generator.apply(0)
-        }
-
-        fun isBlocking(direction: Direction): Boolean {
-            return !this.contains(direction)
-        }
-
-        companion object {
-            val ALL = Connectivity(EnumSet.allOf(Direction::class.java))
-            val NONE = Connectivity(EnumSet.noneOf(Direction::class.java))
-
-            fun from(vararg directions: Direction): Connectivity {
-                return Connectivity(EnumSet.copyOf(directions.toList()))
-            }
-
-            fun exclude(vararg excludes: Direction): Connectivity {
-                val directions = Direction.entries.filterNot { excludes.contains(it) }
-                return Connectivity(EnumSet.copyOf(directions))
-            }
         }
     }
 

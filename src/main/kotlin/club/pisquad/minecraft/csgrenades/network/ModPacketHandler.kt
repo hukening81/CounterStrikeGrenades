@@ -13,6 +13,7 @@ import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityM
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntitySoundMessage
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
 import kotlinx.serialization.serializer
 import net.minecraft.network.FriendlyByteBuf

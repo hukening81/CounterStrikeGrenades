@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.grenades.flashbang.client
+package club.pisquad.minecraft.csgrenades.grenades.flashbang.sound
 
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangSounds
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance

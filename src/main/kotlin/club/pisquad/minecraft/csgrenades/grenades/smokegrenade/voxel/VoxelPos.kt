@@ -1,7 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel
 
-import club.pisquad.minecraft.csgrenades.math.Quadrant
 import club.pisquad.minecraft.csgrenades.toInt
+import club.pisquad.minecraft.csgrenades.utils.Quadrant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.core.BlockPos
@@ -16,6 +16,7 @@ data class VoxelPos(
     val y: Int,
     val z: Int,
 ) {
+    val quadrant: Quadrant = Quadrant.from(this.center)
 
     val up: VoxelPos
         get() = this.relative(Direction.UP)
@@ -43,7 +44,7 @@ data class VoxelPos(
         }
 
     val center: Vec3
-        get() = this.toWorldPos().add(CENTER_OFFSET)
+        get() = this.worldPos().add(CENTER_OFFSET)
 
     @Transient
     val boundibgBox = AABB.ofSize(this.center, 0.5, 0.5, 0.5)
@@ -76,11 +77,20 @@ data class VoxelPos(
         }
     }
 
-    fun toWorldPos(): Vec3 {
+    fun worldPos(): Vec3 {
         val convert = { i: Int ->
             i.div(2.0)
         }
         return Vec3(convert(this.x), convert(this.y), convert(this.z))
+    }
+
+    fun blockPos(): BlockPos {
+        return BlockPos.containing(this.center)
+    }
+
+    fun contains(center: Vec3): Boolean {
+        val offset = center.subtract(this.worldPos())
+        return offset.x > 0 && offset.y > 0 && offset.z > 0 && offset.x < 0.5 && offset.y < 0.5 && offset.z < 0.5
     }
 
     companion object {

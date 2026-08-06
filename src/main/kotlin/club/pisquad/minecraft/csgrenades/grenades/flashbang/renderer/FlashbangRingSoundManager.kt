@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.client.render.flashbang
+package club.pisquad.minecraft.csgrenades.grenades.flashbang.renderer
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import net.minecraftforge.api.distmarker.Dist

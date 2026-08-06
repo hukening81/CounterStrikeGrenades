@@ -150,7 +150,7 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
                         randomSource.nextDouble(0.0, 0.5),
                     )
                     val position =
-                        pos.toWorldPos().add(offset)
+                        pos.worldPos().add(offset)
                     val particle = particleEngine.createParticle(
                         variant.particle.get(),
                         position.x,

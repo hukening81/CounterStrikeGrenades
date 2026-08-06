@@ -1,8 +1,8 @@
 package club.pisquad.minecraft.csgrenades.grenades.flashbang.messages
 
-import club.pisquad.minecraft.csgrenades.client.render.flashbang.BlindEffectRenderManager
+import club.pisquad.minecraft.csgrenades.grenades.flashbang.renderer.BlindEffectRenderManager
 import club.pisquad.minecraft.csgrenades.grenades.flashbang.FlashbangBlindEffectData
-import club.pisquad.minecraft.csgrenades.grenades.flashbang.client.FlashbangSoundManager
+import club.pisquad.minecraft.csgrenades.grenades.flashbang.sound.FlashbangSoundManager
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer

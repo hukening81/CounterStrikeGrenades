@@ -1,4 +1,4 @@
-package club.pisquad.minecraft.csgrenades.math
+package club.pisquad.minecraft.csgrenades.utils
 
 import club.pisquad.minecraft.csgrenades.div
 import club.pisquad.minecraft.csgrenades.isBetween

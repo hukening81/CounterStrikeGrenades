@@ -9,9 +9,11 @@ class FireGrenadeCommonConfig(
 ) : ConfigSection {
     lateinit var spreadRadius: ForgeConfigSpec.DoubleValue
     lateinit var maxDamagePerTick: ForgeConfigSpec.DoubleValue
+    lateinit var fireHeight: ForgeConfigSpec.DoubleValue
 
     override fun build(builder: ForgeConfigSpec.Builder) {
-        builder.defineInRange("spread_radius", defaultSpreadRadius, 1.0, 10.0)
-        builder.defineInRange("max_damage_per_tick", defaultMaxDamagePerTick, 0.0, 10.0)
+        this.spreadRadius = builder.defineInRange("spread_radius", defaultSpreadRadius, 1.0, 10.0)
+        this.fireHeight = builder.defineInRange("max_damage_per_tick", defaultMaxDamagePerTick, 0.0, 10.0)
+        this.fireHeight = builder.defineInRange("fire_height", 2.5, 0.0, 10.0)
     }
 }
