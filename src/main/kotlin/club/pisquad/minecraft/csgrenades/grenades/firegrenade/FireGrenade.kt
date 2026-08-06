@@ -19,13 +19,11 @@ import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModRenderers
 import net.minecraft.client.renderer.entity.EntityRenderers
 import net.minecraft.core.particles.ParticleOptions
-import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraftforge.network.NetworkDirection
 import java.util.*
-import kotlin.random.Random
 
 object FireGrenadeRegistryHelper {
     val incendiaryEntity = ModEntities.registerGrenadeEntity(INCENDIARY_RESOURCE_KEY, ::IncendiaryEntity)
@@ -44,6 +42,9 @@ object FireGrenadeRegistryHelper {
             .updateInterval(1)
             .build(ResourceLocation(CounterStrikeGrenades.ID, "fire_region").toString())
     }
+
+    @Suppress("unused")
+    private val _particle = FlameParticleRegistry
 
 
     init {
@@ -67,19 +68,21 @@ enum class FireGrenadeVariant(
     val getRandomParticleType: () -> ParticleOptions
 ) {
     INCENDIARY({
-        val random = Random.nextDouble()
-        when {
-            random < 0.2 -> ParticleTypes.SMOKE
-            random < 0.5 -> ParticleTypes.SOUL_FIRE_FLAME
-            else -> ParticleTypes.SMALL_FLAME
-        }
+        FlameParticleRegistry.INCENDIARY_FLAME.get()
+//        val random = Random.nextDouble()
+//        when {
+//            random < 0.2 -> ParticleTypes.SMOKE
+//            random < 0.5 -> FlameParticleRegistry.INCENDIARY_FLAME.get()
+//            else -> ParticleTypes.SMALL_FLAME
+//        }
     }),
     MOLOTOV({
-        val random = Random.nextDouble()
-        when {
-            random < 0.2 -> ParticleTypes.SMOKE
-            random < 0.5 -> ParticleTypes.FLAME
-            else -> ParticleTypes.SMALL_FLAME
-        }
+        FlameParticleRegistry.MOLOTOV_FLAME.get()
+//        val random = Random.nextDouble()
+//        when {
+//            random < 0.2 -> ParticleTypes.SMOKE
+//            random < 0.5 -> FlameParticleRegistry.MOLOTOV_FLAME.get()
+//            else -> ParticleTypes.SMALL_FLAME
+//        }
     }),
 }

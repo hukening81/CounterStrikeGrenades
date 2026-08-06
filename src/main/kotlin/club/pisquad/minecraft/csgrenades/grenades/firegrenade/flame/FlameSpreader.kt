@@ -15,7 +15,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import kotlin.math.ceil
-import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -113,6 +113,7 @@ class FlameSpreader(
         if (targetVoxel.connectivity.contains(direciton.opposite)) {
             return this.searchSurfaceBelow(level, targetVoxel)
         } else {
+            var currentVoxel = currentVoxel
             repeat(MAX_SPREAD_JUMP_VOXEL_COUNT) {
                 val aboveCurrentVoxel = this.voxelCache.get(level, currentVoxel.position.up)
                 val targetVoxel = this.voxelCache.get(level, aboveCurrentVoxel.position.relative(direciton))
@@ -123,6 +124,7 @@ class FlameSpreader(
                 ) {
                     return this.searchSurfaceBelow(level, targetVoxel)
                 }
+                currentVoxel = aboveCurrentVoxel
             }
         }
         return null
@@ -131,7 +133,7 @@ class FlameSpreader(
     private fun searchSurfaceBelow(level: Level, currentVoxel: ComputeVoxel): ComputeVoxel? {
         var targetVoxel = currentVoxel
         var belowTargetVoxel = this.voxelCache.get(level, targetVoxel.position.down)
-        repeat(MAX_SPREAD_FALL_VOXEL_COUNT) {
+        repeat(MAX_SPREAD_FALL_VOXEL_COUNT + 1) {
             if (!targetVoxel.connectivity.contains(Direction.DOWN)
                 ||
                 !belowTargetVoxel.connectivity.contains(Direction.UP)
@@ -211,7 +213,7 @@ data class FlameMap(
                     1.0
                 )
             ).toInt()
-            max(voxelHeight, this.inner[voxelPos]!!.fireHeight) * FIRE_PARTICLE_LIFETIME_PER_VOXEL
+            min(voxelHeight, this.inner[voxelPos]!!.fireHeight) * FIRE_PARTICLE_LIFETIME_PER_VOXEL
         } + Random.nextInt(-3, 3)
     }
 }

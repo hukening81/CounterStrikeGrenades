@@ -26,6 +26,9 @@ object FlameParticleRenderer {
                 return@forEach
             }
             entity.flameMap.forEach { pos, entry ->
+                if (Random.nextDouble() < 0.7) {
+                    return@forEach
+                }
                 val lifetime = entity.flameMap.getParticleLifeTime(pos)
                 val particleType = entity.variant.getRandomParticleType()
                 val position = pos.randomPositionFromBottom()

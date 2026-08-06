@@ -2,8 +2,6 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.registry.ModParticleFactories
 import club.pisquad.minecraft.csgrenades.registry.ModParticles
-import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.Camera
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.ParticleProvider
 import net.minecraft.client.particle.ParticleRenderType
@@ -39,11 +37,14 @@ object SmokeParticleRegistry {
 
 class SmokeGrenadeParticle(
     level: ClientLevel,
-    val position: Vec3,
+    x: Double,
+    y: Double,
+    z: Double,
 ) : TextureSheetParticle(
     level,
-    position.x, position.y, position.z, 0.0, 0.0, 0.0
+    x, y, z, 0.0, 0.0, 0.0
 ) {
+    val position = Vec3(x, y, z)
 
     @Transient
     var hideTimer: Int = 0
@@ -76,10 +77,6 @@ class SmokeGrenadeParticle(
     }
 
     override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
-
-    override fun render(pBuffer: VertexConsumer, pRenderInfo: Camera, pPartialTicks: Float) {
-        super.render(pBuffer, pRenderInfo, pPartialTicks)
-    }
 }
 
 class SmokeParticleFactory(
@@ -95,7 +92,7 @@ class SmokeParticleFactory(
         ySpeed: Double,
         zSpeed: Double,
     ): SmokeGrenadeParticle {
-        val particle = SmokeGrenadeParticle(level, Vec3(x, y, z))
+        val particle = SmokeGrenadeParticle(level, x, y, z)
         particle.pickSprite(this.spriteSet)
         return particle
     }

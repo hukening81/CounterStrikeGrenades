@@ -23,8 +23,7 @@ class FireRegionDebugRenderer(context: EntityRendererProvider.Context) : EntityR
         bufferSource: MultiBufferSource,
         packedLight: Int
     ) {
-//        if (!entity.hasInitialized || !entity.debugMode) {
-        if (!entity.hasInitialized) {
+        if (!entity.hasInitialized || !entity.debugMode) {
             return
         }
         poseStack.pushPose()
