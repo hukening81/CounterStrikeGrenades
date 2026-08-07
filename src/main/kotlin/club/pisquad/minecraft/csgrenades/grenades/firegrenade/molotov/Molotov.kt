@@ -6,9 +6,12 @@ import club.pisquad.minecraft.csgrenades.core.GrenadeProperties
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.core.item.CounterStrikeGrenadeItem
 import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeDamageTypes
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeRegistryHelper
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.damagesource.DamageType
 import net.minecraft.world.entity.EntityType
 import net.minecraftforge.registries.RegistryObject
 
@@ -24,9 +27,12 @@ object MolotovProperties : GrenadeProperties {
     override val damageTypes: GrenadeCommonDamageTypes = MolotovDamageTypes
 }
 
-object MolotovDamageTypes : GrenadeCommonDamageTypes {
-    val fire = ModDamageTypes.registerSingle("molotov/fire")
-    override val hit = ModDamageTypes.registerSingle("molotov/hit")
+object MolotovDamageTypes : GrenadeCommonDamageTypes, FireGrenadeDamageTypes {
+    override val fire = ModDamageTypes.registerSingle("molotov/fire")
+    override val common: GrenadeCommonDamageTypes = object : GrenadeCommonDamageTypes {
+        override val hit: ResourceKey<DamageType> = ModDamageTypes.registerSingle("molotov/hit")
+    }
+    override val hit = this.common.hit
 }
 
 object MolotovSounds : GrenadeCommonSounds {

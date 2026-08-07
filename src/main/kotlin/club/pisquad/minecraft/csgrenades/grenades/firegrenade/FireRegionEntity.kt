@@ -1,23 +1,31 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade
 
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.flame.FlameMap
+import club.pisquad.minecraft.csgrenades.hurtCancelKnockback
+import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import club.pisquad.minecraft.csgrenades.runOnClient
 import club.pisquad.minecraft.csgrenades.runOnServer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
+import kotlin.math.min
 
 
 class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) : Entity(entityType, level),
@@ -26,6 +34,9 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
     var debugMode: Boolean = false
     lateinit var variant: FireGrenadeVariant
     lateinit var flameMap: FlameMap
+
+    // (Entity's ID, tick time when it enters the damage region)
+    var entityPreviousInRange: MutableMap<Int, Int> = mutableMapOf()
 
     init {
         noPhysics = true
@@ -116,6 +127,57 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
 
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
         return NetworkHooks.getEntitySpawningPacket(this)
+    }
+
+    override fun tick() {
+        super.tick()
+        this.runOnServer {
+            if (!this.hasInitialized) {
+                return@runOnServer
+            }
+            if (this.debugMode) {
+                return@runOnServer
+            }
+            this.damageTick()
+        }
+    }
+
+    private fun damageTick() {
+        require(!this.level().isClientSide)
+        require(this.hasInitialized)
+        // Don't deal damage when debug mode is enabled
+        if (this.debugMode) {
+            return
+        }
+        val damageTransitionTime = this.variant.config().firegrenade.damageTransitionTime.get()
+        val damage = this.variant.config().firegrenade.damage.get()
+        val damageNonPlayer = this.variant.config().common.damageNonPlayer.get()
+
+        val damageTypeHolder = this.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE)
+            .getHolderOrThrow(this.variant.damageTypes().fire)
+
+        val entityInRange = mutableSetOf<Int>()
+        this.level().getEntities(this, this.boundingBox).filter {
+            (damageNonPlayer && it is LivingEntity) || it is Player
+        }
+            .filter { this.flameMap.boxes.any() { box -> box.contains(it.position()) } }.forEach {
+                val entity = it as LivingEntity
+                entityInRange.add(it.id)
+                val enterTick = this.entityPreviousInRange.getOrPut(it.id) { this.tickCount }
+                val damageAmount = min(
+                    Mth.lerp(
+                        GrenadeDuration.fromTick(this.tickCount.toDouble() - enterTick).seconds / damageTransitionTime,
+                        0.0,
+                        damage
+                    ), damage
+                )
+                val damageSource = DamageSource(damageTypeHolder, entity, this, this.position())
+                if (entity.invulnerableTime <= 0) {
+                    entity.hurtCancelKnockback(damageSource, damageAmount, 10)
+                }
+            }
+        this.entityPreviousInRange =
+            this.entityPreviousInRange.filterKeys { entityInRange.contains(it) }.toMutableMap()
     }
 
     @Serializable

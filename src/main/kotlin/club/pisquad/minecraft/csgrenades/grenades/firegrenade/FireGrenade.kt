@@ -67,26 +67,3 @@ object FireGrenadeRegistryHelper {
         )
     }
 }
-
-enum class FireGrenadeVariant(
-    val getRandomParticleType: () -> ParticleOptions
-) {
-    INCENDIARY({
-        FlameParticleRegistry.INCENDIARY_FLAME.get()
-//        val random = Random.nextDouble()
-//        when {
-//            random < 0.2 -> ParticleTypes.SMOKE
-//            random < 0.5 -> FlameParticleRegistry.INCENDIARY_FLAME.get()
-//            else -> ParticleTypes.SMALL_FLAME
-//        }
-    }),
-    MOLOTOV({
-        FlameParticleRegistry.MOLOTOV_FLAME.get()
-//        val random = Random.nextDouble()
-//        when {
-//            random < 0.2 -> ParticleTypes.SMOKE
-//            random < 0.5 -> FlameParticleRegistry.MOLOTOV_FLAME.get()
-//            else -> ParticleTypes.SMALL_FLAME
-//        }
-    }),
-}

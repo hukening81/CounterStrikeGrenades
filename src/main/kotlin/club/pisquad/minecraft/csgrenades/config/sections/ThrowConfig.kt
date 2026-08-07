@@ -1,9 +1,9 @@
 package club.pisquad.minecraft.csgrenades.config.sections
 
-import club.pisquad.minecraft.csgrenades.config.ConfigSection
+import club.pisquad.minecraft.csgrenades.config.ConfigBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 
-object ThrowConfig : ConfigSection {
+object ThrowConfig : ConfigBuilder {
     lateinit var cooldown: ForgeConfigSpec.DoubleValue
     lateinit var speed_weak: ForgeConfigSpec.DoubleValue
     lateinit var speed_medium: ForgeConfigSpec.DoubleValue

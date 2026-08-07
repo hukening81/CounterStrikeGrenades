@@ -1,9 +1,9 @@
 package club.pisquad.minecraft.csgrenades.config.sections
 
-import club.pisquad.minecraft.csgrenades.config.ConfigSection
+import club.pisquad.minecraft.csgrenades.config.ConfigBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 
-object PhysicsConfig : ConfigSection {
+object PhysicsConfig : ConfigBuilder {
     lateinit var ignoreBarrierBlock: ForgeConfigSpec.BooleanValue
 
     override fun build(builder: ForgeConfigSpec.Builder) {

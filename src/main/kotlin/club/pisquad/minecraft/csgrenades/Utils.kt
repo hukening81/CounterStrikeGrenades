@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
@@ -241,10 +242,25 @@ internal fun Vec3.inverseAxis(axis: Direction.Axis): Vec3 {
     }
 }
 
-internal fun LivingEntity.hurtCancelKnockback(source: DamageSource, amount: Double): Boolean {
+internal fun LivingEntity.hurtCancelKnockback(
+    source: DamageSource,
+    amount: Double,
+    invulnerableTick: Int? = null
+): Boolean {
+    val originalKnockBackResistance =
+        this.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue?:0.0
+    this.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = 1.0
+
     val movement = this.deltaMovement
+
     val result = this.hurt(source, amount.toFloat())
+    if (invulnerableTick != null) {
+        this.invulnerableTime = invulnerableTick
+    }
+
     this.deltaMovement = movement
+    this.getAttribute(Attributes.KNOCKBACK_RESISTANCE)?.baseValue = originalKnockBackResistance
+
     return result
 }
 

@@ -4,7 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec
 
 class GrenadeCommonConfig(
     val defaultFuseTime: Double = 2.5,
-) : ConfigSection {
+) : ConfigBuilder {
     lateinit var damageNonPlayer: ForgeConfigSpec.BooleanValue
     lateinit var fuseTime: ForgeConfigSpec.DoubleValue
 
