@@ -51,7 +51,7 @@ object VoxelBlockDelegator {
             it.check(context)
         } ?: SolidVoxelBlock
 
-        ModLogger.debug("VoxelBlockDelegator: block [{}] delegated to [{}]", context.blockState.block, result)
+        ModLogger.trace("VoxelBlockDelegator: block [{}] delegated to [{}]", context.blockState.block, result)
 
         return result
     }

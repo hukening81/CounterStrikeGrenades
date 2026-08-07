@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.grenades.firegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.ModSettings
+import club.pisquad.minecraft.csgrenades.command.ModCommands
 import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.INCENDIARY_RESOURCE_KEY
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.IncendiaryConfig
@@ -54,6 +55,9 @@ object FireGrenadeRegistryHelper {
         ModRenderers.addDefferedRegisterEntityRendererTask {
             EntityRenderers.register(this.fireRegionEntity.get(), ::FireRegionDebugRenderer)
         }
+
+        ModCommands.addRegisterTask(FireGrenadeCommands::register)
+
         ModPacketHandler.registerMessage(
             ServerFireGrenadeActivatedMessage::class.java,
             ServerFireGrenadeActivatedMessage::encoder,

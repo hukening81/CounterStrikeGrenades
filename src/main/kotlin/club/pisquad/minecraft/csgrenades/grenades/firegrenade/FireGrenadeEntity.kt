@@ -76,7 +76,10 @@ abstract class FireGrenadeEntity(
 
         this.runOnServer {
             val flameMap = FlameSpreader(location, 3.0, 5).spread(this.level())
-            FireRegionEntity.create(this.level() as ServerLevel, this.center, this.variant, flameMap)
+            FireRegionEntity.create(
+                this.level() as ServerLevel, this.center, this.variant, flameMap,
+                FireGrenadeOptions.debugMode
+            )
 
             val message =
                 ServerFireGrenadeActivatedMessage(this.id, ActivateReason.SmashOnGround(this.center, flameMap))

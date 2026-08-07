@@ -15,7 +15,7 @@ internal object RegisterObjectivesCommand {
                     Commands.literal("init")
                         .executes(RegisterObjectivesCommand::scoreboardInit),
                 ).requires {
-                    it.hasPermission(1)
+                    it.hasPermission(Commands.LEVEL_ADMINS)
                 },
             ),
         )

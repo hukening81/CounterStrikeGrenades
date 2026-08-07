@@ -1,9 +1,8 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.command.buildCommandFromEnum
 import com.mojang.brigadier.Command
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraftforge.event.RegisterCommandsEvent
 
@@ -15,26 +14,10 @@ object SmokeGrenadeCommands {
                 Commands.literal("smoke").then(
                     buildCommandFromEnum("voxelDebug", VoxelDebugMode::class.java) {
                         SmokeGrenadeOptions.voxelDebugMode = it
-                    }.requires { it.hasPermission(3) }
+                        Command.SINGLE_SUCCESS
+                    }.requires { it.hasPermission(Commands.LEVEL_ADMINS) }
                 )
             )
         )
     }
-}
-
-fun <T : Enum<T>> buildCommandFromEnum(
-    sectionName: String,
-    enumClass: Class<T>,
-    cb: (T) -> Unit
-): LiteralArgumentBuilder<CommandSourceStack> {
-    var baseCommand = Commands.literal(sectionName)
-    enumClass.enumConstants.forEach { variant ->
-        baseCommand = baseCommand.then(
-            Commands.literal(variant.name.lowercase()).executes {
-                cb(variant)
-                Command.SINGLE_SUCCESS
-            }
-        )
-    }
-    return baseCommand
 }
