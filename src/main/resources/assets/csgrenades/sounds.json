@@ -285,6 +285,18 @@
       "csgrenades:molotov/smash_04"
     ]
   },
+  "molotov.fire_loop": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:molotov/fire_loop_1"
+    ]
+  },
+  "molotov.fire_loop_fadeout": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:molotov/fire_loop_fadeout_01"
+    ]
+  },
   "smokegrenade.can": {
     "category": "player",
     "sounds": [

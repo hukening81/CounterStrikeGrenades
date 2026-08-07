@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import kotlin.math.roundToInt
 
 abstract class FireGrenadeEntity(
     entityType: EntityType<out FireGrenadeEntity>, level: Level, val fuseTime: Double
@@ -63,8 +64,9 @@ abstract class FireGrenadeEntity(
 
     fun popInAir() {
         this.runOnServer {
-            val message = ServerFireGrenadeActivatedMessage(this.id, ActivateReason.PopInAir(this.center))
+            val message = ServerFireGrenadeActivatedMessage(this.id, this.variant, ActivateReason.PopInAir(this.center))
             ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
+            this.discard()
         }
     }
 
@@ -76,20 +78,30 @@ abstract class FireGrenadeEntity(
 
         this.runOnServer {
             val flameMap = FlameSpreader(location, 3.0, 5).spread(this.level())
+            val lifetime =
+                GrenadeDuration.fromSeconds(this.variant.config().firegrenade.fireDuration.get()).ticks.roundToInt()
             FireRegionEntity.create(
-                this.level() as ServerLevel, this.center, this.variant, flameMap,
-                FireGrenadeOptions.debugMode
+                this.level() as ServerLevel,
+                this.center,
+                this.variant,
+                flameMap, lifetime,
+                FireGrenadeOptions.debugMode,
             )
 
             val message =
-                ServerFireGrenadeActivatedMessage(this.id, ActivateReason.SmashOnGround(this.center, flameMap))
+                ServerFireGrenadeActivatedMessage(
+                    this.id,
+                    this.variant,
+                    ActivateReason.SmashOnGround(this.center, flameMap)
+                )
             ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
         }
     }
 
     fun smashInSmoke() {
         this.runOnServer {
-            val message = ServerFireGrenadeActivatedMessage(this.id, ActivateReason.SmashInSmoke(this.center))
+            val message =
+                ServerFireGrenadeActivatedMessage(this.id, this.variant, ActivateReason.SmashInSmoke(this.center))
             ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
         }
     }

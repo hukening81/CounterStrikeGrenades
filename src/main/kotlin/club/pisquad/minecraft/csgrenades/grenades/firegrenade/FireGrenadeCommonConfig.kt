@@ -10,6 +10,7 @@ class FireGrenadeCommonConfig(
     lateinit var fireHeight: ForgeConfigSpec.DoubleValue
     lateinit var damage: ForgeConfigSpec.DoubleValue
     lateinit var damageTransitionTime: ForgeConfigSpec.DoubleValue
+    lateinit var fireDuration: ForgeConfigSpec.DoubleValue
 
     override fun build(builder: ForgeConfigSpec.Builder) {
         this.spreadRadius = builder.defineInRange("spread_radius", 3.0, 1.0, 10.0)
@@ -17,5 +18,7 @@ class FireGrenadeCommonConfig(
         this.fireHeight = builder.defineInRange("fire_height", 2.5, 0.0, 10.0)
         this.damage = builder.defineInRange("damage", 2.0, 0.0, 100.0)
         this.damageTransitionTime = builder.defineInRange("damage_transition_time", 1.0, 0.0, 10.0)
+        this.fireDuration = builder.defineInRange("fire_duration", 7.0, 0.0, 60.0)
+
     }
 }

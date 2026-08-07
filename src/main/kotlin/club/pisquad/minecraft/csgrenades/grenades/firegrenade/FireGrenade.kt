@@ -19,7 +19,6 @@ import club.pisquad.minecraft.csgrenades.registry.ModEntities
 import club.pisquad.minecraft.csgrenades.registry.ModItems
 import club.pisquad.minecraft.csgrenades.registry.ModRenderers
 import net.minecraft.client.renderer.entity.EntityRenderers
-import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory

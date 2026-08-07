@@ -14,7 +14,7 @@ import kotlin.random.Random
 class GrenadeSoundData(
     val soundRegistry: RegistryObject<SoundEvent>,
     val volumeD: Double,
-    val source: SoundSource = SoundSource.PLAYERS
+    val source: SoundSource = SoundSource.PLAYERS,
 ) {
     val soundEvent: SoundEvent
         get() = soundRegistry.get()
@@ -24,13 +24,13 @@ class GrenadeSoundData(
     companion object {
         val EMPTY_SOUND = GrenadeSoundData(
             ModSoundEvents.registerSoundEvent("dev_null"),
-            0.0
+            0.0,
         )
 
-        fun create(name: String, volume: Double = 10.0): GrenadeSoundData {
+        fun create(name: String,  volume: Double = 10.0): GrenadeSoundData {
             return GrenadeSoundData(
                 ModSoundEvents.registerSoundEvent(name),
-                volume
+                volume,
             )
         }
 

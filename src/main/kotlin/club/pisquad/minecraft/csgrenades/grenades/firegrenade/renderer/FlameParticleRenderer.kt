@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade.renderer
 
 import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeVariant
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireRegionEntity
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.flame.FIRE_PARTICLE_Y_SPEED
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelPos
@@ -26,7 +27,7 @@ object FlameParticleRenderer {
                 return@forEach
             }
             entity.flameMap.forEach { pos, entry ->
-                if (Random.nextDouble() < 0.7) {
+                if (Random.nextDouble() < 0.6) {
                     return@forEach
                 }
                 val lifetime = entity.flameMap.getParticleLifeTime(pos)
@@ -38,12 +39,28 @@ object FlameParticleRenderer {
                     position.y,
                     position.z,
                     0.0,
-                    FIRE_PARTICLE_Y_SPEED,
+                    FIRE_PARTICLE_Y_SPEED * Random.nextDouble(1.0),
                     0.0
                 )?.lifetime = lifetime
 
             }
         }
+    }
+
+    fun renderPopInAir(center: Vec3, variant: FireGrenadeVariant): Boolean {
+        val particleEngine = Minecraft.getInstance().particleEngine
+        val particleType = variant.getRandomParticleType()
+        val speeds = buildSet {
+            repeat(500) {
+                add(randomShootDirection().scale(Random.nextDouble(0.1, 0.2)))
+            }
+        }
+        speeds.forEach {
+            particleEngine.createParticle(
+                particleType, center.x, center.y, center.z, it.x, it.y, it.z
+            )
+        }
+        return true
     }
 }
 
@@ -51,4 +68,10 @@ private fun VoxelPos.randomPositionFromBottom(): Vec3 {
     val offsetX = Random.nextDouble(0.5)
     val offsetZ = Random.nextDouble(0.5)
     return this.worldPos().add(Vec3(offsetX, 0.0, offsetZ))
+}
+private fun randomShootDirection(): Vec3 {
+    val x = Random.nextDouble(-0.5, 0.5)
+    val y = Random.nextDouble(-0.5, 0.5)
+    val z = Random.nextDouble(-0.5, 0.5)
+    return Vec3(x, y, z).normalize()
 }

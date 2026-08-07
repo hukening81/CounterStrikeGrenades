@@ -39,9 +39,9 @@ class FlameParticle(
     x: Double,
     y: Double,
     z: Double,
-    xSpeed: Double,
+    val xSpeed: Double,
     val ySpeed: Double,
-    zSpeed: Double,
+    val zSpeed: Double,
 ) : TextureSheetParticle(level, x, y, z, xSpeed, ySpeed, zSpeed) {
 
     override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
@@ -54,7 +54,9 @@ class FlameParticle(
         this.yo = this.y
         this.zo = this.z
 
+        this.x = this.x + this.xSpeed
         this.y = this.y + this.ySpeed
+        this.z = this.z + this.zSpeed
     }
 }
 
@@ -71,7 +73,7 @@ class FlameParticleFactory(
         ySpeed: Double,
         zSpeed: Double
     ): Particle? {
-        val particle = FlameParticle(level, x, y, z, 0.0, ySpeed, 0.0)
+        val particle = FlameParticle(level, x, y, z, xSpeed, ySpeed, zSpeed)
         particle.pickSprite(this.spriteSet)
         return particle
     }
