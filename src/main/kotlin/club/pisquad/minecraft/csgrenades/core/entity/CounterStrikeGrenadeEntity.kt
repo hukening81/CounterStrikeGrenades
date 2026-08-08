@@ -11,11 +11,13 @@ import club.pisquad.minecraft.csgrenades.config.ModConfig
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonSounds
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
+import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockSoundMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntitySoundMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitEntity
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitBlock
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitEntity
 import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
 import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
 import club.pisquad.minecraft.csgrenades.physics.MovementPredictor
@@ -135,24 +137,37 @@ abstract class CounterStrikeGrenadeEntity(
                 }
 
                 is MovementPredictor.PredictResult.PredictSuccess -> {
-                    movementPredict.entityHits.forEach {
-                        this.deltaMovement = it.velocity.blocksPerTick
-                        this.center = it.hitPoint
-                        val handleResult = this.onHitEntity(it)
-                        if (handleResult.shouldPlaySound) {
-                            ServerGrenadeHitEntitySoundMessage.createAndSend(this, it)
-                        }
-                        if (handleResult.damageAmount > 0 && it.entity is LivingEntity) {
-                            CSGrenadeServerAPI.dealHitDamage(this, it.entity, handleResult.damageAmount)
+                    movementPredict.hits.forEach {
+                        when (it) {
+                            is GrenadeHitBlock -> {
+                                val handleResult = this.onHitBlock(it)
+                                val message = ServerGrenadeHitBlockMessage.create(this, it, handleResult)
+                                ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
+
+                                if (handleResult.shouldPlaySound) {
+                                    ServerGrenadeHitBlockSoundMessage.createAndSend(this, it)
+                                }
+                            }
+
+                            is GrenadeHitEntity -> {
+                                this.deltaMovement = it.velocity.blocksPerTick
+                                this.center = it.hitPoint
+                                val handleResult = this.onHitEntity(it)
+                                if (handleResult.shouldPlaySound) {
+                                    ServerGrenadeHitEntitySoundMessage.createAndSend(this, it)
+                                }
+                                if (handleResult.damageAmount > 0 && it.entity is LivingEntity) {
+                                    CSGrenadeServerAPI.dealHitDamage(this, it.entity, handleResult.damageAmount)
+                                }
+                            }
                         }
                     }
-                    movementPredict.blockHits.forEach {
-                        this.onHitBlock(it)
-                    }
+
                     this.setPos(movementPredict.position.worldPos)
                     this.deltaMovement = movementPredict.velocity.blocksPerTick
 
-                    movementPredict.blockHits.lastOrNull()?.let {
+                    movementPredict.hits.filter { it is GrenadeHitBlock }.lastOrNull()?.let {
+                        require(it is GrenadeHitBlock)
                         // Predict if the grenade has stopped
                         if (it.direction == Direction.UP && this.deltaMovement.y.absoluteValue < 0.05) {
                             // Snap to the ground
@@ -247,8 +262,6 @@ abstract class CounterStrikeGrenadeEntity(
         val event = GrenadeHitBlockEvent.create(LogicalSide.SERVER, this, data)
         MinecraftForge.EVENT_BUS.post(event)
 
-//        val message = ServerGrenadeHitBlockMessage.create(this, data)
-//        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
 
         return HitBlockHandleResult()
     }

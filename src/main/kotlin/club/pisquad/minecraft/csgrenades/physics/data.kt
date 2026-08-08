@@ -127,16 +127,19 @@ class GrenadeDuration private constructor(val seconds: Double) {
         }
 }
 
+sealed interface GrenadeHitSomething {
+
 class GrenadeHitEntity(
     val entity: Entity,
     val hitPoint: Vec3,
     val direction: Direction,
     val velocity: GrenadeVelocity
-)
+) : GrenadeHitSomething
 
 class GrenadeHitBlock(
     val blockPos: BlockPos,
     val hitPoint: Vec3,
     val direction: Direction,
     val velocity: GrenadeVelocity,
-)
+) : GrenadeHitSomething
+}

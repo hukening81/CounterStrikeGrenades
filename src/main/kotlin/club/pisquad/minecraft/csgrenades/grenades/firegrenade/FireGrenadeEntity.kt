@@ -9,7 +9,7 @@ import club.pisquad.minecraft.csgrenades.grenades.firegrenade.messages.ServerFir
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeRegionEntity
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitBlock
 import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
 import club.pisquad.minecraft.csgrenades.runOnServer
 import net.minecraft.core.BlockPos

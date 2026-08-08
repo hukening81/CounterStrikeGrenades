@@ -240,6 +240,12 @@
       "csgrenades:molotov/detonate_3_distant"
     ]
   },
+  "molotov.detonate_air": {
+    "category": "player",
+    "sounds": [
+      "csgrenades:molotov/detonate_air_01"
+    ]
+  },
   "molotov.draw": {
     "category": "player",
     "sounds": [

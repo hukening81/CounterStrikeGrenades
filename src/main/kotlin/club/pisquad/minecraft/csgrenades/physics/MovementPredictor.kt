@@ -28,7 +28,6 @@ object MovementPredictor {
                 position,
                 velocity,
                 mutableListOf(),
-                mutableListOf(),
             )
 
         val getTickDeltaBeforeVerticalStop = {
@@ -144,8 +143,7 @@ object MovementPredictor {
         class PredictSuccess(
             var position: GrenadePosition,
             var velocity: GrenadeVelocity,
-            val entityHits: MutableList<GrenadeHitEntity>,
-            val blockHits: MutableList<GrenadeHitBlock>,
+            val hits: MutableList<GrenadeHitSomething>,
         ) : PredictResult {
             fun updateFromSubtick(result: PartialTickPredictResult) {
                 this.position = result.position
@@ -153,11 +151,11 @@ object MovementPredictor {
 
                 when (result) {
                     is PartialTickPredictResult.BlockHit -> {
-                        this.blockHits.add(result.data)
+                        this.hits.add(result.data)
                     }
 
                     is PartialTickPredictResult.EntityHit -> {
-                        this.entityHits.add(result.data)
+                        this.hits.add(result.data)
                     }
 
                     is PartialTickPredictResult.Through -> {
@@ -190,7 +188,7 @@ object MovementPredictor {
         }
 
         class EntityHit(
-            val data: GrenadeHitEntity,
+            val data: GrenadeHitSomething.GrenadeHitEntity,
             val distance: Double,
             override val position: GrenadePosition,
             override val velocity: GrenadeVelocity,
@@ -209,7 +207,12 @@ object MovementPredictor {
                         from.add(velocity.blocksPerTick.scale(tickDelta - Double.epsilon()))
                     val velocityAtBounce = PhysicsUtil.updateVelocityPartialTick(velocity, tickDelta)
 
-                    val data = GrenadeHitEntity(entity, result.location, result.direction, velocityAtBounce)
+                    val data = GrenadeHitSomething.GrenadeHitEntity(
+                        entity,
+                        result.location,
+                        result.direction,
+                        velocityAtBounce
+                    )
                     return EntityHit(
                         data,
                         distance,
@@ -222,7 +225,7 @@ object MovementPredictor {
         }
 
         class BlockHit(
-            val data: GrenadeHitBlock,
+            val data: GrenadeHitSomething.GrenadeHitBlock,
             val distance: Double,
             override val position: GrenadePosition,
             override val velocity: GrenadeVelocity,
@@ -241,7 +244,12 @@ object MovementPredictor {
                     val velocityAtBounce = PhysicsUtil.updateVelocityPartialTick(velocity, tickDelta)
                     val newVelocity = PhysicsUtil.bounceVelocity(velocityAtBounce, result.direction)
 
-                    val data = GrenadeHitBlock(result.blockPos, result.location, result.direction, newVelocity)
+                    val data = GrenadeHitSomething.GrenadeHitBlock(
+                        result.blockPos,
+                        result.location,
+                        result.direction,
+                        newVelocity
+                    )
                     return BlockHit(
                         data,
                         distance,

@@ -2,8 +2,8 @@ package club.pisquad.minecraft.csgrenades.api.event
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitBlock
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitEntity
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitBlock
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitEntity
 import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.Entity

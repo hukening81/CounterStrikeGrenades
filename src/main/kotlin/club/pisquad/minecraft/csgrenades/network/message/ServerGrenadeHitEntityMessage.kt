@@ -7,7 +7,7 @@ import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
-import club.pisquad.minecraft.csgrenades.physics.GrenadeHitEntity
+import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitEntity
 import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
