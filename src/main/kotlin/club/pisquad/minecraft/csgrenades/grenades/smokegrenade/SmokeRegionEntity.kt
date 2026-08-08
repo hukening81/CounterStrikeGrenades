@@ -1,5 +1,6 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireRegionEntity
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.ServerSmokeDisperseMessage
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages.SmokePatch
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
@@ -17,6 +18,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
@@ -55,23 +57,64 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
     }
 
     companion object {
-        // Only supported on server
-        val trackedRegions: MutableSet<SmokeRegionEntity> = mutableSetOf()
+        val serverTrackedRegions: MutableMap<ResourceKey<Level>, MutableSet<SmokeRegionEntity>> = mutableMapOf()
+        val clientTrackedRegions: MutableSet<SmokeRegionEntity> = mutableSetOf()
+
+        fun isVoxelInSmoke(level: Level, voxelPos: VoxelPos): Boolean {
+            val bb = voxelPos.boundibgBox
+            return if (level.isClientSide) {
+                this.clientTrackedRegions.any() {
+                    it.boundingBox.intersects(bb) && it.voxelMap.keys.any() { it == voxelPos }
+                }
+            } else {
+                this.serverTrackedRegions.get(level.dimension())?.any() {
+                    it.boundingBox.intersects(bb) && it.voxelMap.keys.any() { it == voxelPos }
+                }?:false
+            }
+        }
     }
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
         this.runOnServer {
-            SmokeRegionEntity.trackedRegions.add(this)
+            SmokeRegionEntity.serverTrackedRegions.getOrPut(this.level().dimension()) { mutableSetOf() }.add(this)
+
+            val shouldExtinguish = FireRegionEntity.serverTrackedEntities.get(this.level().dimension())?.filter {
+                it.boundingBox.intersects(this.boundingBox)
+            }?.filter {
+                val totalVoxelCount = it.flameMap.keys.count()
+                if (totalVoxelCount == 0) {
+                    true
+                }
+                val coveredVoxelCount = it.flameMap.keys.filter { flameVoxel ->
+                    this.voxelMap.keys.any() { it == flameVoxel }
+                }.count()
+                coveredVoxelCount / totalVoxelCount.toDouble() > 0.3
+            }
+                ?:emptyList<FireRegionEntity>()
+            shouldExtinguish.forEach {
+                it.extinguish()
+            }
+        }
+        this.runOnClient {
+            SmokeRegionEntity.clientTrackedRegions.add(this)
         }
     }
 
     override fun onRemovedFromWorld() {
         super.onRemovedFromWorld()
         this.runOnServer {
-            SmokeRegionEntity.trackedRegions.remove(this)
+            val collection = SmokeRegionEntity.serverTrackedRegions.get(this.level().dimension())
+            if (collection != null) {
+                collection.remove(this)
+            }
+        }
+        this.runOnClient {
+            SmokeRegionEntity.clientTrackedRegions.remove(this)
         }
     }
+
+    override fun canChangeDimensions(): Boolean = false
 
     override fun defineSynchedData() {
     }

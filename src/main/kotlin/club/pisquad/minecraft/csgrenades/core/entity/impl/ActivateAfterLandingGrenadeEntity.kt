@@ -26,7 +26,7 @@ abstract class ActivateAfterLandingGrenadeEntity(
                 tickSinceLanded = 0
             }
 
-            if (tickSinceLanded == delay) {
+            if (tickSinceLanded == delay && !this.isActivated) {
                 this.activate()
             }
         }

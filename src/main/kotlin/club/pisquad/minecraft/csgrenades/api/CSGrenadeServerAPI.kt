@@ -26,20 +26,6 @@ object CSGrenadeServerAPI {
     val entity = CSGrenadeEntityAPI
 
     object CSGrenadeEntityAPI {
-        val grenades: MutableMap<UUID, CounterStrikeGrenadeEntity> = mutableMapOf()
-
-        internal fun register(entity: CounterStrikeGrenadeEntity) {
-            grenades[entity.uuid] = entity
-        }
-
-        internal fun unregister(uuid: UUID): CounterStrikeGrenadeEntity? {
-            return grenades.remove(uuid)
-        }
-
-        fun get(grenadeType: GrenadeType): List<CounterStrikeGrenadeEntity> {
-            return grenades.filter { it.value.grenadeType == grenadeType }.map { it.value }
-        }
-
         /**
          * Spawn a grenade with the provide context
          *

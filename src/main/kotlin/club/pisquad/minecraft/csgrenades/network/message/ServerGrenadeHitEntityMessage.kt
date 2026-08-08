@@ -1,9 +1,9 @@
 package club.pisquad.minecraft.csgrenades.network.message
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
-import club.pisquad.minecraft.csgrenades.api.CSGrenadeClientAPI
 import club.pisquad.minecraft.csgrenades.api.event.GrenadeHitEntityEvent
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.HitEntityHandleResult
 import club.pisquad.minecraft.csgrenades.network.CsGrenadeMessageHandler
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.network.serializer.Vec3Serializer
@@ -31,7 +31,9 @@ class ServerGrenadeHitEntityMessage(
     @Serializable(with = Vec3Serializer::class)
     val hitPoint: Vec3,
 
-    val velocity: GrenadeVelocity
+    val velocity: GrenadeVelocity,
+
+    val handleResult: HitEntityHandleResult
 ) {
     companion object :
         CsGrenadeMessageHandler<ServerGrenadeHitEntityMessage>(ServerGrenadeHitEntityMessage::class) {
@@ -53,22 +55,29 @@ class ServerGrenadeHitEntityMessage(
                     grenade,
                     entity,
                     msg.hitPoint,
-                    msg.velocity
+                    msg.velocity,
+                    msg.handleResult
                 )
                 MinecraftForge.EVENT_BUS.post(event)
-
-                CSGrenadeClientAPI.CSGrenadeClientSoundAPI.playHitEntity(msg.hitPoint, msg.grenadeType)
+                if (event.handleResult.shouldPlaySound) {
+                    event.grenadeType.properties.sounds.hitEntity.play(msg.hitPoint)
+                }
             }
         }
 
-        fun create(grenade: CounterStrikeGrenadeEntity, data: GrenadeHitEntity): ServerGrenadeHitEntityMessage {
+        fun create(
+            grenade: CounterStrikeGrenadeEntity,
+            data: GrenadeHitEntity,
+            handleResult: HitEntityHandleResult
+        ): ServerGrenadeHitEntityMessage {
             return ServerGrenadeHitEntityMessage(
                 grenade.id,
                 grenade.grenadeType,
                 grenade.ownerUuid,
                 data.entity.id,
                 data.hitPoint,
-                data.velocity
+                data.velocity,
+                handleResult
             )
         }
     }

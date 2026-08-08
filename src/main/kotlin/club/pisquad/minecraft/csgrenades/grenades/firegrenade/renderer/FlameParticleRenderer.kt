@@ -4,6 +4,7 @@ import club.pisquad.minecraft.csgrenades.CounterStrikeGrenades
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeVariant
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireRegionEntity
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.flame.FIRE_PARTICLE_Y_SPEED
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeRegionEntity
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelPos
 import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.Vec3
@@ -22,11 +23,13 @@ object FlameParticleRenderer {
             return
         }
         val particleEngine = Minecraft.getInstance().particleEngine
+
         FireRegionEntity.clientTrackedEntities.forEach { entity ->
             if (!entity.hasInitialized || entity.debugMode) {
                 return@forEach
             }
-            entity.flameMap.forEach { pos, entry ->
+
+            entity.flameMap.filter { !SmokeRegionEntity.isVoxelInSmoke(entity.level(), it.key) }.forEach { pos, entry ->
                 if (Random.nextDouble() < 0.6) {
                     return@forEach
                 }

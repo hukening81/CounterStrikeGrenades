@@ -105,7 +105,7 @@ object HEGrenadeHelper {
         val center = grenade.center
         val patch = SmokePatch.Explosion(center, radius)
         val bb = AABB.ofSize(center, radius, radius, radius)
-        SmokeRegionEntity.trackedRegions.forEach {
+        SmokeRegionEntity.serverTrackedRegions.get(grenade.level().dimension())?.forEach {
             if (bb.intersects(it.boundingBox)) {
                 it.applyPatch(patch)
             }

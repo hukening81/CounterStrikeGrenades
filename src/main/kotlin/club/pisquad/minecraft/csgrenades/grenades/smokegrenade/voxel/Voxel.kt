@@ -33,10 +33,8 @@ class VoxelMap(
     companion object {
     }
 
-    @Transient
     val edges: Set<VoxelPos> by lazy { this.keys.filter { this.isEdge(it) }.toSet() }
 
-    @Transient
     val specials: Set<VoxelPos> by lazy {
         if (this.hasDebug) {
             this.filter { (pos, voxel) -> voxel.debug!!.special }.keys
@@ -45,7 +43,6 @@ class VoxelMap(
         }
     }
 
-    @Transient
     val boundingBox: AABB by lazy {
         val firstWorldPos = this.edges.first().worldPos()
         var minX = firstWorldPos.x
@@ -67,7 +64,6 @@ class VoxelMap(
         return@lazy AABB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    @Transient
     val hasDebug: Boolean by lazy { this.values.all { it.debug != null } }
 
     fun isEdge(position: VoxelPos): Boolean {

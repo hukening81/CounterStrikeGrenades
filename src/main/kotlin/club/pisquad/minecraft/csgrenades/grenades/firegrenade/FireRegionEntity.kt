@@ -1,7 +1,11 @@
 package club.pisquad.minecraft.csgrenades.grenades.firegrenade
 
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.flame.FlameMap
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.messages.ServerFireExtinguishMessage
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeRegionEntity
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelPos
 import club.pisquad.minecraft.csgrenades.hurtCancelKnockback
+import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import club.pisquad.minecraft.csgrenades.runOnClient
 import club.pisquad.minecraft.csgrenades.runOnServer
@@ -16,6 +20,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
@@ -39,7 +44,7 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
     var debugMode: Boolean = false
     lateinit var variant: FireGrenadeVariant
     lateinit var flameMap: FlameMap
-    lateinit var fireLoopSoundInstance: SimpleSoundInstance
+    var fireLoopSoundInstance: SimpleSoundInstance? = null
     var lifetime = -1
 
     // (Entity's ID, tick time when it enters the damage region)
@@ -51,7 +56,7 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
 
     companion object {
         val clientTrackedEntities: MutableSet<FireRegionEntity> = mutableSetOf()
-        val serverTrackedEntities: MutableSet<FireRegionEntity> = mutableSetOf()
+        val serverTrackedEntities: MutableMap<ResourceKey<Level>, MutableSet<FireRegionEntity>> = mutableMapOf()
 
         val FIRE_FADEOUT_SOUND_LENGTH_TICK: Int = GrenadeDuration.fromSeconds(1.28).ticks.roundToInt()
 
@@ -94,7 +99,7 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
     override fun onAddedToWorld() {
         super.onAddedToWorld()
         this.runOnServer {
-            FireRegionEntity.serverTrackedEntities.add(this)
+            FireRegionEntity.serverTrackedEntities.getOrPut(this.level().dimension()) { mutableSetOf() }.add(this)
         }
         this.runOnClient {
             FireRegionEntity.clientTrackedEntities.add(this)
@@ -104,10 +109,14 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
     override fun onRemovedFromWorld() {
         super.onRemovedFromWorld()
         this.runOnServer {
-            FireRegionEntity.serverTrackedEntities.remove(this)
+            FireRegionEntity.serverTrackedEntities.get(this.level().dimension())
+                ?.run { this.remove(this@FireRegionEntity) }
         }
         this.runOnClient {
             FireRegionEntity.clientTrackedEntities.remove(this)
+            if (this.fireLoopSoundInstance != null) {
+                Minecraft.getInstance().soundManager.stop(this.fireLoopSoundInstance!!)
+            }
         }
     }
 
@@ -144,7 +153,7 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
                 this.random, true, 0, SoundInstance.Attenuation.LINEAR,
                 this.x, this.y, this.z, false,
             )
-        Minecraft.getInstance().soundManager.play(this.fireLoopSoundInstance)
+        Minecraft.getInstance().soundManager.play(this.fireLoopSoundInstance!!)
 
         this.hasInitialized = true
     }
@@ -173,7 +182,9 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
             }
             // Use equal sign for the sound to only play once
             if (this.lifetime - this.tickCount == FireRegionEntity.FIRE_FADEOUT_SOUND_LENGTH_TICK) {
-                Minecraft.getInstance().soundManager.stop(this.fireLoopSoundInstance)
+                if (this.fireLoopSoundInstance != null) {
+                    Minecraft.getInstance().soundManager.stop(this.fireLoopSoundInstance!!)
+                }
                 val instance = SimpleSoundInstance(
                     this.variant.sounds().fireLoopFadeOut.get(),
                     SoundSource.PLAYERS,
@@ -207,7 +218,13 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
         this.level().getEntities(this, this.boundingBox).filter {
             (damageNonPlayer && it is LivingEntity) || it is Player
         }
-            .filter { this.flameMap.boxes.any() { box -> box.contains(it.position()) } }.forEach {
+            .filter {
+                this.flameMap.boxes.any() { box ->
+                    box.contains(it.position()) && !SmokeRegionEntity.isVoxelInSmoke(
+                        this.level(), VoxelPos.containing(it.position())
+                    )
+                }
+            }.forEach {
                 val entity = it as LivingEntity
                 entityInRange.add(it.id)
                 val enterTick = this.entityPreviousInRange.getOrPut(it.id) { this.tickCount }
@@ -225,6 +242,13 @@ class FireRegionEntity(entityType: EntityType<FireRegionEntity>, level: Level) :
             }
         this.entityPreviousInRange =
             this.entityPreviousInRange.filterKeys { entityInRange.contains(it) }.toMutableMap()
+    }
+
+    fun extinguish() {
+        require(this.hasInitialized)
+        val message = ServerFireExtinguishMessage(this.position(), this.variant)
+        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.position(), message)
+        this.discard()
     }
 
     @Serializable

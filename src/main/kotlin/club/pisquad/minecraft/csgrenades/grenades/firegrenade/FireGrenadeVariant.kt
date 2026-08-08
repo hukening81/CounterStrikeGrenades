@@ -32,6 +32,7 @@ interface FireGrenadeSounds {
     val fireLoop: RegistryObject<SoundEvent>
     val fireLoopFadeOut: RegistryObject<SoundEvent>
     val extinguish: GrenadeSoundData
+    val pop: GrenadeSoundData
 }
 
 enum class FireGrenadeVariant(

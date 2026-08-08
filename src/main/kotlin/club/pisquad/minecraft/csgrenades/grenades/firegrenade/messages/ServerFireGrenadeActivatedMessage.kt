@@ -34,7 +34,8 @@ class ServerFireGrenadeActivatedMessage(
 
                 is ActivateReason.SmashInSmoke -> {
                     context.enqueueWork {
-                        msg.variant.sounds().extinguish.play(msg.reason.position)
+                        msg.variant.sounds().smash.play(msg.reason.position)
+                        msg.variant.sounds().pop.play(msg.reason.position)
                     }
                 }
 

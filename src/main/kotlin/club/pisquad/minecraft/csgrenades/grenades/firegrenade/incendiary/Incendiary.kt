@@ -51,13 +51,22 @@ object IncendiarySounds : GrenadeCommonSounds, FireGrenadeSounds {
     val detonate = GrenadeSoundData.create("incendiary.detonate")
     override val smash = MolotovSounds.smash
 
-    val pop = GrenadeSoundData.create("incendiary.pop")
+    override val pop = GrenadeSoundData.create("incendiary.pop")
     val detonateDistant = GrenadeSoundData.create("incendiary.detonate_distant")
     override val detonateAir = GrenadeSoundData.create("incendiary.detonate_air")
-    override val fireLoop: RegistryObject<SoundEvent> = MolotovSounds.fireLoop
-    override val fireLoopFadeOut: RegistryObject<SoundEvent> = MolotovSounds.fireLoopFadeOut
+    override val fireLoop: RegistryObject<SoundEvent>
+        get() {
+            return MolotovSounds.fireLoop
+        }
+    override val fireLoopFadeOut: RegistryObject<SoundEvent>
+        get() {
+            return MolotovSounds.fireLoopFadeOut
+        }
     override val detonateSegmented = DistanceSegmentedSoundData.createTwoPhasedExplosion(
         this.detonate, this.detonateDistant
     )
-    override val extinguish: GrenadeSoundData = MolotovSounds.extinguish
+    override val extinguish: GrenadeSoundData
+        get() {
+            return MolotovSounds.extinguish
+        }
 }

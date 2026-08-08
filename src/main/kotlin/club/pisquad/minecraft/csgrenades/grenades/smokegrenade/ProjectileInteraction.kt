@@ -86,7 +86,7 @@ private object Vanilla {
 
     fun tickSingleProjectile(entity: Projectile, size: Double) {
         val destination = entity.position().add(entity.deltaMovement)
-        SmokeRegionEntity.trackedRegions.forEach { region ->
+        SmokeRegionEntity.serverTrackedRegions.get(entity.level().dimension())?.forEach { region ->
             if (region.boundingBox.contains(entity.position())
                 || region.boundingBox.clip(
                     entity.position(),

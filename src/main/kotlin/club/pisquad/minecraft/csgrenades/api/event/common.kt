@@ -2,6 +2,8 @@ package club.pisquad.minecraft.csgrenades.api.event
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.core.entity.HitBlockHandleResult
+import club.pisquad.minecraft.csgrenades.core.entity.HitEntityHandleResult
 import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitBlock
 import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitEntity
 import club.pisquad.minecraft.csgrenades.physics.GrenadeVelocity
@@ -34,12 +36,14 @@ open class GrenadeHitBlockEvent(
     val blockPos: BlockPos,
     val hitPoint: Vec3,
     val velocity: GrenadeVelocity,
+    val handleResult: HitBlockHandleResult
 ) : CSGrenadeEvent(side, grenadeType, ownerUUID) {
     companion object {
         fun create(
             side: LogicalSide,
             grenade: CounterStrikeGrenadeEntity,
-            data: GrenadeHitBlock
+            data: GrenadeHitBlock,
+            handleResult: HitBlockHandleResult
         ): GrenadeHitBlockEvent {
             return GrenadeHitBlockEvent(
                 side,
@@ -48,7 +52,8 @@ open class GrenadeHitBlockEvent(
                 grenade,
                 data.blockPos,
                 data.hitPoint,
-                data.velocity
+                data.velocity,
+                handleResult
             )
         }
     }
@@ -62,12 +67,14 @@ open class GrenadeHitEntityEvent(
     val entity: Entity?,
     val hitPoint: Vec3,
     val velocity: GrenadeVelocity,
+    val handleResult: HitEntityHandleResult
 ) : CSGrenadeEvent(side, grenadeType, ownerUUID) {
     companion object {
         fun create(
             side: LogicalSide,
             grenade: CounterStrikeGrenadeEntity,
-            data: GrenadeHitEntity
+            data: GrenadeHitEntity,
+            handleResult: HitEntityHandleResult
         ): GrenadeHitEntityEvent {
             return GrenadeHitEntityEvent(
                 side,
@@ -76,7 +83,8 @@ open class GrenadeHitEntityEvent(
                 grenade,
                 data.entity,
                 data.hitPoint,
-                data.velocity
+                data.velocity,
+                handleResult
             )
         }
     }

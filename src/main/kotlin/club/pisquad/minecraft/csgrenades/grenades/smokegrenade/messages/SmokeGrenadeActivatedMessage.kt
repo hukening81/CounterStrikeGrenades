@@ -2,6 +2,7 @@ package club.pisquad.minecraft.csgrenades.grenades.smokegrenade.messages
 
 import club.pisquad.minecraft.csgrenades.GrenadeType
 import club.pisquad.minecraft.csgrenades.core.entity.CounterStrikeGrenadeEntity
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeSounds
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeGrenadeVariant
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.event.SmokeGrenadeActivatedEvent
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
@@ -31,7 +32,9 @@ class SmokeGrenadeActivatedMessage(
             val context = ctx.get()
             context.packetHandled = true
 
-            (Minecraft.getInstance().level!!.getEntity(msg.grenade) as CounterStrikeGrenadeEntity?).run {
+
+            context.enqueueWork {
+                (Minecraft.getInstance().level!!.getEntity(msg.grenade) as CounterStrikeGrenadeEntity?).run {
                 MinecraftForge.EVENT_BUS.post(
                     SmokeGrenadeActivatedEvent(
                         LogicalSide.CLIENT,
@@ -43,6 +46,9 @@ class SmokeGrenadeActivatedMessage(
                         msg.voxels,
                     )
                 )
+            }
+
+                SmokeGrenadeSounds.emit.play(msg.voxels.center)
             }
         }
     }

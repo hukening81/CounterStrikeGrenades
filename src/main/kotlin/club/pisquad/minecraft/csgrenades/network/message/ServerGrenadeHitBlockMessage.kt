@@ -49,9 +49,13 @@ data class ServerGrenadeHitBlockMessage(
                     grenade,
                     msg.blockPos,
                     msg.hitPoint,
-                    msg.velocity
+                    msg.velocity,
+                    msg.handleResult
                 )
                 MinecraftForge.EVENT_BUS.post(event)
+                if (event.handleResult.shouldPlaySound) {
+                    event.grenadeType.properties.sounds.hitBlock.play(msg.hitPoint)
+                }
             }
         }
 

@@ -10,6 +10,7 @@ import club.pisquad.minecraft.csgrenades.core.sound.GrenadeSoundData
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeDamageTypes
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeRegistryHelper
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.FireGrenadeSounds
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.IncendiarySounds
 import club.pisquad.minecraft.csgrenades.registry.ModDamageTypes
 import club.pisquad.minecraft.csgrenades.registry.ModSoundEvents
 import net.minecraft.resources.ResourceKey
@@ -57,4 +58,8 @@ object MolotovSounds : GrenadeCommonSounds, FireGrenadeSounds {
         this.detonate, this.detonateDistant
     )
     override val detonateAir = GrenadeSoundData.create("molotov.detonate_air")
+    override val pop: GrenadeSoundData
+        get() {
+            return IncendiarySounds.pop
+        }
 }

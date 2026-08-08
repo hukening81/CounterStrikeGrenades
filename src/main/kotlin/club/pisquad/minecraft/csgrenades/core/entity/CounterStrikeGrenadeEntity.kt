@@ -12,9 +12,6 @@ import club.pisquad.minecraft.csgrenades.core.GrenadeCommonDamageTypes
 import club.pisquad.minecraft.csgrenades.core.GrenadeCommonSounds
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockMessage
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitBlockSoundMessage
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntityMessage
-import club.pisquad.minecraft.csgrenades.network.message.ServerGrenadeHitEntitySoundMessage
 import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitBlock
 import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitEntity
@@ -34,6 +31,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
@@ -84,6 +82,10 @@ abstract class CounterStrikeGrenadeEntity(
         val isStoppedAccessor: EntityDataAccessor<Boolean> = SynchedEntityData.defineId(
             CounterStrikeGrenadeEntity::class.java, EntityDataSerializers.BOOLEAN
         )
+
+        val clientTrackedEntities: MutableSet<CounterStrikeGrenadeEntity> = mutableSetOf()
+        val serverTrackedEntities: MutableMap<ResourceKey<Level>, MutableSet<CounterStrikeGrenadeEntity>> =
+            mutableMapOf()
     }
 
     var isActivated: Boolean
@@ -143,22 +145,27 @@ abstract class CounterStrikeGrenadeEntity(
                                 val handleResult = this.onHitBlock(it)
                                 val message = ServerGrenadeHitBlockMessage.create(this, it, handleResult)
                                 ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
+                                val event = GrenadeHitBlockEvent.create(LogicalSide.SERVER, this, it, handleResult)
+                                MinecraftForge.EVENT_BUS.post(event)
 
-                                if (handleResult.shouldPlaySound) {
-                                    ServerGrenadeHitBlockSoundMessage.createAndSend(this, it)
+                                this.deltaMovement = it.velocity.blocksPerTick
+                                this.center = it.hitPoint
+
+                                if (handleResult.shouldStop) {
+                                    this.isStopped = true
                                 }
                             }
 
                             is GrenadeHitEntity -> {
-                                this.deltaMovement = it.velocity.blocksPerTick
-                                this.center = it.hitPoint
                                 val handleResult = this.onHitEntity(it)
-                                if (handleResult.shouldPlaySound) {
-                                    ServerGrenadeHitEntitySoundMessage.createAndSend(this, it)
-                                }
                                 if (handleResult.damageAmount > 0 && it.entity is LivingEntity) {
                                     CSGrenadeServerAPI.dealHitDamage(this, it.entity, handleResult.damageAmount)
                                 }
+                                val event = GrenadeHitEntityEvent.create(LogicalSide.SERVER, this, it, handleResult)
+                                MinecraftForge.EVENT_BUS.post(event)
+
+                                this.deltaMovement = it.velocity.blocksPerTick
+                                this.center = it.hitPoint
                             }
                         }
                     }
@@ -190,13 +197,28 @@ abstract class CounterStrikeGrenadeEntity(
 
     override fun onAddedToWorld() {
         super.onAddedToWorld()
-        CSGrenadeServerAPI.entity.register(this)
+        this.runOnServer {
+            CounterStrikeGrenadeEntity.serverTrackedEntities.getOrPut(this.level().dimension()) { mutableSetOf() }
+                .add(this)
+        }
+        this.runOnClient {
+            CounterStrikeGrenadeEntity.clientTrackedEntities.add(this)
+        }
     }
 
     override fun onRemovedFromWorld() {
-        CSGrenadeServerAPI.entity.unregister(this.uuid)
         super.onRemovedFromWorld()
+        this.runOnServer {
+            CounterStrikeGrenadeEntity.serverTrackedEntities.get(this.level().dimension())?.run {
+                this.remove(this@CounterStrikeGrenadeEntity)
+            }
+        }
+        this.runOnClient {
+            CounterStrikeGrenadeEntity.clientTrackedEntities.remove(this)
+        }
     }
+
+    override fun canChangeDimensions(): Boolean = false
 
     override fun isOnFire(): Boolean = false
 
@@ -208,7 +230,7 @@ abstract class CounterStrikeGrenadeEntity(
 
     open fun activate() {
         this.runOnServer {
-            this.entityData.set(isActivatedAccessor, true)
+            this.isActivated = true
             ModLogger.debug(this) { "Firing GrenadeActivateEvent" }
             MinecraftForge.EVENT_BUS.post(this.createActivatedEvent(LogicalSide.SERVER))
         }
@@ -258,23 +280,11 @@ abstract class CounterStrikeGrenadeEntity(
 
     open fun onHitBlock(data: GrenadeHitBlock): HitBlockHandleResult {
         ModLogger.info(this) { "Grenade hit block at ${data.hitPoint} (${data.direction})" }
-
-        val event = GrenadeHitBlockEvent.create(LogicalSide.SERVER, this, data)
-        MinecraftForge.EVENT_BUS.post(event)
-
-
         return HitBlockHandleResult()
     }
 
     open fun onHitEntity(data: GrenadeHitEntity): HitEntityHandleResult {
         ModLogger.info(this) { "Grenade hit entity(${data.entity}) at ${data.hitPoint} (${data.direction})" }
-
-        val event = GrenadeHitEntityEvent.create(LogicalSide.SERVER, this, data)
-        MinecraftForge.EVENT_BUS.post(event)
-
-        val message = ServerGrenadeHitEntityMessage.create(this, data)
-        ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
-
         return HitEntityHandleResult()
     }
 

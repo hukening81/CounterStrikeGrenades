@@ -8,6 +8,7 @@ import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.INCENDI
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.IncendiaryConfig
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.IncendiaryEntity
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.incendiary.IncendiaryItem
+import club.pisquad.minecraft.csgrenades.grenades.firegrenade.messages.ServerFireExtinguishMessage
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.messages.ServerFireGrenadeActivatedMessage
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.molotov.MOLOTOV_RESOURCE_KEY
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.molotov.MolotovConfig
@@ -62,6 +63,13 @@ object FireGrenadeRegistryHelper {
             ServerFireGrenadeActivatedMessage::encoder,
             ServerFireGrenadeActivatedMessage::decoder,
             ServerFireGrenadeActivatedMessage::handler,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        )
+        ModPacketHandler.registerMessage(
+            ServerFireExtinguishMessage::class.java,
+            ServerFireExtinguishMessage::encoder,
+            ServerFireExtinguishMessage::decoder,
+            ServerFireExtinguishMessage::handler,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         )
     }

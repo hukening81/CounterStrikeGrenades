@@ -93,6 +93,10 @@ data class VoxelPos(
         return offset.x > 0 && offset.y > 0 && offset.z > 0 && offset.x < 0.5 && offset.y < 0.5 && offset.z < 0.5
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is VoxelPos && other.x == this.x && other.y == this.y && other.z == this.z
+    }
+
     companion object {
         val CENTER_OFFSET = Vec3(0.25, 0.25, 0.25)
 

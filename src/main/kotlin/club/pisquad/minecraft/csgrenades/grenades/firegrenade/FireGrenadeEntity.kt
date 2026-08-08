@@ -7,10 +7,10 @@ import club.pisquad.minecraft.csgrenades.grenades.firegrenade.flame.FlameSpreade
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.messages.ActivateReason
 import club.pisquad.minecraft.csgrenades.grenades.firegrenade.messages.ServerFireGrenadeActivatedMessage
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.SmokeRegionEntity
+import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelPos
 import club.pisquad.minecraft.csgrenades.network.ModPacketHandler
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import club.pisquad.minecraft.csgrenades.physics.GrenadeHitSomething.GrenadeHitBlock
-import club.pisquad.minecraft.csgrenades.physics.GrenadePosition
 import club.pisquad.minecraft.csgrenades.runOnServer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 abstract class FireGrenadeEntity(
@@ -45,18 +46,16 @@ abstract class FireGrenadeEntity(
         val result = super.onHitBlock(data)
         this.runOnServer {
             if (data.direction == Direction.UP) {
-                this.setPos(
-                    GrenadePosition.fromCenter(data.hitPoint).worldPos
-                )
+                this.center = data.hitPoint
                 this.isStopped = true
                 this.activate()
-                val offsetLocation = data.hitPoint.add(0.0, 0.1, 0.0)
-                if (isPositionInSmoke(this.level() as ServerLevel, offsetLocation)) {
+                val offsetLocation = data.hitPoint.add(0.0, 0.05, 0.0)
+                val voxelPos = VoxelPos.containing(offsetLocation)
+                if (SmokeRegionEntity.isVoxelInSmoke(this.level(), voxelPos)) {
                     this.smashInSmoke()
                 } else {
                     this.smashOnGround(offsetLocation)
                 }
-                this.discard()
             }
         }
         return result
@@ -77,7 +76,12 @@ abstract class FireGrenadeEntity(
         }
 
         this.runOnServer {
-            val flameMap = FlameSpreader(location, 3.0, 5).spread(this.level())
+            val flameMap =
+                FlameSpreader(
+                    location,
+                    this.variant.config().firegrenade.spreadRadius.get(),
+                    ceil(this.variant.config().firegrenade.spreadRadius.get() * 2).toInt()
+                ).spread(this.level())
             val lifetime =
                 GrenadeDuration.fromSeconds(this.variant.config().firegrenade.fireDuration.get()).ticks.roundToInt()
             FireRegionEntity.create(
@@ -105,10 +109,9 @@ abstract class FireGrenadeEntity(
             ModPacketHandler.sendMessageToPlayer(this.level() as ServerLevel, this.center, message)
         }
     }
-}
 
-private fun isPositionInSmoke(level: ServerLevel, center: Vec3): Boolean {
-    return SmokeRegionEntity.trackedRegions.filter { it.boundingBox.contains(center) }.filter {
-        it.voxelMap.any() { it.key.contains(center) }
-    }.isNotEmpty()
+    override fun activate() {
+        super.activate()
+        this.discard()
+    }
 }
