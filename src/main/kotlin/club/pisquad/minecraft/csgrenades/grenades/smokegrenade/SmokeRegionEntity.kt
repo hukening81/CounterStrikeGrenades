@@ -10,6 +10,7 @@ import club.pisquad.minecraft.csgrenades.network.serializer.UUIDSerializer
 import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import club.pisquad.minecraft.csgrenades.runOnClient
 import club.pisquad.minecraft.csgrenades.runOnServer
+import club.pisquad.minecraft.csgrenades.utils.easeOutQuart
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -28,9 +29,11 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 private const val PARTICLE_COUNT_PER_VOXEL = 3
+private const val SMOKE_PARTICLE_TRANSITION_TICK = 5
 
 class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level) : Entity(entityType, level),
     IEntityAdditionalSpawnData {
@@ -185,8 +188,13 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
             return
         }
 
-        val getFadeInTimeFromDistance = { distance: Double ->
-            0.5
+        val radius = SmokeGrenadeConfig.spread.smokeWidth.get()
+
+        val getTransitionTimeFromDistance = { distance: Double ->
+            (easeOutQuart((distance/radius).coerceIn(0.0,1.0))*SMOKE_PARTICLE_TRANSITION_TICK).roundToInt()
+
+//            Mth.lerp((distance / radius).coerceIn(0.0, 1.0), 0.0, SMOKE_PARTICLE_TRANSITION_TICK.toDouble())
+//                .roundToInt()
         }
         val createForVoxel = { pos: VoxelPos ->
             buildSet {
@@ -198,16 +206,19 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
                     )
                     val position =
                         pos.worldPos().add(offset)
+                    val transitionTime =
+                        getTransitionTimeFromDistance(position.distanceTo(this@SmokeRegionEntity.position()))
                     val particle = particleEngine.createParticle(
                         variant.particle.get(),
                         position.x,
                         position.y,
                         position.z,
                         0.0, 0.0, 0.0,
-                    )
+                    ) as SmokeGrenadeParticle?
                     if (particle != null) {
-                        particle.lifetime = lifeTime
-                        add(particle as SmokeGrenadeParticle)
+                        particle.lifetime = (lifeTime - transitionTime)
+                        particle.hide(transitionTime)
+                        add(particle)
                     }
                 }
             }
