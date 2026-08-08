@@ -28,9 +28,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.entity.IEntityAdditionalSpawnData
 import net.minecraftforge.network.NetworkHooks
 import java.util.*
-import kotlin.math.roundToInt
 import kotlin.random.Random
-import kotlin.time.Clock
 
 private const val PARTICLE_COUNT_PER_VOXEL = 3
 
@@ -48,7 +46,7 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
     var variant = SmokeGrenadeVariant.T
     var randomSeed = Random.nextLong()
 
-    var activateTime: Long = 0
+    var lifetime: Int = 0
 
     val trackedParticles: MutableSet<SmokeGrenadeParticle> = mutableSetOf()
 
@@ -70,6 +68,15 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
                 this.serverTrackedRegions.get(level.dimension())?.any() {
                     it.boundingBox.intersects(bb) && it.voxelMap.keys.any() { it == voxelPos }
                 }?:false
+            }
+        }
+    }
+
+    override fun tick() {
+        super.tick()
+        this.runOnServer {
+            if (this.tickCount > this.lifetime) {
+                this.discard()
             }
         }
     }
@@ -131,9 +138,8 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun writeSpawnData(buffer: FriendlyByteBuf) {
-        this.activateTime = Clock.System.now().toEpochMilliseconds()
         val data = SpawnData(
-            this.ownerUUID, this.variant, this.voxelMap, this.activateTime, this.randomSeed, this.debugMode
+            this.ownerUUID, this.variant, this.voxelMap, this.randomSeed, this.debugMode, this.lifetime
         )
         buffer.writeByteArray(ProtoBuf.encodeToByteArray(SpawnData.serializer(), data))
     }
@@ -146,9 +152,9 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
         this.variant = data.variant
         this.voxelMap = data.voxelMap
         this.boundingBox = voxelMap.boundingBox
-        this.activateTime = data.activateTime
         this.randomSeed = data.randomSeed
         this.debugMode = data.debugMode
+        this.lifetime = data.lifetime
         this.hasInitialized = true
 
         // When `readSpawnData` is called, it means this entity is loaded/reloaded from the server.
@@ -172,10 +178,8 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
 
     private fun createClientSideParticles() {
         val particleEngine = Minecraft.getInstance().particleEngine
-        val timeSinceStart = (Clock.System.now().toEpochMilliseconds() - this.activateTime).div(1000.0)
         val randomSource = Random(this.randomSeed)
-        val lifeTime =
-            GrenadeDuration.fromSeconds(SmokeGrenadeConfig.duration.get() - timeSinceStart).ticks.roundToInt()
+        val lifeTime = GrenadeDuration.fromSeconds(SmokeGrenadeConfig.duration.get()).wholeTick - this.tickCount
 
         if (lifeTime <= 0) {
             return
@@ -225,14 +229,15 @@ class SmokeRegionEntity(entityType: EntityType<SmokeRegionEntity>, level: Level)
         }
     }
 
+
     @Serializable
     data class SpawnData(
         @Serializable(with = UUIDSerializer::class) val ownerUUID: UUID,
         val variant: SmokeGrenadeVariant,
         val voxelMap: VoxelMap,
-        val activateTime: Long,
         val randomSeed: Long,
-        val debugMode: VoxelDebugMode
+        val debugMode: VoxelDebugMode,
+        val lifetime: Int,
     )
 
 }

@@ -1,6 +1,7 @@
 package club.pisquad.minecraft.csgrenades.grenades.smokegrenade
 
 import club.pisquad.minecraft.csgrenades.grenades.smokegrenade.voxel.VoxelMap
+import club.pisquad.minecraft.csgrenades.physics.GrenadeDuration
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.phys.Vec3
 import java.util.*
@@ -20,6 +21,7 @@ object SmokeGrenadeUtils {
         entity.voxelMap = voxelMap
         entity.boundingBox = voxelMap.boundingBox
         entity.debugMode = SmokeGrenadeOptions.voxelDebugMode
+        entity.lifetime = GrenadeDuration.convertSecondToWholeTick(SmokeGrenadeConfig.duration.get())
         entity.hasInitialized = true
 
         entity.setPos(voxelMap.center)
